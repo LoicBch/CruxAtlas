@@ -1,0 +1,30 @@
+package com.jetbrains.kmm.shared.domain.model
+
+data class Spot(var name : String , var lat: Double, var long: Double)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
