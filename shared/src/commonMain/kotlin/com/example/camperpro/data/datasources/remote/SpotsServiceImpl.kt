@@ -1,10 +1,9 @@
-package com.jetbrains.kmm.shared.data.datasources.remote
+package com.example.camperpro.data.datasources.remote
 
 import com.jetbrains.kmm.shared.data.ResultWrapper
 import com.jetbrains.kmm.shared.data.model.responses.SpotResponse
 import com.jetbrains.kmm.shared.data.safeApiCall
-import com.jetbrains.kmm.shared.domain.model.Spot
-import com.jetbrains.kmm.shared.domain.model.User
+import com.example.camperpro.domain.model.Spot
 import com.jetbrains.kmm.shared.domain.model.Location
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -13,8 +12,8 @@ import toVo
 
 class SpotsServiceImpl(private var client: HttpClient) : SpotsService {
 
-    override suspend fun getSpotsAround(location: Location): ResultWrapper<List<Spot>> {
-        return safeApiCall {
+    override suspend fun getSpotsAround(location: Location): ResultWrapper<List<Spot>> =
+        safeApiCall {
             client.get {
                 url(
                     HttpRoutes.constructUrl(
@@ -24,9 +23,4 @@ class SpotsServiceImpl(private var client: HttpClient) : SpotsService {
                 )
             }.body<SpotResponse>().spots.toVo()
         }
-    }
-
-    override suspend fun getUsers(): List<User> {
-        TODO("Not yet implemented")
-    }
 }

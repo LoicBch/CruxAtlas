@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 50;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -15,6 +15,7 @@
 		CE7818CA2912D61C009C4032 /* MainMapScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7818C92912D61C009C4032 /* MainMapScreen.swift */; };
 		CEC42B7629184C77008577E3 /* MarkerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC42B7529184C77008577E3 /* MarkerView.swift */; };
 		CEC42B8629191B04008577E3 /* MarkerIos.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC42B8529191B04008577E3 /* MarkerIos.swift */; };
+		CEE12B4C2929848F00E70B62 /* SpotSheetScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEE12B4B2929848F00E70B62 /* SpotSheetScreen.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		CE7818C92912D61C009C4032 /* MainMapScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMapScreen.swift; sourceTree = "<group>"; };
 		CEC42B7529184C77008577E3 /* MarkerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkerView.swift; sourceTree = "<group>"; };
 		CEC42B8529191B04008577E3 /* MarkerIos.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarkerIos.swift; sourceTree = "<group>"; };
+		CEE12B4B2929848F00E70B62 /* SpotSheetScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotSheetScreen.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -106,6 +108,7 @@
 				CE7818C72912D600009C4032 /* MainMapViewModel.swift */,
 				CE7818C92912D61C009C4032 /* MainMapScreen.swift */,
 				CEC42B7529184C77008577E3 /* MarkerView.swift */,
+				CEE12B4B2929848F00E70B62 /* SpotSheetScreen.swift */,
 			);
 			path = main_map;
 			sourceTree = "<group>";
@@ -211,6 +214,7 @@
 				CE7818C82912D600009C4032 /* MainMapViewModel.swift in Sources */,
 				CEC42B7629184C77008577E3 /* MarkerView.swift in Sources */,
 				CEC42B8629191B04008577E3 /* MarkerIos.swift in Sources */,
+				CEE12B4C2929848F00E70B62 /* SpotSheetScreen.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

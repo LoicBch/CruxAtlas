@@ -1,7 +1,7 @@
 package com.example.camperproglobal.data.datasources.local
 
 import com.example.camperproglobal.domain.model.dao.SpotDao
-import com.jetbrains.kmm.shared.domain.model.Spot
+import com.example.camperpro.domain.model.Spot
 import com.example.camperpro.database.CamperproDatabase
 
 class SpotDaoDelight(db: CamperproDatabase) : SpotDao {
@@ -14,7 +14,6 @@ class SpotDaoDelight(db: CamperproDatabase) : SpotDao {
 
     override suspend fun getSpotByid(id: Long): Spot? {
 //        mapper
-//        return queries.getSpotById(14).executeAsOneOrNull(). mapper
         TODO("Not yet implemented")
     }
 

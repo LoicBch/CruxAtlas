@@ -12,6 +12,8 @@ import SwiftUI
 struct MarkerView: View {
     
     @State private var showTitle = true
+    
+    
     let title: String
     
     var body: some View {
@@ -33,10 +35,6 @@ struct MarkerView: View {
                 .foregroundColor(.red)
                 .offset(x: 0, y: -5)
             
-        }.onTapGesture {
-            withAnimation(.easeInOut) {
-                showTitle.toggle()
-            }
         }
     }
 }

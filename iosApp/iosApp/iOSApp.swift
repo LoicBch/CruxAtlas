@@ -1,9 +1,14 @@
 import SwiftUI
 import UIKit
-import GoogleMaps
+import shared
 
 @main
 struct iOSApp: App {
+    
+    init() {
+        HelperKt.doInitKoin()
+    }
+    
 	var body: some Scene {
 		WindowGroup {
 			MainMapScreen()

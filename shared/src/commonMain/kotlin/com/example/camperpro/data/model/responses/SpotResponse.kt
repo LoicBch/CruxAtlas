@@ -1,6 +1,6 @@
 package com.jetbrains.kmm.shared.data.model.responses
 
-import com.jetbrains.kmm.shared.data.model.dto.SpotDto
+import com.example.camperpro.data.model.dto.SpotDto
 import kotlinx.serialization.SerialName
 
 @kotlinx.serialization.Serializable

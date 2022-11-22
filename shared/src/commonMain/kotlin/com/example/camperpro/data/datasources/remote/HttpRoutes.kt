@@ -1,4 +1,4 @@
-package com.jetbrains.kmm.shared.data.datasources.remote
+package com.example.camperpro.data.datasources.remote
 
 object HttpRoutes {
 

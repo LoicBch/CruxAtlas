@@ -1,8 +1,23 @@
 plugins {
     id("com.android.application")
     kotlin("android")
-    id("kotlin-kapt")
-    id("dagger.hilt.android.plugin")
+    id("com.google.devtools.ksp") version "1.7.10-1.0.6"
+}
+
+kotlin {
+    sourceSets {
+        debug {
+            kotlin.srcDir("build/generated/ksp/debug/kotlin")
+        }
+        release {
+            kotlin.srcDir("build/generated/ksp/release/kotlin")
+        }
+    }
+}
+
+ksp {
+    arg("compose-destinations.mode", "singlemodule")
+    arg("compose-destinations.moduleName", "androidApp")
 }
 
 android {
@@ -36,23 +51,35 @@ android {
 dependencies {
     implementation(project(":shared"))
 
-    implementation("androidx.multidex:multidex:2.0.1")
-
     //Dependency injection
-    implementation("com.google.dagger:hilt-android:2.42")
-    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
-    kapt("com.google.dagger:hilt-android-compiler:2.42")
-    kapt("androidx.hilt:hilt-compiler:1.0.0")
+    with(Deps.Koin) {
+        implementation(core)
+        implementation(android)
+        implementation(compose)
+    }
 
-    //google maps
-    implementation ("com.google.maps.android:maps-compose:2.5.3")
-    implementation ("com.google.android.gms:play-services-maps:18.1.0")
+    //Google maps
+    with(Deps.Maps) {
+        implementation(compose)
+        implementation(playService)
+    }
 
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.4.1")
-    implementation("androidx.compose.ui:ui:1.2.1")
-    implementation("androidx.compose.ui:ui-tooling:1.2.1")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.2.1")
-    implementation("androidx.compose.foundation:foundation:1.2.1")
-    implementation("androidx.compose.material:material:1.2.1")
-    implementation("androidx.activity:activity-compose:1.5.1")
+    //Animation
+    implementation(Deps.Lottie.compose)
+
+    //Compose
+    with(Deps.Compose) {
+        implementation(viewmodel)
+        implementation(core)
+        implementation(uiTooling)
+        implementation(uiToolingPreview)
+        implementation(foundation)
+        implementation(material)
+        implementation(activity)
+        implementation(navigationObjectArgs)
+        ksp(navigationObjectArgsKsp)
+    }
+
+    //Image
+    implementation(Deps.landscapist)
 }

@@ -1,8 +1,7 @@
-package com.example.camperproglobal.android
+package com.example.camperpro.android
 
 import android.app.Application
-import dagger.hilt.android.HiltAndroidApp
 
-@HiltAndroidApp
 class CamperProApp: Application() {
+
 }

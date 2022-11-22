@@ -18,22 +18,23 @@ extension MainMapScreen {
             
         }
         
-        @Published var mapRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 51.5, longitude: -0.12), span: MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2))
+        @Published var mapRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 45.7, longitude: 4.8), span: MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2))
         @Published private(set) var markers = [MarkerIos]()
         @Published private(set) var mapcenter = Location(latitude: 51.5, longitude: -0.12)
-        
+        @Published var spotSelected : Spot?
         
         func getSpotAroundPos(location: Location){
             
             Task.init {
                         do {
-                            let spots = try await FetchSpotAtLocation(location: location).executeIos()
+                            let spots = try await RFetchSpotAtLocationUseCase().execute(location : location)
+                            //let spots : ResultWrapper<[Spot]> = try await FetchSpotAtLocation(location: location).execute() as! ResultWrapper<[Spot]>
+
                             self.markers = spots.map({ (spot:Spot) -> MarkerIos in
-                                MarkerIos(id : UUID(), name : spot.name, description: spot.name, latitude: spot.lat, longitude: spot.long_)
+                                MarkerIos(id : UUID(), name : spot.name, description: spot.name, latitude: spot.lat, longitude: spot.long_, spot : spot)
                             })
-                            print(spots)
                         } catch {
-                            // .. handle error
+                            // handle error
                         }
                     }
         }

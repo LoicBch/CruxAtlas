@@ -9,18 +9,22 @@
 import SwiftUI
 import shared
 import MapKit
-
- struct MainMapScreen: View {
+ 
+struct MainMapScreen: View {
     
      
     @StateObject private var viewModel = MainMapViewModel()
+    @State private var showingSheet = false
    
      public var body: some View {
         
         ZStack(alignment: .leading){
             Map(coordinateRegion: .constant(viewModel.mapRegion), annotationItems: viewModel.markers){ marker in
                 MapAnnotation(coordinate: marker.coordinate) {
-                    MarkerView(title: marker.name)
+                    MarkerView(title: marker.name).onTapGesture {
+                        showingSheet = true
+                        viewModel.spotSelected = marker.spot
+                    }
                       }
                 }
             Button(action: {
@@ -30,13 +34,16 @@ import MapKit
                 Image("reload")
             }
             .frame(width: 50, height: 50)
-            .background(Color.green)
+            .background(Color(red: 136, green: 175, blue: 255))
             .cornerRadius(25)
             .buttonStyle(.plain)
             .offset(x: 25, y: 300)
-            }
+        }.sheet(isPresented: $showingSheet){
+            SpotSheetScreen(spot: viewModel.spotSelected!)
+        }
         }
     }
+
 
     struct MainMapScreen_Previews: PreviewProvider {
         static var previews: some View {

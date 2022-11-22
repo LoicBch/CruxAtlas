@@ -1,4 +1,4 @@
-package com.jetbrains.kmm.shared.data.model.dto
+package com.example.camperpro.data.model.dto
 
 import com.jetbrains.kmm.shared.data.model.dto.PhotoDto
 import kotlinx.serialization.SerialName

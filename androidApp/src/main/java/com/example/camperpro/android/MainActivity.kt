@@ -16,8 +16,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.camperpro.Greeting
-import com.example.camperproglobal.android.MainMap
+import com.example.camperpro.android.di.viewModelModule
+import com.example.camperpro.android.mainmap.MainMap
+import com.example.camperpro.android.mainmap.MainMapViewModel
+import com.example.camperpro.utils.di.sharedModule
+import com.ramcosta.composedestinations.DestinationsNavHost
+import com.ramcosta.composedestinations.annotation.NavGraph
+import com.ramcosta.composedestinations.navigation.dependency
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.androidx.viewmodel.ext.android.getViewModel
+import org.koin.core.context.startKoin
 
 @Composable
 fun MyApplicationTheme(
@@ -61,13 +70,21 @@ fun MyApplicationTheme(
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        startKoin {
+            androidLogger()
+            androidContext(this@MainActivity)
+            modules(viewModelModule + sharedModule())
+        }
+
         setContent {
             MyApplicationTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    MainMap()
+                    DestinationsNavHost(navGraph = NavGraphs.root)
+//                    Navigation()
                 }
             }
         }

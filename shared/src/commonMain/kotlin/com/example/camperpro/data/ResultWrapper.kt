@@ -3,11 +3,13 @@ package com.jetbrains.kmm.shared.data
 import io.ktor.client.plugins.*
 import io.ktor.utils.io.errors.*
 
-//covariant
+//covar != Swift
 sealed class ResultWrapper<out T> {
-    data class Success<out T>(val value: T?) : ResultWrapper<T>()
+    data class Success<T>(val value: T?) : ResultWrapper<T>()
     data class Failure(val code: Int, val throwable: Throwable) : ResultWrapper<Nothing>()
 }
+
+
 @Throws(IllegalStateException::class)
 suspend fun <T> safeApiCall(apiCall: suspend () -> T): ResultWrapper<T> {
     return try {

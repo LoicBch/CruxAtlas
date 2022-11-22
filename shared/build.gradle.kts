@@ -4,6 +4,7 @@ plugins {
     id("com.android.library")
     kotlin("plugin.serialization") version "1.4.21"
     id("com.squareup.sqldelight")
+    id("kotlin-parcelize")
 }
 
 kotlin {
@@ -22,23 +23,30 @@ kotlin {
             baseName = "shared"
         }
     }
-    
+
     sourceSets {
         val commonMain by getting {
             dependencies {
 
-                //Local model
-                implementation("com.squareup.sqldelight:runtime:1.5.3")
+                //Local
+                implementation(Deps.SqlDelight.runtime)
 
+                //Dependency injection
+                implementation(Deps.Koin.core)
 
                 //Networking
-                implementation("io.ktor:ktor-client-core:2.0.0")
-                implementation("io.ktor:ktor-client-cio:2.0.0")
-                implementation("io.ktor:ktor-client-content-negotiation:2.0.0")
-                implementation("io.ktor:ktor-client-serialization:2.0.0")
-                implementation("io.ktor:ktor-client-logging:2.0.0")
-                implementation("io.ktor:ktor-serialization-kotlinx-json:2.0.0")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
+                with(Deps.Ktor) {
+                    implementation(core)
+                    implementation(clientCio)
+                    implementation(contentNegociation)
+                    implementation(serializationCore)
+                    implementation(serializationJson)
+                    implementation(logging)
+                }
+
+                //Parsing
+                implementation(Deps.Kotlinx.serializationJson)
+
             }
         }
         val commonTest by getting {
@@ -48,7 +56,7 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                implementation("com.squareup.sqldelight:android-driver:1.5.3")
+                implementation(Deps.SqlDelight.androidDriver)
             }
         }
         val androidTest by getting
@@ -57,8 +65,9 @@ kotlin {
         val iosSimulatorArm64Main by getting
         val iosMain by creating {
             dependencies {
-                implementation("com.squareup.sqldelight:native-driver:1.5.3")
-                implementation("io.ktor:ktor-client-darwin:2.0.0")
+                implementation(Deps.SqlDelight.nativeDriver)
+                implementation(Deps.Ktor.darwin)
+                implementation(Deps.landscapist)
             }
             dependsOn(commonMain)
             iosX64Main.dependsOn(this)
@@ -77,8 +86,9 @@ kotlin {
     }
 }
 
+
 sqldelight {
-    database("CamperproDatabase"){
+    database("CamperproDatabase") {
         packageName = "com.example.camperpro.database"
         sourceFolders = listOf("sqldelight")
     }
