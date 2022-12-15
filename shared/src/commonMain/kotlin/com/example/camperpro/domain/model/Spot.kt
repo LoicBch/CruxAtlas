@@ -6,11 +6,9 @@ import com.example.camperpro.utils.CommonParcelize
 @CommonParcelize
 data class Spot(
     var name: String,
-    var description: String,
-    var creatorName: String,
-    var lat: Double,
-    var long: Double,
-    var photos: List<Photo>
+    var city: String,
+    var latitude: Double,
+    var longitude: Double,
 ) : CommonParcelable
 
 

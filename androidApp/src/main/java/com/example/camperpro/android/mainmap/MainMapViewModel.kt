@@ -4,11 +4,9 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.camperproglobal.android.mainmap.MainMapState
+import com.example.camperpro.domain.model.Spot
 import com.example.camperpro.domain.usecases.FetchSpotAtLocationUseCase
 import com.jetbrains.kmm.shared.data.ResultWrapper
-import com.jetbrains.kmm.shared.domain.model.Location
-import com.example.camperpro.domain.model.Spot
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
@@ -21,22 +19,39 @@ class MainMapViewModel(
 
     private val spots = savedStateHandle.getStateFlow("spots", emptyList<Spot>())
     private val loading = savedStateHandle.getStateFlow("loading", false)
+    private val verticalListIsShowing =
+        savedStateHandle.getStateFlow("verticalListIsShowing", false)
+    private val cameraIsOutOfRadiusLimit =
+        savedStateHandle.getStateFlow("cameraIsOutOfRadiusLimit", false)
 
-    val state = combine(spots, loading) { spots, loading ->
+    val state = combine(
+        spots,
+        loading,
+        verticalListIsShowing,
+        cameraIsOutOfRadiusLimit
+    ) { spots, isLoading, verticalListIsShowing, cameraIsOutOfRadiusLimit ->
         MainMapState(
-            spots = spots.map { it.copy(name = it.name.lowercase()) },
-            loading
+            spots = spots, isLoading, verticalListIsShowing, cameraIsOutOfRadiusLimit
         )
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
-        MainMapState(emptyList(), false)
+        MainMapState(
+            emptyList(),
+            isLoading = false,
+            verticalListIsShowing = false,
+            cameraIsOutOfRadiusLimit = false
+        )
     )
 
-    fun getSpotAroundPos(location: Location) {
+    fun showVerticalList() {
+        savedStateHandle["verticalListIsShowing"] = !verticalListIsShowing.value
+    }
+
+    fun getSpots() {
         savedStateHandle["loading"] = true
         viewModelScope.launch {
-            when (val call = fetchSpotAtLocationUseCase(location)) {
+            when (val call = fetchSpotAtLocationUseCase()) {
                 is ResultWrapper.Failure -> {
                     Log.d("TAG", call.throwable.toString())
                     savedStateHandle["loading"] = false
@@ -48,4 +63,5 @@ class MainMapViewModel(
             }
         }
     }
+
 }

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--  Global -->
+    <string name="all">All</string>
+    <string name="reset">Reset</string>
+
+
+    <!--  MainMap Screen  -->
+    <string name="appbar_around_me">Around me</string>
+    <string name="appbar_around_location">Location</string>
+    <string name="appbar_events">Events</string>
+    <string name="appbar_partners">Partners</string>
+    <string name="appbar_menu">More</string>
+    <string name="search_this_area">Search this area</string>
+    <!--  Content description  -->
+    <string name="cd_button_vertical_list">switch to list mode</string>
+    <string name="cd_button_filter">switch to list mode</string>
+    <string name="cd_button_mapstyle">Change map layer</string>
+    <string name="cd_around_me">display places around me</string>
+    <string name="cd_around_location">open screen to search around a location</string>
+    <string name="cd_events">open events screen</string>
+    <string name="cd_partners">open partners screen</string>
+    <string name="cd_menu">open menu</string>
+    <string name="cd_search_here">search at this location</string>
+
+    <!--  Filter Screen  -->
+    <string name="filters_title">Filters</string>
+    <string name="category_subtitle">Category</string>
+    <string name="show_all_places">Show all places</string>
+    <string name="motorhome_brands">Motorhome brands</string>
+    <string name="motorhome_services">Motorhome services</string>
+    <string name="motorhome_accessories">Motorhome accessories</string>
+    <string name="search_details_subtitle">Search details</string>
+    <string name="choose_motorhome_brand">Choose motorhome brand</string>
+    <string name="choose_services_type">Choose services type</string>
+    <string name="choose_accessories_brand">Choose accessories brand</string>
+    <string name="apply_filters">Apply filters</string>
+    <string name="confirm_selection">Confirm selection</string>
+    <string name="search_placeholder">Type to search</string>
+    <string name="last_searched">Last searched</string>
+    <!--  Content description  -->
+    <string name="cd_filter_icon">filter icon</string>
+    <string name="cd_filter_option">open and choose %1$s</string>
+
+    <!--  Around location  -->
+    <string name="around_location_placeholder">City, place, address</string>
+    <!--  Content description  -->
+    <string name="cd_magnifying_glass_icon">magnifying glass icon</string>
+
+    <!--  Menu  -->
+    <string name="menu_travel_tools">Travel tools</string>
+    <string name="menu_travel_checklists">Travel checklists</string>
+    <string name="menu_leveler">Leveler</string>
+    <string name="menu_my_location">My location</string>
+    <string name="menu_app_settings">App settings</string>
+    <!--  Content description  -->
+    <string name="cd_travel_tools">travel tools icon</string>
+    <string name="cd_travel_checklist">travel checklist icon</string>
+    <string name="cd_leveler">leveler icon</string>
+    <string name="cd_my_location">my location icon</string>
+    <string name="cd_app_settings">app settings icon</string>
+
+    <!-- Partner sheet -->
+    <string name="navigate_to_event">Navigate to the event</string>
+    <!--  Content description  -->
+    <string name="cd_arrow_back">go back</string>
+
+
+</resources>

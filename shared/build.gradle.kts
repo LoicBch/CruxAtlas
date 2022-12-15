@@ -102,3 +102,6 @@ android {
         targetSdk = 33
     }
 }
+dependencies {
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+}

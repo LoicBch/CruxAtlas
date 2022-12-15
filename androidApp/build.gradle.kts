@@ -50,6 +50,7 @@ android {
 
 dependencies {
     implementation(project(":shared"))
+    implementation("com.google.android.gms:play-services-location:21.0.1")
 
     //Dependency injection
     with(Deps.Koin) {
@@ -66,6 +67,9 @@ dependencies {
 
     //Animation
     implementation(Deps.Lottie.compose)
+
+    //Persistence
+    implementation(Deps.preferences)
 
     //Compose
     with(Deps.Compose) {

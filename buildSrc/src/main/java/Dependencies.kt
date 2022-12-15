@@ -47,6 +47,7 @@ object Versions {
         const val compose = "5.2.0"
     }
 
+    const val preferences = "1.0.0"
     const val landscapist = "2.1.0"
 
 }
@@ -112,5 +113,6 @@ object Deps {
         const val compose = "com.airbnb.android:lottie-compose:${Versions.Lottie.compose}"
     }
 
+    const val preferences = "androidx.datastore:datastore-preferences:${Versions.preferences}"
     const val landscapist = "com.github.skydoves:landscapist-glide:${Versions.landscapist}"
 }
