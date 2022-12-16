@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,8 +16,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.camperpro.android.LocalDependencyContainer
 import com.example.camperpro.android.NavGraphs
 import com.example.camperpro.android.R
 import com.example.camperpro.android.destinations.*
@@ -27,7 +24,6 @@ import com.ramcosta.composedestinations.navigation.navigate
 import com.ramcosta.composedestinations.navigation.popBackStack
 import com.ramcosta.composedestinations.navigation.popUpTo
 import com.ramcosta.composedestinations.utils.isRouteOnBackStack
-import kotlinx.coroutines.flow.update
 
 @Composable
 fun BottomBar(navController: NavHostController) {
@@ -47,7 +43,7 @@ fun BottomBar(navController: NavHostController) {
 
 //            val appViewModel = LocalDependencyContainer.current.appViewModel
 
-            
+
             BottomBarDestination.values().forEach { destination ->
                 val selected = navController.isRouteOnBackStack(destination.direction)
 
@@ -80,12 +76,16 @@ fun BottomBar(navController: NavHostController) {
                             return@BottomNavigationItem
                         }
 
+
                         navController.navigate(destination.direction) {
                             // Pop up to the root of the graph to
                             // avoid building up a large stack of destinations
                             // on the back stack as users select items
-                            popUpTo(NavGraphs.root) {
-                                saveState = true
+                            if (destination.ordinal == 0) {
+
+                                popUpTo(NavGraphs.root) {
+                                    saveState = true
+                                }
                             }
 
                             // Avoid multiple copies of the same destination when

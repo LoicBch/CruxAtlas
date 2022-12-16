@@ -7,33 +7,33 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.camperpro.android.components.checkPermission
-import com.example.camperpro.android.composables.AppScaffold
-import com.example.camperpro.android.composables.BottomBar
+import com.example.camperpro.android.destinations.SplashScreenDestination
 import com.example.camperpro.android.di.AppDependencyContainer
 import com.example.camperpro.android.di.viewModelModule
+import com.example.camperpro.android.home.HomeScreen
+import com.example.camperpro.android.onBoarding.SplashScreen
 import com.example.camperpro.utils.di.sharedModule
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
-import com.ramcosta.composedestinations.DestinationsNavHost
-import com.ramcosta.composedestinations.animations.rememberAnimatedNavHostEngine
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
-import org.koin.androidx.viewmodel.ext.android.getViewModel
+import org.koin.androidx.compose.getViewModel
 import org.koin.core.context.startKoin
 
 val LocalDependencyContainer = compositionLocalOf<AppDependencyContainer> {
@@ -110,7 +110,6 @@ class MainActivity : ComponentActivity() {
             )
         }
 
-
         startKoin {
             androidLogger()
             androidContext(this@MainActivity)
@@ -120,47 +119,48 @@ class MainActivity : ComponentActivity() {
         setContent {
             MyApplicationTheme {
                 val appViewModel: AppViewModel = getViewModel()
-                appViewModel.saveFilters(LocalContext.current)
-
                 val dependencyContainer = AppDependencyContainer(appViewModel)
 
                 CompositionLocalProvider(LocalDependencyContainer provides dependencyContainer) {
-
-                    val sheetState = appViewModel.bottomSheetIsShowing
-                    val engine = rememberAnimatedNavHostEngine()
-                    val navController = engine.rememberNavController()
-
-                    AppScaffold(
-                        navController = navController,
-                        sheetState = sheetState,
-                        bottomBar = { BottomBar(navController = navController) },
-                        startRoute = NavGraphs.root.startRoute,
-                        topBar = false
-                    ) {
-                        DestinationsNavHost(
-                            modifier = Modifier.padding(it),
-                            engine = engine,
-                            navController = navController,
-                            navGraph = NavGraphs.root,
-                            startRoute = NavGraphs.root.startRoute
-                        )
-                    }
+                    RootNavGraph(navController = rememberNavController())
                 }
             }
         }
     }
-}
 
 
-@Composable
-fun Greeting(text: String) {
-    Text(text = text)
-}
+    @Composable
+    fun RootNavGraph(navController: NavHostController) {
+        NavHost(
+            navController = navController, route = Graphs.ROOT, startDestination =
+            SplashScreenDestination.route
+        ) {
 
-@Preview
-@Composable
-fun DefaultPreview() {
-    MyApplicationTheme {
-        Greeting("Hello, Android!")
+            composable(route = SplashScreenDestination.route) {
+                SplashScreen(navController = navController)
+            }
+
+            composable(route = Graphs.HOME) {
+                HomeScreen()
+            }
+        }
+    }
+
+    object Graphs {
+        const val ROOT = "root_graph"
+        const val HOME = "home_graph"
+    }
+
+    @Composable
+    fun Greeting(text: String) {
+        Text(text = text)
+    }
+
+    @Preview
+    @Composable
+    fun DefaultPreview() {
+        MyApplicationTheme {
+            Greeting("Hello, Android!")
+        }
     }
 }

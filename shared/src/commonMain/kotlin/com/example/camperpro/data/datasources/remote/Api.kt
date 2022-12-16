@@ -1,13 +1,14 @@
 package com.example.camperpro.data.datasources.remote
 
 import com.example.camperpro.data.model.responses.SpotResponse
-import com.example.camperpro.domain.model.Spot
+import com.example.camperpro.data.model.responses.StarterResponse
+import com.example.camperpro.data.repositories.Spots
+import com.example.camperpro.domain.model.*
 import com.jetbrains.kmm.shared.data.ResultWrapper
-import io.ktor.client.statement.*
 
 interface Api {
-    suspend fun getAllSpots(): ResultWrapper<List<Spot>>
-    suspend fun test(): SpotResponse
-
-//    suspend fun getSpotAtLocation(location: Location): ResultWrapper<SpotResponse>
+    suspend fun starter(): ResultWrapper<Starter>
+    suspend fun getSpotAtLocation(location: Location): ResultWrapper<List<Spot>>
+    suspend fun getAds(): ResultWrapper<List<Ad>>
+    suspend fun getPartners(): ResultWrapper<List<Partner>>
 }

@@ -41,7 +41,6 @@ class AppViewModel : ViewModel() {
                 filters[accessories] = false
                 updateFilter(context)
             }
-
         }
     }
 

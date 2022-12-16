@@ -8,7 +8,7 @@ import kotlin.math.sin
 
 class Location(val latitude: Double, val longitude: Double)
 
-fun Location.distanceFromUserLocation(): Double? = Globals.lastKnownLocation?.let {
+fun Location.distanceFromUserLocation(): Double? = Globals.Location.lastKnownLocation?.let {
     this.distanceFrom(it) }
 
 
