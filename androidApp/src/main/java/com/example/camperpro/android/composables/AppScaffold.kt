@@ -1,27 +1,24 @@
 package com.example.camperpro.android.composables
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -29,7 +26,6 @@ import com.example.camperpro.android.*
 import com.example.camperpro.android.R
 import com.example.camperpro.android.destinations.AndroidAppDestination
 import com.example.camperpro.android.ui.theme.AppColor
-import com.example.camperpro.android.ui.theme.Dimensions
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.ramcosta.composedestinations.spec.Route
 
@@ -51,10 +47,14 @@ fun AppScaffold(
             FilterScreen()
         }, scrimColor = Color.Black.copy(alpha = 0.32f)
     ) {
-        Scaffold(topBar = { }, bottomBar = { bottomBar(destination) }, content = content
+        Scaffold(topBar = { }, bottomBar = {
+            if (destination.shouldShowBottomBar) bottomBar(destination)
+        }, content = content
         )
     }
 }
+
+val AndroidAppDestination.shouldShowBottomBar get() = AndroidConstants.ScreensAboveBottomBar.any { this.route == it.route }
 
 @Composable
 fun FilterScreen() {
@@ -102,8 +102,9 @@ fun FilterSearch(filterLabel: String, lastSearches: Set<String>, options: List<S
     LastSearchList(lastSearches) { atLeastOneFilterHasChanged = true }
 
     Text(
-        text = "${stringResource(id = R.string.all)} $filterLabel", fontSize = 10.sp, fontWeight =
-        FontWeight.Black
+        text = "${stringResource(id = R.string.all)} $filterLabel",
+        fontSize = 10.sp,
+        fontWeight = FontWeight.Black
     )
     Divider()
     FilterOptionsList(options) { atLeastOneFilterHasChanged = true }

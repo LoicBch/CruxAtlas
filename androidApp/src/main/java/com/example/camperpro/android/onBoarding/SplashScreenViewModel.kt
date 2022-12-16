@@ -9,11 +9,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class SplashScreenViewModel(private val setupApp: SetupApp) : ViewModel() {
-    val setupIsComplete = MutableStateFlow(false)
 
     init {
         initApp()
     }
+
+    var setupIsComplete =  false
 
     private fun initApp() {
         viewModelScope.launch {
@@ -22,7 +23,7 @@ class SplashScreenViewModel(private val setupApp: SetupApp) : ViewModel() {
                     Log.d("TAG", call.throwable.toString())
                 }
                 is ResultWrapper.Success -> {
-                    setupIsComplete.value = true
+                    setupIsComplete = true
                 }
             }
         }

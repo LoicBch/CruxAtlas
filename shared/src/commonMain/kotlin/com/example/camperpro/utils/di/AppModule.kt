@@ -11,13 +11,16 @@ import io.ktor.serialization.kotlinx.json.*
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import com.example.camperpro.domain.usecases.*
+import com.example.camperpro.utils.KMMCalendar
+import com.example.camperpro.utils.KMMPreference
+import com.example.camperpro.utils.KMMContext
 import com.example.camperpro.utils.Constants
 import io.ktor.client.plugins.*
 import io.ktor.http.*
 import org.koin.core.module.dsl.bind
 import org.koin.dsl.module
 
-fun sharedModule() = listOf(apiDependency, useCasesDependencies, repositoriesDependencies)
+fun sharedModule() = listOf(apiDependency, useCasesDependencies, repositoriesDependencies, utilityDependencies)
 
 
 val apiDependency = module {
@@ -52,5 +55,13 @@ val useCasesDependencies = module {
     factoryOf(::FetchAds)
     factoryOf(::FetchNews)
     factoryOf(::FetchCheckLists)
+    factoryOf(::SetupApp)
 }
+
+val utilityDependencies = module {
+    factoryOf(::KMMCalendar)
+    factoryOf(::KMMPreference)
+}
+
+
 
