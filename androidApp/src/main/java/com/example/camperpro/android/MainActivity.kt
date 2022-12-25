@@ -1,6 +1,7 @@
 package com.example.camperpro.android
 
 import android.Manifest
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,7 +17,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -26,15 +26,19 @@ import androidx.navigation.compose.rememberNavController
 import com.example.camperpro.android.components.checkPermission
 import com.example.camperpro.android.destinations.SplashScreenDestination
 import com.example.camperpro.android.di.AppDependencyContainer
-import com.example.camperpro.android.di.viewModelModule
+import com.example.camperpro.android.di.platformModule
 import com.example.camperpro.android.home.HomeScreen
 import com.example.camperpro.android.onBoarding.SplashScreen
+import com.example.camperpro.utils.Globals
+import com.example.camperpro.utils.LanguageManager
+import com.example.camperpro.utils.LocationManager
 import com.example.camperpro.utils.di.sharedModule
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.context.startKoin
+import org.koin.core.logger.Level
 
 val LocalDependencyContainer = compositionLocalOf<AppDependencyContainer> {
     error("No dependency container provided!")
@@ -83,37 +87,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val locationPermissionRequest = registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions()
-        ) { permissions ->
-            when {
-                permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true -> {
-                    // Precise location access granted.
-                }
-                permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true -> {
-                    // Only approximate location access granted.
-                }
-                else -> {
-                    // No location access granted.
-                }
-            }
-        }
-
-        if (!this.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION) && !this
-                .checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
-        ) {
-            locationPermissionRequest.launch(
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                )
-            )
-        }
+        checkPermission(this)
+        initGlobalsVar(this.applicationContext)
 
         startKoin {
-            androidLogger()
+            androidLogger(level = Level.DEBUG)
             androidContext(this@MainActivity)
-            modules(viewModelModule + sharedModule())
+            modules(sharedModule() + platformModule())
         }
 
         setContent {
@@ -151,16 +131,47 @@ class MainActivity : ComponentActivity() {
         const val HOME = "home_graph"
     }
 
-    @Composable
-    fun Greeting(text: String) {
-        Text(text = text)
+}
+
+private fun initGlobalsVar(context: Context) {
+    Globals.geoLoc.appLanguage = "FR"
+    Globals.geoLoc.deviceLanguage = LanguageManager(context).getDeviceLanguage()
+    Globals.geoLoc.deviceCountry = LanguageManager(context).getDeviceCountry()
+}
+
+fun checkPermission(activity: ComponentActivity) {
+    val locationPermissionRequest = activity.registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        when {
+            permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true -> {
+                LocationManager(activity.applicationContext).startLocationObserver()
+            }
+            permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true -> {
+                LocationManager(activity.applicationContext).startLocationObserver()
+            }
+            else -> {
+                // No location access granted.
+            }
+        }
     }
 
-    @Preview
-    @Composable
-    fun DefaultPreview() {
-        MyApplicationTheme {
-            Greeting("Hello, Android!")
+    if (!activity.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION) && !activity
+            .checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+    ) {
+        locationPermissionRequest.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        )
+    } else {
+        LocationManager(activity.applicationContext).apply {
+            startLocationObserver()
+            getCurrentLocation {
+                Globals.geoLoc.lastSearchedLocation = it
+                Globals.geoLoc.lastKnownLocation = it
+            }
         }
     }
 }

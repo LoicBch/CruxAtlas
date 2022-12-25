@@ -1,0 +1,24 @@
+CREATE TABLE searchEntity (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    searchCategoryKey TEXT NOT NULL,
+    searchLabel TEXT NOT NULL,
+    timeStamp INTEGER NOT NULL
+);
+
+getAllSearchBySearchCategory:
+SELECT *
+FROM searchEntity
+WHERE searchCategoryKey = ?;
+
+insertSearch:
+INSERT OR REPLACE
+INTO searchEntity(
+id,
+searchCategoryKey,
+searchLabel,
+timeStamp
+) VALUES (?,?,?, ?);
+
+deleteSearchBySearchLabel:
+DELETE  FROM searchEntity
+WHERE searchLabel = ?;

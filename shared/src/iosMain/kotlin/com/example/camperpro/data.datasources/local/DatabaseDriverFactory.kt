@@ -6,6 +6,6 @@ import com.squareup.sqldelight.drivers.native.NativeSqliteDriver
 
 actual class DatabaseDriverFactory {
     actual fun createDriver(): SqlDriver {
-        return NativeSqliteDriver(CamperproDatabase.Schema, "spot.db")
+        return NativeSqliteDriver(CamperproDatabase.Schema, "camperpro.db")
     }
 }

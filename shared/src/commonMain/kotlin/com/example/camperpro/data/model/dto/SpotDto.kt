@@ -5,59 +5,41 @@ import kotlinx.serialization.SerialName
 @kotlinx.serialization.Serializable
 data class SpotDto(
 
-    var id: String? = null,
-
-    @SerialName("nom")
+    var id: String = "",
     var name: String = "",
     var distance: String = "",
+    var brands: String = "",
+    var services: String = "",
 
-    @SerialName("concessionnaire")
-    var dealer: String = "",
-
-    @SerialName("loueur")
-    var renter: String? = null,
-    var garage: String? = null,
-
-    @SerialName("boutique")
-    var shop: String? = null,
-
-    @SerialName("marques")
-    var brand: String? = null,
-    var services: String? = null,
-
-    @SerialName("geolocalisable")
-    var geolocatable: String? = null,
+    @SerialName("geolocatible")
+    var geolocatable: String = "",
     var latitude: String = "",
     var longitude: String = "",
+    var address: String = "",
 
-    @SerialName("adresse")
-    var adress: String? = null,
+    @SerialName("postal_code")
+    var postalCode: String = "",
+    var city: String = "",
+    var country: String = "",
 
-    @SerialName("code_postal")
-    var zipcode: String? = null,
-
-    @SerialName("commune")
-    var city: String? = null,
-
-    @SerialName("pays")
-    var country: String? = null,
-
-    @SerialName("pays_iso")
-    var countryIso: String? = null,
+    @SerialName("country_iso")
+    var countryIso: String = "",
+    var phone: String = "",
+    var email: String = "",
+    var website: String = "",
+    var facebook: String = "",
+    var youtube: String? = "",
+    var instagram: String? = "",
+    var twitter: String = "",
+    var premium: String = "",
 
     @SerialName("tel")
-    var phone: String? = null,
-    var email: String? = null,
-
-    @SerialName("site_internet")
-    var website: String? = null,
-    var facebook: String? = null,
-    var youtube: String? = null,
-    var instagram: String? = null,
-    var twitter: String? = null,
-    var premium: String? = null,
+    var phone2: String? = null,
     var photos: List<PhotoDto> = listOf()
 )
 
 @kotlinx.serialization.Serializable
-data class PhotoDto(var photo: String? = null)
+data class PhotoDto(
+    @SerialName("photo")
+    var url: String = ""
+)

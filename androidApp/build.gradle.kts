@@ -59,6 +59,7 @@ dependencies {
         implementation(compose)
     }
 
+
     //Google maps
     with(Deps.Maps) {
         implementation(compose)
@@ -81,6 +82,7 @@ dependencies {
         implementation(material)
         implementation(activity)
         implementation(navigationObjectArgs)
+        implementation(accompanist)
         ksp(navigationObjectArgsKsp)
     }
 

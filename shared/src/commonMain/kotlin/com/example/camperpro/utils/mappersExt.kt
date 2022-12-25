@@ -1,42 +1,76 @@
-import com.example.camperpro.data.model.dto.AdDto
-import com.example.camperpro.data.model.dto.MenuLinkDto
-import com.example.camperpro.data.model.dto.SpotDto
+import com.example.camperpro.data.model.dto.*
 import com.example.camperpro.data.model.responses.StarterResponse
-import com.example.camperpro.domain.model.Ad
-import com.example.camperpro.domain.model.MenuLink
-import com.example.camperpro.domain.model.Spot
-import com.example.camperpro.domain.model.Starter
+import com.example.camperpro.domain.model.*
+import com.example.camperpro.utils.toBool
+import database.SearchEntity
 import kotlin.jvm.JvmName
 
 //Data to domain layer
 fun SpotDto.toVo() =
-    Spot(name = this.name, city = this.city!!, this.latitude.toDouble(), this.longitude.toDouble())
+    Spot(
+        id,
+        name,
+        distance,
+        brands.split(","),
+        services.split(","),
+        address,
+        postalCode,
+        countryIso,
+        phone,
+        email,
+        website,
+        facebook,
+        "youtube",
+        "instagram",
+        twitter,
+        premium.toBool(),
+        city,
+        latitude.toDouble(),
+        longitude.toDouble(),
+        photos.toVo()
+    )
 
-fun List<SpotDto>.toVo() = this.map { it.toVo() }
+fun PhotoDto.toVo() = Photo(url)
 
-fun AdDto.toVo() = Ad(this.type, this.url, this.click)
+@JvmName("toPhotoVo")
+fun List<PhotoDto>.toVo() = map { it.toVo() }
+fun List<SpotDto>.toVo() = map { it.toVo() }
+fun AdDto.toVo() = Ad(type, url, click)
 
 @JvmName("toAdVo")
-fun List<AdDto>.toVo() = this.map { it.toVo() }
+fun List<AdDto>.toVo() = map { it.toVo() }
 
 fun StarterResponse.toVo() = Starter(
-    this.lists.services.map { it.label },
-    this.lists.brands.map { it.name },
-    this.lists.menuLinks.toVo()
+    lists.services.map { Pair(it.id, it.label) },
+    lists.brands.map { Pair(it.id, it.name) },
+    lists.menuLinks.toVo()
 )
 
-fun MenuLinkDto.toVo() = MenuLink(this.name, this.subtitle, this.icon, this.url, this.urlstat)
+fun MenuLinkDto.toVo() = MenuLink(name, subtitle, icon, url, urlstat)
 
 @JvmName("toMenuLinkVo")
-fun List<MenuLinkDto>.toVo() = this.map { it.toVo() }
+fun List<MenuLinkDto>.toVo() = map { it.toVo() }
+
 
 //Domain to data layer
 fun Spot.toDto() = SpotDto(
-    name = this.name, latitude = this.latitude.toString(), longitude = this.longitude.toString()
+    name = name, latitude = latitude.toString(), longitude = longitude.toString()
 )
 
-fun List<Spot>.toDto() = this.map { it.toDto() }
+fun List<Spot>.toDto() = map { it.toDto() }
 
+//SQL DELIGHT
+fun SearchEntity.toDto() = SearchDto(id, searchCategoryKey, searchLabel, timeStamp)
+fun Search.toDto() = SearchDto(id, categoryKey, searchLabel, timeStamp)
+fun SearchDto.toVo() = Search(id, categoryKey, searchLabel, timeStamp)
 
+@JvmName("toSearchDtoFromEntity")
+fun List<SearchEntity>.toDto() = map { it.toDto() }
+
+@JvmName("toSearchDto")
+fun List<Search>.toDto() = map { it.toDto() }
+
+@JvmName("toSearchVo")
+fun List<SearchDto>.toVo() = map { it.toVo() }
 
 

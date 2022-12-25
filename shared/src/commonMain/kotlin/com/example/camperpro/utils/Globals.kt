@@ -6,8 +6,9 @@ import kotlinx.coroutines.Job
 
 // to replace by class with dependecy injection if this get to messy
 object Globals {
-    object Location {
-        var lastKnownLocation: com.example.camperpro.domain.model.Location? = null
+    object geoLoc {
+        var lastKnownLocation: Location? = null
+        var lastSearchedLocation: Location? = null
         var locationObserver: Job? = null
         lateinit var deviceCountry: String
         lateinit var deviceLanguage: String
@@ -15,15 +16,20 @@ object Globals {
     }
 
     object filters {
-        lateinit var brands: List<String>
-        lateinit var services: List<String>
-        lateinit var acessories: List<String>
+        lateinit var brands: List<Pair<String, String>>
+        lateinit var services: List<Pair<String, String>>
     }
 
     object internet {
         var isConnected: Boolean = false
     }
 
+    var currentBottomSheetOption: BottomSheetOption = BottomSheetOption.FILTER
     var lastTimeStarterWasLoaded: Int = 0
     lateinit var menuLinks: List<MenuLink>
+}
+
+
+enum class BottomSheetOption{
+    FILTER, SORT, MAPLAYER
 }

@@ -14,7 +14,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.camperpro.android.ui.theme.AppColor
 import com.example.camperpro.android.ui.theme.Dimensions
 
@@ -25,19 +27,18 @@ fun AppButton(isActive: Boolean, onClick: () -> Unit, modifier: Modifier, @Strin
         modifier = modifier
             .fillMaxWidth()
             .height(Dimensions.buttonHeight)
-            .padding(horizontal = 16.dp)
             .clip(RoundedCornerShape(Dimensions.radiusAppButton)),
         onClick = onClick,
         enabled = isActive,
         colors = ButtonDefaults.buttonColors(
             backgroundColor = if (isActive) AppColor
-                .unSelectedFilterOption else AppColor.BlueCamperPro
+                .unSelectedFilterOption else AppColor.Secondary
         )
     ) {
         Text(
             modifier = Modifier.align(Alignment.CenterVertically), text = stringResource(
                 id = textRes
-            ), color = Color.White
+            ), color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.W700
         )
     }
 

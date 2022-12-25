@@ -16,6 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.camperpro.android.AndroidConstants
 import com.example.camperpro.android.NavGraphs
 import com.example.camperpro.android.R
 import com.example.camperpro.android.destinations.*
@@ -24,6 +25,8 @@ import com.ramcosta.composedestinations.navigation.navigate
 import com.ramcosta.composedestinations.navigation.popBackStack
 import com.ramcosta.composedestinations.navigation.popUpTo
 import com.ramcosta.composedestinations.utils.isRouteOnBackStack
+
+val AndroidAppDestination.shouldShowBottomBar get() = AndroidConstants.ScreensAboveBottomBar.all{ this.route == it.route }
 
 @Composable
 fun BottomBar(navController: NavHostController) {
@@ -140,13 +143,6 @@ enum class BottomBarDestination(
         iconUnselected = R.drawable.around_location,
         label = R.string.appbar_around_location,
         contentDescription = R.string.cd_around_location
-    ),
-    Events(
-        direction = EventsScreenDestination,
-        iconSelected = R.drawable.events_selected,
-        iconUnselected = R.drawable.events,
-        label = R.string.appbar_events,
-        contentDescription = R.string.cd_events
     ),
     Partners(
         direction = PartnersScreenDestination,

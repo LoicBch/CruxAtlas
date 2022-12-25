@@ -11,10 +11,10 @@ actual class LocationManager actual constructor(private val context: Any?) {
 
     @SuppressLint("MissingPermission")
     actual fun startLocationObserver() {
-        Globals.Location.locationObserver = CoroutineScope(Dispatchers.Default).launch {
+        Globals.geoLoc.locationObserver = CoroutineScope(Dispatchers.Default).launch {
             while (isActive) {
                 this@LocationManager.getCurrentLocation {
-                    Globals.Location.lastKnownLocation = it
+                    Globals.geoLoc.lastKnownLocation = it
                 }
                 delay(Constants.LOCATION_UPDATE_RATE)
             }
@@ -22,7 +22,7 @@ actual class LocationManager actual constructor(private val context: Any?) {
     }
 
     actual fun stopLocationObserver() {
-        val observer = Globals.Location.locationObserver
+        val observer = Globals.geoLoc.locationObserver
         if (observer?.isActive == true) {
             observer.cancel()
         }

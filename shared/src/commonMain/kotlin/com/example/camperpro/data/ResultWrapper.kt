@@ -1,5 +1,6 @@
 package com.jetbrains.kmm.shared.data
 
+import io.ktor.client.call.*
 import io.ktor.client.plugins.*
 import io.ktor.utils.io.errors.*
 

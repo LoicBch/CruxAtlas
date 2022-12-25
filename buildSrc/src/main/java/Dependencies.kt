@@ -10,6 +10,7 @@ object Versions {
         const val activity = "1.6.1"
         const val navigationObjectArgs = "1.7.27-beta"
         const val navigationObjectArgsKsp = "1.7.27-beta"
+        const val accompanist = "0.28.0"
     }
 
     object Kotlinx {
@@ -47,6 +48,7 @@ object Versions {
         const val compose = "5.2.0"
     }
 
+    const val napier = "2.6.1"
     const val preferences = "1.0.0"
     const val landscapist = "2.1.0"
 
@@ -74,6 +76,7 @@ object Deps {
             "io.github.raamcosta.compose-destinations:animations-core:${Versions.Compose.navigationObjectArgs}"
         const val navigationObjectArgsKsp =
             "io.github.raamcosta.compose-destinations:ksp:${Versions.Compose.navigationObjectArgsKsp}"
+        const val accompanist = "com.google.accompanist:accompanist-pager:${Versions.Compose.accompanist}"
     }
 
     object Maps {
@@ -113,6 +116,7 @@ object Deps {
         const val compose = "com.airbnb.android:lottie-compose:${Versions.Lottie.compose}"
     }
 
+    const val napier = "io.github.aakira:napier:${Versions.napier}"
     const val preferences = "androidx.datastore:datastore-preferences:${Versions.preferences}"
     const val landscapist = "com.github.skydoves:landscapist-glide:${Versions.landscapist}"
 }

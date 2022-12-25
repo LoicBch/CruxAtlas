@@ -7,6 +7,6 @@ import com.squareup.sqldelight.db.SqlDriver
 
 actual class DatabaseDriverFactory(private val context: Context) {
     actual fun createDriver(): SqlDriver{
-        return AndroidSqliteDriver(CamperproDatabase.Schema, context, "spot.db")
+        return AndroidSqliteDriver(CamperproDatabase.Schema, context, "camperpro.db")
     }
 }

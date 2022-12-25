@@ -9,8 +9,8 @@ import org.koin.core.component.inject
 
 class FetchSpotAtLocationUseCase(private val spots: Spots) : IBaseUsecase {
 
-    suspend operator fun invoke(): ResultWrapper<List<Spot>> {
-        return spots.atLocation(Location(23.3, 23.3))
+    suspend operator fun invoke(location: Location): ResultWrapper<List<Spot>> {
+        return spots.atLocation(location)
     }
 
     suspend fun executeIos(): List<Spot> {

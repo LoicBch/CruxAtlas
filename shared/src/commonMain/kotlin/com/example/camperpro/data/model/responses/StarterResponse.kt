@@ -39,14 +39,4 @@ data class Service(
     val rank: String
 )
 
-@kotlinx.serialization.Serializable
-data class MenuLink(
-    val id: Long,
-    val name: String,
-    val subtitle: String,
-    val icon: String,
-    val url: String,
-    val urlstat: String
-)
-
 

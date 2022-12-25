@@ -1,10 +1,12 @@
 package com.example.camperpro.android.mainmap
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.camperpro.domain.model.Ad
+import com.example.camperpro.domain.model.Location
 import com.example.camperpro.domain.model.Spot
+import com.example.camperpro.domain.usecases.FetchAds
 import com.example.camperpro.domain.usecases.FetchSpotAtLocationUseCase
 import com.jetbrains.kmm.shared.data.ResultWrapper
 import kotlinx.coroutines.flow.SharingStarted
@@ -12,12 +14,15 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+
 class MainMapViewModel(
     private val savedStateHandle: SavedStateHandle,
-    private val fetchSpotAtLocationUseCase: FetchSpotAtLocationUseCase
+    private val fetchSpotAtLocationUseCase: FetchSpotAtLocationUseCase,
+    private val fetchAds: FetchAds
 ) : ViewModel() {
 
     private val spots = savedStateHandle.getStateFlow("spots", emptyList<Spot>())
+    private val ads = savedStateHandle.getStateFlow("ads", emptyList<Ad>())
     private val loading = savedStateHandle.getStateFlow("loading", false)
     private val verticalListIsShowing =
         savedStateHandle.getStateFlow("verticalListIsShowing", false)
@@ -25,18 +30,14 @@ class MainMapViewModel(
         savedStateHandle.getStateFlow("cameraIsOutOfRadiusLimit", false)
 
     val state = combine(
-        spots,
-        loading,
-        verticalListIsShowing,
-        cameraIsOutOfRadiusLimit
-    ) { spots, isLoading, verticalListIsShowing, cameraIsOutOfRadiusLimit ->
+        spots, ads, loading, verticalListIsShowing, cameraIsOutOfRadiusLimit
+    ) { spots, ads, isLoading, verticalListIsShowing, cameraIsOutOfRadiusLimit ->
         MainMapState(
-            spots = spots, isLoading, verticalListIsShowing, cameraIsOutOfRadiusLimit
+            spots = spots, ads = ads, isLoading, verticalListIsShowing, cameraIsOutOfRadiusLimit
         )
     }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        MainMapState(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), MainMapState(
+            emptyList(),
             emptyList(),
             isLoading = false,
             verticalListIsShowing = false,
@@ -44,22 +45,30 @@ class MainMapViewModel(
         )
     )
 
-    fun showVerticalList() {
+    fun swapVerticalList() {
         savedStateHandle["verticalListIsShowing"] = !verticalListIsShowing.value
     }
 
-    fun getSpots() {
+    fun showSpots(location: Location) {
         savedStateHandle["loading"] = true
         viewModelScope.launch {
-            when (val call = fetchSpotAtLocationUseCase()) {
+            when (val call = fetchSpotAtLocationUseCase(location)) {
                 is ResultWrapper.Failure -> {
-                    Log.d("TAG", call.throwable.toString())
                     savedStateHandle["loading"] = false
                 }
                 is ResultWrapper.Success -> {
                     savedStateHandle["spots"] = call.value
                     savedStateHandle["loading"] = false
                 }
+            }
+        }
+    }
+
+    fun getAds() {
+        viewModelScope.launch {
+            when (val call = fetchAds()) {
+                is ResultWrapper.Failure -> {}
+                is ResultWrapper.Success -> savedStateHandle["ads"] = call.value
             }
         }
     }

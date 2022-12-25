@@ -5,6 +5,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
 object AppColor {
+    val Primary = Color(0xFF556DD1)
+    val Secondary = Color(0xFF6750A4)
+    val Tertiary = Color(0xFF42556E)
     val SelectedItem = Color(0xFF165DD7)
     val BlueCamperPro = Color(0xFF165DD7)
     val unSelectedFilter = Color(0xFF8A8FAB)
@@ -12,7 +15,15 @@ object AppColor {
     val unSelectedFilterOption = Color(0xFFE0E0E0)
     val selectedFilterOption = unSelectedFilter
     val Black = Color(0xFF000000)
+    val neutralText = Color(0xFF787579)
+    val outlineText = Color(0xFFCAC4D0)
 }
+
+object M3 {
+
+}
+
+
 
 val Purple200 = Color(0xFFBB86FC)
 val Purple500 = Color(0xFF6200EE)

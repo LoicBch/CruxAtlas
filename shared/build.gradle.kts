@@ -44,6 +44,9 @@ kotlin {
                     implementation(logging)
                 }
 
+//                Logging
+                implementation(Deps.napier)
+
                 //Parsing
                 implementation(Deps.Kotlinx.serializationJson)
 
