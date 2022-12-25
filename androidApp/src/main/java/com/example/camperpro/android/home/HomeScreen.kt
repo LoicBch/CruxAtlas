@@ -19,11 +19,8 @@ fun HomeScreen(navController: NavHostController = rememberNavController()) {
     val sheetState = LocalDependencyContainer.current.appViewModel.bottomSheetIsShowing
 
     AppScaffold(
-        navController = navController,
         sheetState = sheetState,
         bottomBar = { BottomBar(navController = navController) },
-        startRoute = NavGraphs.root.startRoute,
-        topBar = false
     ) {
         DestinationsNavHost(
             modifier = Modifier.padding(it),

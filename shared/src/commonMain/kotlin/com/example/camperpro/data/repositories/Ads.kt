@@ -7,6 +7,6 @@ import com.jetbrains.kmm.shared.data.ResultWrapper
 
 class Ads(private var camperProApi: Api) : AdRepository {
     override suspend fun all(): ResultWrapper<List<Ad>> {
-        TODO("Not yet implemented")
+        return camperProApi.getAds()
     }
 }

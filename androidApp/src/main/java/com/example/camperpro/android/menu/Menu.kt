@@ -183,7 +183,6 @@ fun PubContainer(pub: MenuLink) {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp)
-                .background(Color.Yellow)
                 .padding(vertical = 25.dp),
             imageModel = { scope.launch { pub.url } }, // loading a network image using an URL.
             imageOptions = ImageOptions(

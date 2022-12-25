@@ -78,11 +78,6 @@ fun MyApplicationTheme(
 }
 
 class MainActivity : ComponentActivity() {
-    @OptIn(
-        ExperimentalAnimationApi::class,
-        ExperimentalMaterialNavigationApi::class,
-        ExperimentalMaterialApi::class
-    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

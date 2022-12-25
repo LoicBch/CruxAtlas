@@ -59,9 +59,11 @@ import org.koin.androidx.compose.getViewModel
 @Composable
 fun MainMap(navigator: DestinationsNavigator, viewModel: MainMapViewModel = getViewModel()) {
     val state by viewModel.state.collectAsState()
+
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(LatLng(45.7, 4.8), 10f)
     }
+
     val spotsLoaded = remember {
         mutableStateOf(false)
     }
@@ -91,8 +93,6 @@ fun MainMap(navigator: DestinationsNavigator, viewModel: MainMapViewModel = getV
     //            easing = LinearEasing,
     //        )
     //    )
-
-    Log.d("Nav", "mainMapScreen is recomposed")
 
     Box {
         GoogleMap(
