@@ -13,6 +13,7 @@ fun Double.toDMS(): String {
     return "$degrees° $minutes' $seconds''"
 }
 
+
 val Spot.fullLocation get() = "$address, $city, $postalCode"
 val Spot.fullGeolocalisation
     get() =

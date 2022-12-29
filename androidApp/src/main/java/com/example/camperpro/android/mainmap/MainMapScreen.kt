@@ -2,7 +2,6 @@
 
 package com.example.camperpro.android.mainmap
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -34,20 +35,24 @@ import com.example.camperpro.android.LocalDependencyContainer
 import com.example.camperpro.android.MyApplicationTheme
 import com.example.camperpro.android.R
 import com.example.camperpro.android.components.locationVo
+import com.example.camperpro.android.destinations.AroundLocationScreenDestination
 import com.example.camperpro.android.destinations.SpotSheetDestination
 import com.example.camperpro.android.ui.theme.AppColor
 import com.example.camperpro.android.ui.theme.Dimensions
-import com.example.camperpro.domain.model.Ad
-import com.example.camperpro.domain.model.Spot
-import com.example.camperpro.domain.model.isAroundLastSearchedLocation
+import com.example.camperpro.domain.model.*
 import com.example.camperpro.utils.BottomSheetOption
 import com.example.camperpro.utils.Globals
+import com.example.camperpro.utils.LocationClient
+import com.example.camperpro.utils.hasLocationPermission
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.result.NavResult
+import com.ramcosta.composedestinations.result.ResultRecipient
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.launch
@@ -57,42 +62,64 @@ import org.koin.androidx.compose.getViewModel
 @RootNavGraph(start = true)
 @Destination
 @Composable
-fun MainMap(navigator: DestinationsNavigator, viewModel: MainMapViewModel = getViewModel()) {
+fun MainMap(
+    locationSearch: ResultRecipient<AroundLocationScreenDestination, Place>,
+    navigator: DestinationsNavigator, viewModel: MainMapViewModel = getViewModel()
+) {
     val state by viewModel.state.collectAsState()
+    val locationSearched by viewModel.placeSearched.collectAsState()
+    val context = LocalContext.current
 
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(LatLng(45.7, 4.8), 10f)
+        position = if (context.hasLocationPermission) {
+            CameraPosition.fromLatLngZoom(
+                LatLng(
+                    Globals.geoLoc.lastKnownLocation?.latitude!!,
+                    Globals.geoLoc.lastKnownLocation?.longitude!!
+                ), 10f
+            )
+        } else {
+            CameraPosition.fromLatLngZoom(LatLng(45.87, 2.50), 10f)
+        }
     }
-
-    val spotsLoaded = remember {
-        mutableStateOf(false)
-    }
-
-    val scope = rememberCoroutineScope()
 
     val appViewModel = LocalDependencyContainer.current.appViewModel
-    val refreshSpotsAroundMe = appViewModel.userClickedAroundMe.collectAsState()
 
     LaunchedEffect(true) {
         viewModel.getAds()
     }
 
-    //    if (refreshSpotsAroundMe.value) {
-    //        viewModel.getSpots(cameraPositionState.locationVo)
-    //    }
+    LaunchedEffect(appViewModel.loadAroundMeIsPressed) {
+        appViewModel.loadAroundMeIsPressed.collect {
+            if (it) {
+                if (context.hasLocationPermission) {
+                    cameraPositionState.move(
+                        CameraUpdateFactory.newLatLng(
+                            LatLng(
+                                Globals.geoLoc.lastKnownLocation?.latitude!!,
+                                Globals.geoLoc.lastKnownLocation?.longitude!!
+                            )
+                        )
+                    )
+                    LocationClient(context).getCurrentLocation { location ->
+                        viewModel.showSpots(location)
+                    }
+                } else {
+                    // TODO: display missing gps modal
+                }
+            }
+        }
 
-    //    if (!spotsLoaded.value) {
-    //        Globals.geoLoc.lastKnownLocation?.let { viewModel.getSpots(it) }
-    //        spotsLoaded.value = true
-    //    }
+    }
 
-    //    val imageAlpha: Float by animateFloatAsState(
-    //        targetValue = if (state.isLoading) 1f else 0f,
-    //        animationSpec = tween(
-    //            durationMillis = 500,
-    //            easing = LinearEasing,
-    //        )
-    //    )
+    locationSearch.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {}
+            is NavResult.Value -> {
+               viewModel.showSpotsAroundPlace(result.value)
+            }
+        }
+    }
 
     Box {
         GoogleMap(
@@ -118,17 +145,15 @@ fun MainMap(navigator: DestinationsNavigator, viewModel: MainMapViewModel = getV
             Column(modifier = Modifier.align(Alignment.BottomCenter)) {
                 if (!cameraPositionState.isMoving && !cameraPositionState.locationVo.isAroundLastSearchedLocation) {
                     SearchHereButton(onClick = {
-                        scope.launch {
-                            viewModel.showSpots(cameraPositionState.locationVo)
-                        }
+                        viewModel.showSpots(cameraPositionState.locationVo)
                     })
                 }
+
+                if (locationSearched.isNotEmpty()) LocationSearchContainer(locationSearched)
                 if (state.spots.isNotEmpty()) HorizontalSpotsList(spots = state.spots)
                 if (state.ads.isNotEmpty()) MainMapAdContainer(state.ads)
             }
         }
-
-
 
         if (state.verticalListIsShowing) VerticalSpotsList(spots = state.spots)
 
@@ -153,9 +178,41 @@ fun MainMap(navigator: DestinationsNavigator, viewModel: MainMapViewModel = getV
 }
 
 @Composable
-fun SearchHereButton(onClick: () -> Unit) {
+fun LocationSearchContainer(label: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(44.dp)
+            .padding(bottom = 15.dp, start = 16.dp, end = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            modifier = Modifier.padding(start = 14.dp),
+            painter = painterResource(id = R.drawable.pin_here),
+            contentDescription = "",
+            tint = AppColor.Primary
+        )
 
-    val scope = rememberCoroutineScope()
+        Text(
+            modifier = Modifier.padding(start = 22.dp),
+            text = label,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.W500,
+            color = Color.Black
+        )
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Icon(
+            modifier = Modifier.padding(end = 15.dp),
+            imageVector = Icons.Filled.Close,
+            contentDescription = ""
+        )
+    }
+}
+
+@Composable
+fun SearchHereButton(onClick: () -> Unit) {
 
     Row(modifier = Modifier.fillMaxWidth()) {
 
@@ -165,7 +222,7 @@ fun SearchHereButton(onClick: () -> Unit) {
                 .padding(vertical = 15.dp)
                 .height(40.dp),
             shape = RoundedCornerShape(Dimensions.radiusAppButton),
-            onClick = { scope.launch { onClick() } },
+            onClick = { onClick() },
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = AppColor.Secondary
             )

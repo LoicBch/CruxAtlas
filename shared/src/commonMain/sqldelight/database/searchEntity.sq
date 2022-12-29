@@ -5,7 +5,7 @@ CREATE TABLE searchEntity (
     timeStamp INTEGER NOT NULL
 );
 
-getAllSearchBySearchCategory:
+getAllSearchsOfCategory:
 SELECT *
 FROM searchEntity
 WHERE searchCategoryKey = ?;

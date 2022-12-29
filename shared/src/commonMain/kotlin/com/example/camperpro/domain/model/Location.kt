@@ -1,10 +1,13 @@
 package com.example.camperpro.domain.model
 
+import com.example.camperpro.utils.CommonParcelable
+import com.example.camperpro.utils.CommonParcelize
 import com.example.camperpro.utils.Constants
 import com.example.camperpro.utils.Globals
 import kotlin.math.*
 
-class Location(val latitude: Double, val longitude: Double)
+@CommonParcelize
+class Location(val latitude: Double, val longitude: Double) : CommonParcelable
 
 // TODO: check if location is null
 val Location.distanceFromUserLocation: Double?

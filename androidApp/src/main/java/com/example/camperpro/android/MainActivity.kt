@@ -1,12 +1,13 @@
 package com.example.camperpro.android
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -19,21 +20,20 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.camperpro.android.components.checkPermission
 import com.example.camperpro.android.destinations.SplashScreenDestination
 import com.example.camperpro.android.di.AppDependencyContainer
 import com.example.camperpro.android.di.platformModule
 import com.example.camperpro.android.home.HomeScreen
 import com.example.camperpro.android.onBoarding.SplashScreen
-import com.example.camperpro.utils.Globals
-import com.example.camperpro.utils.LanguageManager
-import com.example.camperpro.utils.LocationManager
+import com.example.camperpro.utils.*
 import com.example.camperpro.utils.di.sharedModule
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.compose.getViewModel
@@ -82,14 +82,15 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        checkPermission(this)
-        initGlobalsVar(this.applicationContext)
-
         startKoin {
             androidLogger(level = Level.DEBUG)
             androidContext(this@MainActivity)
             modules(sharedModule() + platformModule())
         }
+
+        startNetworkObserver(this)
+        checkPermission(this)
+        initGlobalsVar(this.applicationContext)
 
         setContent {
             MyApplicationTheme {
@@ -101,6 +102,13 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    //    mettre dans un networkmanager
+    private fun startNetworkObserver(activity: Activity) {
+        NetworkConnectivityObserver(activity.applicationContext).observe().onEach {
+            Globals.network.status = it
+        }.launchIn(lifecycleScope)
     }
 
 
@@ -126,6 +134,20 @@ class MainActivity : ComponentActivity() {
         const val HOME = "home_graph"
     }
 
+    override fun onResume() {
+        super.onResume()
+        startService(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopService(this)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        stopService(this)
+    }
 }
 
 private fun initGlobalsVar(context: Context) {
@@ -134,16 +156,18 @@ private fun initGlobalsVar(context: Context) {
     Globals.geoLoc.deviceCountry = LanguageManager(context).getDeviceCountry()
 }
 
+
+//Placer ca dans le Splash
 fun checkPermission(activity: ComponentActivity) {
     val locationPermissionRequest = activity.registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         when {
             permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true -> {
-                LocationManager(activity.applicationContext).startLocationObserver()
+                LocationClient(activity.applicationContext).startLocationObserver()
             }
             permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true -> {
-                LocationManager(activity.applicationContext).startLocationObserver()
+                LocationClient(activity.applicationContext).startLocationObserver()
             }
             else -> {
                 // No location access granted.
@@ -151,9 +175,7 @@ fun checkPermission(activity: ComponentActivity) {
         }
     }
 
-    if (!activity.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION) && !activity
-            .checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
-    ) {
+    if (!activity.hasLocationPermission) {
         locationPermissionRequest.launch(
             arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
@@ -161,12 +183,20 @@ fun checkPermission(activity: ComponentActivity) {
             )
         )
     } else {
-        LocationManager(activity.applicationContext).apply {
-            startLocationObserver()
-            getCurrentLocation {
-                Globals.geoLoc.lastSearchedLocation = it
-                Globals.geoLoc.lastKnownLocation = it
-            }
-        }
+        startService(activity)
+    }
+}
+
+private fun startService(activity: Activity) {
+    Intent(activity.applicationContext, LocationService::class.java).apply {
+        action = LocationService.ACTION_START
+        activity.startService(this)
+    }
+}
+
+private fun stopService(activity: Activity) {
+    Intent(activity.applicationContext, LocationService::class.java).apply {
+        action = LocationService.ACTION_STOP
+        activity.stopService(this)
     }
 }

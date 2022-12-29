@@ -3,6 +3,7 @@ package com.example.camperpro.data.datasources.remote
 import com.example.camperpro.data.model.responses.AdResponse
 import com.example.camperpro.data.model.responses.SpotResponse
 import com.example.camperpro.data.model.responses.StarterResponse
+import com.example.camperpro.data.model.responses.SuggestionResponse
 import com.example.camperpro.domain.model.*
 import com.example.camperpro.utils.Constants
 import com.example.camperpro.utils.Globals
@@ -14,6 +15,7 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import toPairList
 import toVo
 
 fun URLBuilder.addAppContext() {
@@ -54,7 +56,18 @@ class CamperProApi(private var client: HttpClient) : Api {
         }
     }
 
+    override suspend fun getLocationSuggestions(input: String): ResultWrapper<List<Pair<String, Location>>> {
+        return safeApiCall {
+            client.get(Constants.API.ADS) {
+                url{
+                    parameters.append("q", input)
+                }
+            }.body<SuggestionResponse>().toPairList()
+        }
+    }
+
     override suspend fun getPartners(): ResultWrapper<List<Partner>> {
         TODO()
     }
+
 }

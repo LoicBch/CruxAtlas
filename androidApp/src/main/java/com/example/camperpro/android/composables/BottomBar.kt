@@ -21,6 +21,7 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.camperpro.android.AndroidConstants
+import com.example.camperpro.android.LocalDependencyContainer
 import com.example.camperpro.android.R
 import com.example.camperpro.android.destinations.*
 import com.example.camperpro.android.ui.theme.AppColor
@@ -47,12 +48,13 @@ fun BottomBar(navController: NavHostController) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 BottomBarDestination.values().forEach { destination ->
-                    val selected =
-                        currentBackStack.value?.destination?.route == destination.direction.route
+                    val selected = currentBackStack.value?.destination?.route == destination.direction.route
+                    val appViewModel = LocalDependencyContainer.current.appViewModel
 
                     navController.backQueue.forEach {
                         it.destination.route?.let { it1 -> Log.d("Nav", it1) }
                     }
+
 
                     BottomNavigationItem(
                         modifier = Modifier.align(Alignment.CenterVertically),
@@ -66,6 +68,10 @@ fun BottomBar(navController: NavHostController) {
 
 
                             if (destination.ordinal == 0){
+                                navController.popBackStack(
+                                    MainMapDestination.route, false
+                                )
+                                appViewModel.onAroundMeClick()
                             }
 
                             if (selected && destination.ordinal != 0) {

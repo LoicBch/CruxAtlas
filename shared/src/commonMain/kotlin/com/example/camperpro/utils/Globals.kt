@@ -20,8 +20,8 @@ object Globals {
         lateinit var services: List<Pair<String, String>>
     }
 
-    object internet {
-        var isConnected: Boolean = false
+    object network {
+        var status: ConnectivityObserver.NetworkStatus = ConnectivityObserver.NetworkStatus.Unavailable
     }
 
     var currentBottomSheetOption: BottomSheetOption = BottomSheetOption.FILTER

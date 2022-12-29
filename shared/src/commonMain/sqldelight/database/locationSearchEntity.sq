@@ -1,0 +1,25 @@
+CREATE TABLE locationSearchEntity (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    label TEXT NOT NULL,
+    timeStamp INTEGER NOT NULL,
+    lat INTEGER NOT NULL,
+    long INTEGER NOT NULL
+);
+
+getAllSearchs:
+SELECT *
+FROM locationSearchEntity;
+
+insertSearch:
+INSERT OR REPLACE
+INTO locationSearchEntity(
+id,
+label,
+timeStamp,
+lat,
+long
+) VALUES (?,?,?, ?, ?);
+
+deleteSearchBySearchLabel:
+DELETE  FROM locationSearchEntity
+WHERE label = ?;

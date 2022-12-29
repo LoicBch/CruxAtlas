@@ -44,11 +44,13 @@ kotlin {
                     implementation(logging)
                 }
 
-//                Logging
+                //                Logging
                 implementation(Deps.napier)
 
                 //Parsing
                 implementation(Deps.Kotlinx.serializationJson)
+
+                implementation("com.google.android.gms:play-services-location:21.0.1")
 
             }
         }
@@ -101,7 +103,7 @@ android {
     namespace = "com.example.camperpro"
     compileSdk = 33
     defaultConfig {
-        minSdk = 23
+        minSdk = 24
         targetSdk = 33
     }
 }

@@ -25,7 +25,7 @@ android {
     compileSdk = 33
     defaultConfig {
         applicationId = "com.example.camperpro.android"
-        minSdk = 23
+        minSdk = 24
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"

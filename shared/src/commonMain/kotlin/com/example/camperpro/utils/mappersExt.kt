@@ -1,7 +1,10 @@
 import com.example.camperpro.data.model.dto.*
 import com.example.camperpro.data.model.responses.StarterResponse
+import com.example.camperpro.data.model.responses.SuggestionResponse
 import com.example.camperpro.domain.model.*
+import com.example.camperpro.utils.Constants
 import com.example.camperpro.utils.toBool
+import database.LocationSearchEntity
 import database.SearchEntity
 import kotlin.jvm.JvmName
 
@@ -46,6 +49,8 @@ fun StarterResponse.toVo() = Starter(
     lists.menuLinks.toVo()
 )
 
+fun SuggestionResponse.toPairList() = results.map { Pair(it.name, Location(it.lat, it.lng)) }
+
 fun MenuLinkDto.toVo() = MenuLink(name, subtitle, icon, url, urlstat)
 
 @JvmName("toMenuLinkVo")
@@ -58,6 +63,7 @@ fun Spot.toDto() = SpotDto(
 )
 
 fun List<Spot>.toDto() = map { it.toDto() }
+
 
 //SQL DELIGHT
 fun SearchEntity.toDto() = SearchDto(id, searchCategoryKey, searchLabel, timeStamp)
@@ -74,3 +80,16 @@ fun List<Search>.toDto() = map { it.toDto() }
 fun List<SearchDto>.toVo() = map { it.toVo() }
 
 
+fun LocationSearchEntity.toDto() = LocationSearchDto(id, label, timeStamp, lat.toDouble(), long.toDouble())
+fun Search.toLocationDto() = LocationSearchDto(id, searchLabel, timeStamp, lat!!, lon!!)
+fun LocationSearchDto.toVo() =
+    Search(id, Constants.Persistence.SEARCH_CATEGORY_LOCATION, label, timeStamp, lat, lon)
+
+@JvmName("toLocationSearchDtoFromEntity")
+fun List<LocationSearchEntity>.toDto() = map { it.toDto() }
+
+@JvmName("toLocationSearchDto")
+fun List<Search>.toLocationDto() = map { it.toDto() }
+
+@JvmName("toSearchVoFromLocationSearch")
+fun List<LocationSearchDto>.toVo() = map { it.toVo() }

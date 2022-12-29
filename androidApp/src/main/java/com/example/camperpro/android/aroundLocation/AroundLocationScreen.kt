@@ -1,12 +1,10 @@
 package com.example.camperpro.android.aroundLocation
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -29,11 +27,22 @@ import com.example.camperpro.android.R
 import com.example.camperpro.android.composables.SearchField
 import com.example.camperpro.android.filter.LastSearchItem
 import com.example.camperpro.android.ui.theme.AppColor
+import com.example.camperpro.domain.model.Location
+import com.example.camperpro.domain.model.Place
+import com.example.camperpro.domain.model.Search
+import com.example.camperpro.utils.Constants
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.result.ResultBackNavigator
+import org.koin.androidx.compose.getViewModel
 
 @Destination
 @Composable
-fun AroundLocationScreen() {
+fun AroundLocationScreen(
+    resultNavigator: ResultBackNavigator<Place>,
+    viewModel: AroundLocationViewModel = getViewModel()
+) {
+
+    val suggestionsList = viewModel.suggestionList.collectAsState()
 
     Column(
         modifier = Modifier
@@ -71,22 +80,35 @@ fun AroundLocationScreen() {
 
         SearchField(
             Modifier.padding(top = 12.dp), placeHolder = R.string
-                .around_location_placeholder
+                .around_location_placeholder, onUserSearch = {
+                viewModel.onUserSearch(it.text)
+            }
         )
 
-        Text(
-            modifier = Modifier.padding(top = 54.dp),
-            text = stringResource(id = R.string.last_searched), fontSize = 14.sp, fontWeight =
-            FontWeight.W500, color = Color.Black
-        )
-        Divider(modifier = Modifier.padding(top = 12.dp))
-        //        launch location search
-        LastSearchedLocationList("AROUND_LOCATION", { TODO() })
+
+
+        if (suggestionsList.value.isEmpty()) {
+            Text(
+                modifier = Modifier.padding(top = 54.dp),
+                text = stringResource(id = R.string.last_searched), fontSize = 14.sp, fontWeight =
+                FontWeight.W500, color = Color.Black
+            )
+            Divider(modifier = Modifier.padding(top = 12.dp))
+            LastSearchedLocationList(Constants.Persistence.SEARCH_CATEGORY_LOCATION) {
+                resultNavigator.navigateBack(
+                    result = Place(it.searchLabel, Location(it.lat!!, it.lon!!))
+                )
+            }
+        } else {
+            SuggestionsList(list = suggestionsList.value) {
+                resultNavigator.navigateBack(result = Place(it.first, it.second))
+            }
+        }
     }
 }
 
 @Composable
-fun LastSearchedLocationList(categorySelected: String, onSelectFilter: (String) -> Unit) {
+fun LastSearchedLocationList(categorySelected: String, onSelectSearch: (Search) -> Unit) {
 
     val appViewmodel = LocalDependencyContainer.current.appViewModel
     val searches by appViewmodel.historicSearches.collectAsState()
@@ -112,10 +134,45 @@ fun LastSearchedLocationList(categorySelected: String, onSelectFilter: (String) 
         items(searches) { search ->
             LastSearchItem(onSearchDelete = {
                 searches.remove(search)
-                appViewmodel.deleteSearch(search)
-            }, onSelectSearch = {
-                onSelectFilter(it)
-            }, search = search)
+                appViewmodel.deleteSearch(search.searchLabel)
+            }, onSelectSearch = { searchLabelSelected ->
+                onSelectSearch(searches[searches.indexOfFirst { it.searchLabel == searchLabelSelected }])
+            }, search = search.searchLabel)
         }
     }
 }
+
+@Composable
+fun SuggestionsList(
+    list: List<Pair<String, Location>>,
+    onItemClicked: (Pair<String, Location>) -> Unit
+) {
+
+    val scrollState = rememberScrollState()
+
+    LazyColumn(
+        modifier = Modifier
+            .padding(top = 12.dp)
+            .scrollable(
+                state = scrollState, orientation = Orientation.Vertical
+            )
+    ) {
+        items(list) { search ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp)
+                    .clickable { onItemClicked(search) },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = search.first,
+                    fontWeight = FontWeight(450),
+                    fontSize = 18.sp,
+                    color = AppColor.suggestionsLabel
+                )
+            }
+        }
+    }
+}
+

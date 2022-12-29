@@ -11,4 +11,5 @@ interface Api {
     suspend fun getSpotAtLocation(location: Location): ResultWrapper<List<Spot>>
     suspend fun getAds(): ResultWrapper<List<Ad>>
     suspend fun getPartners(): ResultWrapper<List<Partner>>
+    suspend fun getLocationSuggestions(input: String): ResultWrapper<List<Pair<String, Location>>>
 }

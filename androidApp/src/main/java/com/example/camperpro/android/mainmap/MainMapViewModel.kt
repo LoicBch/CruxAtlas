@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.camperpro.domain.model.Ad
 import com.example.camperpro.domain.model.Location
+import com.example.camperpro.domain.model.Place
 import com.example.camperpro.domain.model.Spot
 import com.example.camperpro.domain.usecases.FetchAds
 import com.example.camperpro.domain.usecases.FetchSpotAtLocationUseCase
@@ -28,6 +29,9 @@ class MainMapViewModel(
         savedStateHandle.getStateFlow("verticalListIsShowing", false)
     private val cameraIsOutOfRadiusLimit =
         savedStateHandle.getStateFlow("cameraIsOutOfRadiusLimit", false)
+
+    //    flow can only take 5 element max?
+    val placeSearched = savedStateHandle.getStateFlow("placeSearched", "")
 
     val state = combine(
         spots, ads, loading, verticalListIsShowing, cameraIsOutOfRadiusLimit
@@ -58,6 +62,22 @@ class MainMapViewModel(
                 }
                 is ResultWrapper.Success -> {
                     savedStateHandle["spots"] = call.value
+                    savedStateHandle["loading"] = false
+                }
+            }
+        }
+    }
+
+    fun showSpotsAroundPlace(place: Place) {
+        savedStateHandle["loading"] = true
+        viewModelScope.launch {
+            when (val call = fetchSpotAtLocationUseCase(place.location)) {
+                is ResultWrapper.Failure -> {
+                    savedStateHandle["loading"] = false
+                }
+                is ResultWrapper.Success -> {
+                    savedStateHandle["spots"] = call.value
+                    savedStateHandle["placeSearched"] = place.name
                     savedStateHandle["loading"] = false
                 }
             }

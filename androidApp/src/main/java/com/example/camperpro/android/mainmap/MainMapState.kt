@@ -8,7 +8,8 @@ data class MainMapState(
     val ads: List<Ad> = emptyList(),
     val isLoading: Boolean = false,
     val verticalListIsShowing: Boolean = false,
-    val cameraIsOutOfRadiusLimit: Boolean = false
+    val cameraIsOutOfRadiusLimit: Boolean = false,
+    val placeSearched: String = ""
 )
 
 enum class MapSearchSource {

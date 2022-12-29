@@ -11,7 +11,9 @@ import com.example.camperpro.domain.usecases.AddSearch
 import com.example.camperpro.domain.usecases.DeleteSearch
 import com.example.camperpro.domain.usecases.GetAllSearchForACategory
 import com.jetbrains.kmm.shared.data.ResultWrapper
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -25,10 +27,15 @@ class AppViewModel(
 ) : ViewModel() {
 
     val bottomSheetIsShowing = ModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
-    val historicSearches = MutableStateFlow<MutableList<String>>(mutableListOf())
-    val userClickedAroundMe = MutableStateFlow(false)
+    val historicSearches = MutableStateFlow<MutableList<Search>>(mutableListOf())
+    private val loadAroundMeIsPressedChannel = Channel<Boolean>()
+    val loadAroundMeIsPressed = loadAroundMeIsPressedChannel.receiveAsFlow()
 
-    data class Filter(val filterKey: String, val selected: Boolean)
+    fun onAroundMeClick() {
+        viewModelScope.launch {
+            loadAroundMeIsPressedChannel.send(true)
+        }
+    }
 
     fun addSearch(search: Search) {
         viewModelScope.launch {
@@ -44,10 +51,12 @@ class AppViewModel(
 
     fun getSearchesOfCategory(searchCategory: String) {
         viewModelScope.launch {
-            when (val res = getAllSearchForACategory(searchCategory)){
+            when (val res = getAllSearchForACategory(searchCategory)) {
                 is ResultWrapper.Failure -> TODO()
                 is ResultWrapper.Success -> historicSearches.update { res.value!!.toMutableList() }
             }
         }
     }
 }
+
+data class Filter(val filterKey: String, val selected: Boolean)

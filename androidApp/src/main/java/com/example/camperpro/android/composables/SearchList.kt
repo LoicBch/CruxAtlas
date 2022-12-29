@@ -48,10 +48,10 @@ fun SearchList(categorySelected: FilterCategory, onSelectFilter: (String) -> Uni
         items(searches) { search ->
             LastSearchItem(onSearchDelete = {
                 searches.remove(search)
-                appViewmodel.deleteSearch(search)
+                appViewmodel.deleteSearch(search.searchLabel)
             }, onSelectSearch = {
                 onSelectFilter(it)
-            }, search = search)
+            }, search = search.searchLabel)
         }
     }
 }

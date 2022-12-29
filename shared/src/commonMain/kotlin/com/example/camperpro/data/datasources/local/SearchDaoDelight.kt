@@ -13,8 +13,8 @@ class SearchDaoDelight(db: CamperproDatabase) : SearchDao {
         queries.insertSearch(0, search.categoryKey, search.searchLabel, search.timeStamp)
     }
 
-    override suspend fun getAllSearchOfCategory(categoryKey: String): List<SearchDto> {
-        return queries.getAllSearchBySearchCategory(searchCategoryKey = categoryKey)
+    override suspend fun getAllSearchsOfCategory(categoryKey: String): List<SearchDto> {
+        return queries.getAllSearchsOfCategory(searchCategoryKey = categoryKey)
             .executeAsList()
             .toDto()
     }

@@ -6,3 +6,11 @@ data class SearchDto(
     val searchLabel: String,
     val timeStamp: Long
 )
+
+data class LocationSearchDto(
+    val id : Long,
+    val label: String,
+    val timeStamp: Long,
+    val lat: Double,
+    val lon: Double
+)

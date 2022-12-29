@@ -59,7 +59,7 @@ fun FilterOptions(
         SearchField(
             modifier = Modifier.padding(top = 22.dp),
             placeHolder = R.string.search_placeholder,
-            onStateUpdated = { textState.value = it }
+            onUserSearch = { textState.value = it }
         )
 
         if (textState.value.text.isEmpty()) {

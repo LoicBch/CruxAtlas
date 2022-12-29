@@ -29,7 +29,7 @@ import com.example.camperpro.android.ui.theme.Dimensions
 
 
 @Composable
-fun SearchField(modifier: Modifier, @StringRes placeHolder: Int, onStateUpdated: ((TextFieldValue) -> Unit) = {} ) {
+fun SearchField(modifier: Modifier, @StringRes placeHolder: Int, onUserSearch: ((TextFieldValue) -> Unit) = {} ) {
 
     val textState = remember { mutableStateOf(TextFieldValue()) }
     val boxIsFocused = remember {
@@ -69,7 +69,7 @@ fun SearchField(modifier: Modifier, @StringRes placeHolder: Int, onStateUpdated:
               value = textState.value,
               onValueChange = { textFieldValue ->
                   textState.value = textFieldValue
-                  onStateUpdated?.let { it(textFieldValue) }
+                  onUserSearch?.let { it(textFieldValue) }
                               },
               colors = TextFieldDefaults.textFieldColors(
                   backgroundColor = if (boxIsFocused.value) Color.White else AppColor.unFocusedTextField,

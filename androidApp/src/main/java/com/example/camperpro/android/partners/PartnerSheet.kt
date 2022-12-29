@@ -20,7 +20,6 @@ import com.example.camperpro.android.composables.AppButton
 fun PartnerSheet() {
 
     Box {
-
         Column {
            PhotosList()
             Text(text = "")

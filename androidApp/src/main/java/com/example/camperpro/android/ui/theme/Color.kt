@@ -17,12 +17,12 @@ object AppColor {
     val Black = Color(0xFF000000)
     val neutralText = Color(0xFF787579)
     val outlineText = Color(0xFFCAC4D0)
+    val suggestionsLabel = Color(0xFF33417D)
 }
 
 object M3 {
 
 }
-
 
 
 val Purple200 = Color(0xFFBB86FC)
