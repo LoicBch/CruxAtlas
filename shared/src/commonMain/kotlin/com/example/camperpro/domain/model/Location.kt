@@ -15,6 +15,16 @@ val Location.distanceFromUserLocation: Double?
         this.distanceFrom(it)
     }
 
+val Location.distanceFromUserLocationText: String?
+    get() = Globals.geoLoc.lastKnownLocation?.let {
+        "${round(this.distanceFrom(it) * 10.0) / 10.0} km"
+    }
+
+val Location.distanceFromLastSearch: Double?
+    get() = Globals.geoLoc.lastSearchedLocation?.let {
+        this.distanceFrom(it)
+    }
+
 val Location.isAroundLastSearchedLocation get() = this.distanceFrom(Globals.geoLoc.lastSearchedLocation!!) < Constants.RADIUS_AROUND_LIMIT
 
 fun Location.distanceFrom(location: Location): Double {

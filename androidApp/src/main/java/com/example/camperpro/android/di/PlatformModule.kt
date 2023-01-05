@@ -11,13 +11,13 @@ import com.example.camperpro.data.datasources.local.dao.LocationSearchDao
 import com.example.camperpro.data.datasources.local.dao.SearchDao
 import com.example.camperpro.database.CamperproDatabase
 import org.koin.androidx.viewmodel.dsl.viewModelOf
+import org.koin.core.context.GlobalContext
 import org.koin.core.context.GlobalContext.get
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 
 fun platformModule() = listOf(viewModelModule, persistenceModule)
-
 
 val viewModelModule = module {
     viewModelOf(::AppViewModel)

@@ -1,6 +1,6 @@
 package com.example.camperpro.data.datasources.remote
 
-import com.example.camperpro.data.model.responses.AdResponse
+import com.example.camperpro.data.model.dto.AdDto
 import com.example.camperpro.data.model.responses.SpotResponse
 import com.example.camperpro.data.model.responses.StarterResponse
 import com.example.camperpro.data.model.responses.SuggestionResponse
@@ -9,13 +9,11 @@ import com.example.camperpro.utils.Constants
 import com.example.camperpro.utils.Globals
 import com.jetbrains.kmm.shared.data.ResultWrapper
 import com.jetbrains.kmm.shared.data.safeApiCall
-import io.github.aakira.napier.Napier
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import io.ktor.http.*
-import toPairList
+import toPlaces
 import toVo
 
 fun URLBuilder.addAppContext() {
@@ -30,9 +28,9 @@ class CamperProApi(private var client: HttpClient) : Api {
         return safeApiCall {
             client.get {
                 url(Constants.API.STARTER)
-//                {
-//                    addAppContext()
-//                }
+                //                {
+                //                    addAppContext()
+                //                }
             }.body<StarterResponse>().toVo()
         }
     }
@@ -49,20 +47,25 @@ class CamperProApi(private var client: HttpClient) : Api {
     }
 
     override suspend fun getAds(): ResultWrapper<List<Ad>> {
-        return safeApiCall {
+        val first = safeApiCall {
             client.get {
                 url(Constants.API.ADS)
-            }.body<AdResponse>().ads.toVo()
+            }.body<AdDto>().toVo()
         }
+        val value = when (first) {
+            is ResultWrapper.Failure -> ""
+            is ResultWrapper.Success -> first.value
+        }
+        return ResultWrapper.Success(listOf(value as Ad))
     }
 
-    override suspend fun getLocationSuggestions(input: String): ResultWrapper<List<Pair<String, Location>>> {
+    override suspend fun getLocationSuggestions(input: String): ResultWrapper<List<Place>> {
         return safeApiCall {
-            client.get(Constants.API.ADS) {
-                url{
+            client.get(Constants.API.GEOCODING) {
+                url {
                     parameters.append("q", input)
                 }
-            }.body<SuggestionResponse>().toPairList()
+            }.body<SuggestionResponse>().toPlaces()
         }
     }
 

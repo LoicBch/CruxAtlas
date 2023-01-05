@@ -3,26 +3,31 @@ package com.example.camperpro.android.mainmap
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.camperpro.domain.model.Ad
-import com.example.camperpro.domain.model.Location
-import com.example.camperpro.domain.model.Place
-import com.example.camperpro.domain.model.Spot
+import com.example.camperpro.domain.model.*
 import com.example.camperpro.domain.usecases.FetchAds
 import com.example.camperpro.domain.usecases.FetchSpotAtLocationUseCase
+import com.example.camperpro.domain.usecases.SortSpots
+import com.example.camperpro.utils.SortOption
 import com.jetbrains.kmm.shared.data.ResultWrapper
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-
 class MainMapViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val fetchSpotAtLocationUseCase: FetchSpotAtLocationUseCase,
-    private val fetchAds: FetchAds
+    private val fetchAds: FetchAds,
+    private val sortSpots: SortSpots
 ) : ViewModel() {
 
     private val spots = savedStateHandle.getStateFlow("spots", emptyList<Spot>())
+
+    private val spotRepresentation = savedStateHandle.getStateFlow(
+        "spotRepresentation",
+        SpotPresentation(emptyList<Spot>(), SpotSource.DEFAULT)
+    )
+
     private val ads = savedStateHandle.getStateFlow("ads", emptyList<Ad>())
     private val loading = savedStateHandle.getStateFlow("loading", false)
     private val verticalListIsShowing =
@@ -32,16 +37,21 @@ class MainMapViewModel(
 
     //    flow can only take 5 element max?
     val placeSearched = savedStateHandle.getStateFlow("placeSearched", "")
+    val sortedSpots = savedStateHandle.getStateFlow("spotsSorted", emptyList<Spot>())
 
     val state = combine(
-        spots, ads, loading, verticalListIsShowing, cameraIsOutOfRadiusLimit
-    ) { spots, ads, isLoading, verticalListIsShowing, cameraIsOutOfRadiusLimit ->
+        spotRepresentation, ads, loading, verticalListIsShowing, cameraIsOutOfRadiusLimit
+    ) { spotRepresentation, ads, isLoading, verticalListIsShowing, cameraIsOutOfRadiusLimit ->
         MainMapState(
-            spots = spots, ads = ads, isLoading, verticalListIsShowing, cameraIsOutOfRadiusLimit
+            spotRepresentation = spotRepresentation,
+            ads = ads,
+            isLoading,
+            verticalListIsShowing,
+            cameraIsOutOfRadiusLimit
         )
     }.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), MainMapState(
-            emptyList(),
+            spotRepresentation = SpotPresentation(emptyList(), SpotSource.DEFAULT),
             emptyList(),
             isLoading = false,
             verticalListIsShowing = false,
@@ -61,7 +71,12 @@ class MainMapViewModel(
                     savedStateHandle["loading"] = false
                 }
                 is ResultWrapper.Success -> {
-                    savedStateHandle["spots"] = call.value
+                    savedStateHandle["spotRepresentation"] = SpotPresentation(
+                        call.value!!,
+                        SpotSource.AROUND_ME
+                    )
+                    savedStateHandle["spotsSorted"] = call.value
+                    savedStateHandle["placeSearched"] = ""
                     savedStateHandle["loading"] = false
                 }
             }
@@ -76,7 +91,9 @@ class MainMapViewModel(
                     savedStateHandle["loading"] = false
                 }
                 is ResultWrapper.Success -> {
-                    savedStateHandle["spots"] = call.value
+                    //                    savedStateHandle["spots"] = call.value
+                    savedStateHandle["spotRepresentation"] =
+                        SpotPresentation(call.value!!, SpotSource.AROUND_PLACE)
                     savedStateHandle["placeSearched"] = place.name
                     savedStateHandle["loading"] = false
                 }
@@ -93,4 +110,12 @@ class MainMapViewModel(
         }
     }
 
+    fun onSortingOptionSelected(sortOption: SortOption) {
+        viewModelScope.launch {
+            when (val res = sortSpots(sortOption, spotRepresentation.value.spots)) {
+                is ResultWrapper.Failure -> {}
+                is ResultWrapper.Success -> savedStateHandle["spotsSorted"] = res.value
+            }
+        }
+    }
 }

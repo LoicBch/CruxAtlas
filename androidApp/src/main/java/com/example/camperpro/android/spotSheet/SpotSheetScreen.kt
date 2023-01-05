@@ -20,7 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -30,31 +32,43 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.example.camperpro.android.R
+import com.example.camperpro.android.components.dial
+import com.example.camperpro.android.components.navigateByGmaps
+import com.example.camperpro.android.components.sendMail
+import com.example.camperpro.android.components.share
 import com.example.camperpro.android.composables.AppButton
 import com.example.camperpro.android.ui.theme.AppColor
 import com.example.camperpro.android.ui.theme.Dimensions
+import com.example.camperpro.domain.model.Location
 import com.example.camperpro.domain.model.Photo
 import com.example.camperpro.domain.model.Spot
+import com.example.camperpro.domain.model.distanceFromUserLocationText
+import com.example.camperpro.utils.Globals
 import com.example.camperpro.utils.fullGeolocalisation
 import com.example.camperpro.utils.fullLocation
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.launch
 
 @Destination
 @Composable
-fun SpotSheet(spot: Spot) {
+fun SpotSheet(navigator: DestinationsNavigator, spot: Spot) {
     Column {
-        Header(spot)
+        Header(spot, onClose = { navigator.popBackStack() })
         BaseInfos(Modifier.padding(horizontal = 16.dp), spot)
         Tabs(spot)
     }
 }
 
 @Composable
-fun Header(spot: Spot) {
+fun Header(spot: Spot, onClose: () -> Unit) {
+
+    val context = LocalContext.current
+
     Box(Modifier.heightIn(min = 50.dp)) {
         if (spot.isPremium && spot.photos.isNotEmpty()) {
             Gallery(photos = spot.photos)
@@ -64,12 +78,30 @@ fun Header(spot: Spot) {
                 .align(Alignment.TopStart)
                 .fillMaxWidth()
         ) {
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(modifier = Modifier
+                .shadow(2.dp, RoundedCornerShape(Dimensions.radiusRound))
+                .zIndex(1f)
+                .background(Color.White, RoundedCornerShape(Dimensions.radiusRound)),
+                       onClick = { onClose() }) {
                 Icon(imageVector = Icons.Filled.Close, contentDescription = "")
             }
+
             Spacer(modifier = Modifier.weight(1f))
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(imageVector = Icons.Filled.Close, contentDescription = "")
+
+            IconButton(modifier = Modifier
+                .shadow(2.dp, RoundedCornerShape(Dimensions.radiusRound))
+                .zIndex(1f)
+                .background(Color.White, RoundedCornerShape(Dimensions.radiusRound)),
+                       onClick = { /*TODO*/ }) {
+                Icon(painter = painterResource(id = R.drawable.help), contentDescription = "")
+            }
+
+            IconButton(modifier = Modifier
+                .shadow(2.dp, RoundedCornerShape(Dimensions.radiusRound))
+                .zIndex(1f)
+                .background(Color.White, RoundedCornerShape(Dimensions.radiusRound)),
+                       onClick = { context.share(context, "") }) {
+                Icon(painter = painterResource(id = R.drawable.share), contentDescription = "")
             }
         }
 
@@ -160,11 +192,11 @@ fun Gallery(photos: List<Photo>) {
 @Composable
 fun BaseInfos(modifier: Modifier, spot: Spot) {
     Text(
-        modifier = modifier.padding(bottom = 16.dp),
+        modifier = modifier.padding(bottom = 12.dp),
         text = "#${spot.id}",
         fontSize = 11.sp,
         fontWeight = FontWeight.W500,
-        color = AppColor.neutralText
+        color = Color.Black
     )
     Text(
         modifier = modifier.padding(bottom = 16.dp),
@@ -172,14 +204,6 @@ fun BaseInfos(modifier: Modifier, spot: Spot) {
         fontSize = 22.sp,
         fontWeight = FontWeight.W700,
         color = Color.Black
-    )
-
-    Text(
-        modifier = modifier.padding(bottom = 16.dp),
-        text = spot.name,
-        fontSize = 14.sp,
-        fontWeight = FontWeight(450),
-        color = AppColor.neutralText
     )
 }
 
@@ -205,7 +229,7 @@ fun Tabs(spot: Spot) {
         tabWidthStateList
     }
 
-    Column(Modifier.padding(16.dp)) {
+    Column(Modifier.padding(horizontal = 16.dp)) {
         TabRow(selectedTabIndex = pagerState.currentPage,
                backgroundColor = Color.Transparent,
                contentColor = AppColor.Primary,
@@ -243,7 +267,7 @@ fun Tabs(spot: Spot) {
             state = pagerState,
         ) { page ->
             when (page) {
-                0 -> OverviewTab(spot)
+                0 -> OverviewTab(spot, pagerState)
                 1 -> DetailsTab(spot)
                 2 -> ContactTab(spot)
             }
@@ -252,42 +276,59 @@ fun Tabs(spot: Spot) {
 }
 
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
-fun OverviewTab(spot: Spot) {
-    Column {
-        if (!spot.isPremium) {
+fun OverviewTab(spot: Spot, pagerState: PagerState) {
+
+    val scrollState = rememberScrollState()
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    Column(
+        modifier = Modifier.verticalScroll(scrollState)
+    ) {
+        if (spot.isPremium) {
             RowContactPremium(spot = spot)
         } else {
             RowContact(spot = spot)
         }
         LocationInfos(spot)
-        ItemsList(
-            spot.services.subList(0, 3),
-            {},
-            R.string.view_all_services,
-            1,
-            title = R.string.services,
-            subtitle = R.string.services_subtitle, false
-        )
-        ItemsList(
-            spot.brands.subList(0, 3),
-            {},
-            R.string.view_all_brands,
-            2,
-            title = R.string.official_dealers,
-            subtitle = R.string.dealers_subtitle, false
-        )
-        ItemsList(
-            spot.services.subList(0, 3),
-            {},
-            R.string.view_all_services,
-            1,
-            title = R.string.accessories,
-            subtitle = R.string.accessories_subtitle, false
-        )
+
+        if (spot.services.isNotEmpty()) {
+            ServicesList(
+                spot.services.take(3),
+                {
+                    scope.launch { pagerState.scrollToPage(1) }
+                },
+                R.string.view_all_services,
+                title = R.string.services,
+                subtitle = R.string.services_subtitle, false
+            )
+        }
+
+        if (spot.brands.isNotEmpty()) {
+            ItemsList(
+                spot.services.take(3),
+                { scope.launch { pagerState.scrollToPage(1) } },
+                R.string.view_all_brands,
+                title = R.string.official_dealers,
+                subtitle = R.string.dealers_subtitle, false
+            )
+        }
+
+        if (spot.brands.isNotEmpty()) {
+            ItemsList(
+                spot.services.take(3),
+                { scope.launch { pagerState.scrollToPage(1) } },
+                R.string.view_all_services,
+                title = R.string.accessories,
+                subtitle = R.string.accessories_subtitle, false
+            )
+        }
+
         AppButton(
             isActive = true,
-            onClick = { /*TODO*/ },
+            onClick = { context.navigateByGmaps(context, spot.latitude, spot.longitude) },
             modifier = Modifier.padding(top = 50.dp),
             textRes = R.string.navigate
         )
@@ -295,58 +336,114 @@ fun OverviewTab(spot: Spot) {
 }
 
 @Composable
-fun ColumnScope.ItemsList(
+fun ServicesList(
+    items: List<String>,
+    onExtend: () -> Unit,
+    linkLabel: Int,
+    title: Int,
+    subtitle: Int,
+    isFullList: Boolean
+) {
+    Text(
+        modifier = Modifier.padding(top = 15.dp),
+        text = stringResource(id = title),
+        fontSize = 16.sp,
+        fontWeight = FontWeight.W700,
+        color = Color.Black
+    )
+    Text(
+        modifier = Modifier.padding(top = 8.dp),
+        text = stringResource(id = subtitle),
+        fontSize = 12.sp,
+        fontWeight = FontWeight(450),
+        color = Color.Black
+    )
+    Divider(Modifier.padding(top = 8.dp))
+    items.forEach { serviceIndex ->
+        Text(
+            modifier = Modifier.padding(top = 16.dp),
+            text = Globals.filters.services.find { it.first == serviceIndex }?.second.toString(),
+            color = AppColor.Tertiary,
+            fontSize = 14.sp,
+            fontWeight = FontWeight(450)
+        )
+    }
+    if (!isFullList) {
+        Row(modifier = Modifier.clickable { onExtend() }) {
+            Text(
+                modifier = Modifier.padding(top = 12.dp),
+                text = stringResource(id = linkLabel),
+                color = AppColor.Secondary,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.W500
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            IconButton(onClick = { }) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowForward,
+                    contentDescription = "",
+                    tint = AppColor.Secondary
+                )
+            }
+        }
+    }
+}
+
+
+@Composable
+fun ItemsList(
     items: List<String>,
     onExtend: () -> Unit,
     @StringRes linkLabel: Int,
-    columnCount: Int,
     @StringRes title: Int,
     @StringRes subtitle: Int,
     isFullList: Boolean
 ) {
-    Text(modifier = Modifier.padding(top = 30.dp), text = stringResource(id = title))
-    Text(modifier = Modifier.padding(top = 16.dp), text = stringResource(id = subtitle))
-    Divider(Modifier.padding(top = 16.dp))
-    if (columnCount == 1) {
-        items.forEach {
-            Text(
-                modifier = Modifier.padding(top = 12.dp),
-                text = it,
-                color = AppColor.Tertiary,
-                fontSize = 14.sp,
-                fontWeight = FontWeight(450)
-            )
-        }
+    // TODO: side effect
+    val rowCount = if (items.size < 3) {
+        1
     } else {
-        val itemsSplitInHalf =
-            items.withIndex().groupBy { it.index / 2 }.map { it.value.map { it1 -> it1.value } }
-        val col1 = itemsSplitInHalf[0]
-        val col2 = itemsSplitInHalf[1]
-        Column(modifier = Modifier.weight(1f)) {
-            col1.forEach {
+        items.size / 3
+    }
+
+    Text(
+        modifier = Modifier.padding(top = 20.dp),
+        text = stringResource(id = title),
+        fontSize = 16.sp,
+        fontWeight = FontWeight.W700,
+        color = Color.Black
+    )
+    Text(
+        modifier = Modifier.padding(top = 8.dp),
+        text = stringResource(id = subtitle),
+        fontSize = 12.sp,
+        fontWeight = FontWeight(450),
+        color = Color.Black
+    )
+    Divider(Modifier.padding(top = 8.dp))
+
+    val itemsSplit = items.chunked(rowCount)
+
+    repeat(rowCount) {
+        Row {
+            itemsSplit[it].forEach { brandIndex ->
                 Text(
-                    modifier = Modifier.padding(top = 12.dp),
-                    text = it,
-                    color = AppColor.Tertiary,
+                    text = Globals.filters.brands.find { it.first == brandIndex }?.second!!,
+                    modifier = Modifier
+                        .padding(end = 10.dp, top = 10.dp)
+                        .border(
+                            BorderStroke(1.dp, AppColor.unSelectedFilter), RoundedCornerShape(15)
+                        )
+                        .padding(vertical = 4.dp, horizontal = 16.dp),
                     fontSize = 14.sp,
-                    fontWeight = FontWeight(450)
-                )
-            }
-        }
-        Column(modifier = Modifier.weight(1f)) {
-            col2.forEach {
-                Text(
-                    modifier = Modifier.padding(top = 12.dp),
-                    text = it,
-                    color = AppColor.Tertiary,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight(450)
+                    fontWeight = FontWeight(450),
+                    color = AppColor.Tertiary
                 )
             }
         }
     }
 
-    if (isFullList) {
+    if (!isFullList) {
         Row(modifier = Modifier.clickable { onExtend() }) {
             Text(
                 modifier = Modifier.padding(top = 12.dp),
@@ -371,51 +468,54 @@ fun ColumnScope.ItemsList(
 @Composable
 fun LocationInfos(spot: Spot) {
     Row(
-        modifier = Modifier.padding(5.dp), verticalAlignment = Alignment.CenterVertically
+        modifier = Modifier.padding(start = 5.dp, top = 20.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            modifier = Modifier.padding(end = 5.dp),
+            modifier = Modifier.padding(end = 15.dp),
             painter = painterResource(id = R.drawable.distance),
             contentDescription = "",
-            tint = AppColor.Primary
+            tint = AppColor.Tertiary
         )
         Text(
-            text = "30 km${stringResource(id = R.string.from_you)}",
-            color = AppColor.Secondary,
+            text = Location(spot.latitude, spot.longitude).distanceFromUserLocationText!!,
+            color = Color.Black,
             fontWeight = FontWeight.W500,
             fontSize = 12.sp
         )
     }
 
     Row(
-        modifier = Modifier.padding(5.dp), verticalAlignment = Alignment.CenterVertically
+        modifier = Modifier.padding(start = 5.dp, top = 15.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            modifier = Modifier.padding(end = 5.dp),
+            modifier = Modifier.padding(end = 15.dp),
             painter = painterResource(id = R.drawable.pin_here),
             contentDescription = "",
-            tint = AppColor.Primary
+            tint = AppColor.Tertiary
         )
         Text(
             text = spot.fullLocation,
-            color = AppColor.Secondary,
+            color = Color.Black,
             fontWeight = FontWeight.W500,
             fontSize = 12.sp
         )
     }
 
     Row(
-        modifier = Modifier.padding(5.dp), verticalAlignment = Alignment.CenterVertically
+        modifier = Modifier.padding(start = 5.dp, top = 15.dp, bottom = 40.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            modifier = Modifier.padding(end = 5.dp),
+            modifier = Modifier.padding(end = 15.dp),
             painter = painterResource(id = R.drawable.my_location),
             contentDescription = "",
-            tint = AppColor.Primary
+            tint = AppColor.Tertiary
         )
         Text(
             text = spot.fullGeolocalisation,
-            color = AppColor.Secondary,
+            color = Color.Black,
             fontWeight = FontWeight.W500,
             fontSize = 12.sp
         )
@@ -424,21 +524,23 @@ fun LocationInfos(spot: Spot) {
 
 @Composable
 fun RowContact(spot: Spot) {
-    Row {
+    Row(modifier = Modifier.padding(top = 20.dp)) {
         if (spot.website.isNotEmpty()) {
             Row(
                 modifier = Modifier
                     .background(Color.White, RoundedCornerShape(15))
                     .border(1.dp, AppColor.Secondary, RoundedCornerShape(Dimensions.radiusRound))
-                    .padding(5.dp), verticalAlignment = Alignment.CenterVertically
+                    .padding(vertical = 5.dp, horizontal = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    modifier = Modifier.padding(end = 5.dp),
+                    modifier = Modifier.padding(5.dp),
                     painter = painterResource(id = R.drawable.website),
                     contentDescription = "",
-                    tint = AppColor.Primary
+                    tint = AppColor.Secondary
                 )
                 Text(
+                    modifier = Modifier.padding(end = 5.dp),
                     text = stringResource(id = R.string.website).uppercase(),
                     color = AppColor.Secondary,
                     fontWeight = FontWeight.W500,
@@ -452,15 +554,17 @@ fun RowContact(spot: Spot) {
                 modifier = Modifier
                     .background(Color.White, RoundedCornerShape(15))
                     .border(1.dp, AppColor.Secondary, RoundedCornerShape(Dimensions.radiusRound))
-                    .padding(5.dp), verticalAlignment = Alignment.CenterVertically
+                    .padding(vertical = 5.dp, horizontal = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    modifier = Modifier.padding(end = 5.dp),
+                    modifier = Modifier.padding(5.dp),
                     painter = painterResource(id = R.drawable.phone),
                     contentDescription = "",
-                    tint = AppColor.Primary
+                    tint = AppColor.Secondary
                 )
                 Text(
+                    modifier = Modifier.padding(end = 5.dp),
                     text = stringResource(id = R.string.phone).uppercase(),
                     color = AppColor.Secondary,
                     fontWeight = FontWeight.W500,
@@ -474,12 +578,16 @@ fun RowContact(spot: Spot) {
 
 @Composable
 fun RowContactPremium(spot: Spot) {
-    Row(horizontalArrangement = Arrangement.SpaceBetween) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.padding(top = 20.dp)
+    ) {
         if (spot.website.isNotEmpty()) {
             IconButton(modifier = Modifier
                 .background(
                     color = Color.White, RoundedCornerShape(Dimensions.radiusRound)
                 )
+                .padding(end = 12.dp)
                 .border(1.dp, AppColor.Secondary, RoundedCornerShape(Dimensions.radiusRound)),
                        onClick = { /*TODO*/ }) {
                 Icon(
@@ -495,6 +603,7 @@ fun RowContactPremium(spot: Spot) {
                 .background(
                     color = Color.White, RoundedCornerShape(Dimensions.radiusRound)
                 )
+                .padding(end = 12.dp)
                 .border(1.dp, AppColor.Secondary, RoundedCornerShape(Dimensions.radiusRound)),
                        onClick = { /*TODO*/ }) {
                 Icon(
@@ -510,6 +619,7 @@ fun RowContactPremium(spot: Spot) {
                 .background(
                     color = Color.White, RoundedCornerShape(Dimensions.radiusRound)
                 )
+                .padding(end = 12.dp)
                 .border(1.dp, AppColor.Secondary, RoundedCornerShape(Dimensions.radiusRound)),
                        onClick = { /*TODO*/ }) {
                 Icon(
@@ -525,6 +635,7 @@ fun RowContactPremium(spot: Spot) {
                 .background(
                     color = Color.White, RoundedCornerShape(Dimensions.radiusRound)
                 )
+                .padding(end = 12.dp)
                 .border(1.dp, AppColor.Secondary, RoundedCornerShape(Dimensions.radiusRound)),
                        onClick = { /*TODO*/ }) {
                 Icon(
@@ -540,6 +651,7 @@ fun RowContactPremium(spot: Spot) {
                 .background(
                     color = Color.White, RoundedCornerShape(Dimensions.radiusRound)
                 )
+                .padding(end = 12.dp)
                 .border(1.dp, AppColor.Secondary, RoundedCornerShape(Dimensions.radiusRound)),
                        onClick = { /*TODO*/ }) {
                 Icon(
@@ -555,6 +667,7 @@ fun RowContactPremium(spot: Spot) {
                 .background(
                     color = Color.White, RoundedCornerShape(Dimensions.radiusRound)
                 )
+                .padding(end = 12.dp)
                 .border(1.dp, AppColor.Secondary, RoundedCornerShape(Dimensions.radiusRound)),
                        onClick = { /*TODO*/ }) {
                 Icon(
@@ -568,133 +681,182 @@ fun RowContactPremium(spot: Spot) {
 }
 
 @Composable
-fun ColumnScope.DetailsTab(spot: Spot) {
-    ItemsList(
-        spot.services,
-        {},
-        R.string.view_all_services,
-        1,
-        title = R.string.services,
-        subtitle = R.string.services_subtitle, true
-    )
-    ItemsList(
-        spot.brands,
-        {},
-        R.string.view_all_brands,
-        2,
-        title = R.string.official_dealers,
-        subtitle = R.string.dealers_subtitle, true
-    )
-    ItemsList(
-        spot.services,
-        {},
-        R.string.view_all_services,
-        1,
-        title = R.string.accessories,
-        subtitle = R.string.accessories_subtitle, true
-    )
+fun DetailsTab(spot: Spot) {
+    Column(modifier = Modifier.fillMaxHeight()) {
+        ServicesList(
+            spot.services,
+            {},
+            R.string.view_all_services,
+            title = R.string.services,
+            subtitle = R.string.services_subtitle, true
+        )
+        ItemsList(
+            spot.brands,
+            {},
+            R.string.view_all_brands,
+            title = R.string.official_dealers,
+            subtitle = R.string.dealers_subtitle, true
+        )
+        ItemsList(
+            spot.services,
+            {},
+            R.string.view_all_services,
+            title = R.string.accessories,
+            subtitle = R.string.accessories_subtitle, true
+        )
+    }
+
 }
 
 @Composable
 fun ContactTab(spot: Spot) {
-    Row {
-        Image(painter = painterResource(id = R.drawable.pin_here), contentDescription = "")
-        Text(
-            modifier = Modifier.padding(start = 22.dp),
-            text = spot.fullLocation,
-            fontSize = 12.sp,
-            fontWeight = FontWeight(450)
-        )
-    }
 
-    Row {
-        Image(painter = painterResource(id = R.drawable.my_location), contentDescription = "")
-        Text(
-            modifier = Modifier.padding(start = 22.dp),
-            text = spot.fullGeolocalisation,
-            fontSize = 12.sp,
-            fontWeight = FontWeight(450)
-        )
-    }
+    val uriHandler = LocalUriHandler.current
+    val context = LocalContext.current
 
-    if (spot.website.isNotEmpty()) {
-        Row {
-            Image(painter = painterResource(id = R.drawable.website), contentDescription = "")
+    Column(modifier = Modifier.fillMaxHeight()) {
+        Row(
+            modifier = Modifier.padding(vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(painter = painterResource(id = R.drawable.pin_here), contentDescription = "")
             Text(
                 modifier = Modifier.padding(start = 22.dp),
-                text = spot.website,
+                text = spot.fullLocation,
                 fontSize = 12.sp,
                 fontWeight = FontWeight(450)
             )
         }
-    }
+        Divider()
 
-    if (spot.email.isNotEmpty()) {
-        Row {
-            Image(painter = painterResource(id = R.drawable.mail), contentDescription = "")
+        Row(
+            modifier = Modifier.padding(vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(painter = painterResource(id = R.drawable.my_location), contentDescription = "")
             Text(
                 modifier = Modifier.padding(start = 22.dp),
-                text = spot.email,
+                text = spot.fullGeolocalisation,
                 fontSize = 12.sp,
                 fontWeight = FontWeight(450)
             )
         }
-    }
+        Divider()
+
+        if (spot.website.isNotEmpty()) {
+            Row(
+                modifier = Modifier
+                    .padding(vertical = 16.dp)
+                    .clickable { uriHandler.openUri(spot.website) },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(painter = painterResource(id = R.drawable.website), contentDescription = "")
+                Text(
+                    modifier = Modifier.padding(start = 22.dp),
+                    text = spot.website,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight(450)
+                )
+            }
+            Divider()
+        }
+
+        if (spot.email.isNotEmpty()) {
+            Row(
+                modifier = Modifier
+                    .padding(vertical = 16.dp)
+                    .clickable { context.sendMail(spot.email, "") },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(painter = painterResource(id = R.drawable.mail), contentDescription = "")
+                Text(
+                    modifier = Modifier.padding(start = 22.dp),
+                    text = spot.email,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight(450)
+                )
+            }
+            Divider()
+        }
 
 
-    if (spot.phone.isNotEmpty()) {
-        Row {
-            Image(painter = painterResource(id = R.drawable.phone), contentDescription = "")
-            Text(
-                modifier = Modifier.padding(start = 22.dp),
-                text = spot.phone,
-                fontSize = 12.sp,
-                fontWeight = FontWeight(450)
-            )
+        if (spot.phone.isNotEmpty()) {
+            Row(
+                modifier = Modifier
+                    .padding(vertical = 16.dp)
+                    .clickable { context.dial(spot.phone) },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(painter = painterResource(id = R.drawable.phone), contentDescription = "")
+                Text(
+                    modifier = Modifier.padding(start = 22.dp),
+                    text = spot.phone,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight(450)
+                )
+            }
+            Divider()
+        }
+
+
+
+        if (spot.facebook.isNotEmpty()) {
+            Row(
+                modifier = Modifier
+                    .padding(vertical = 16.dp)
+                    .clickable { uriHandler.openUri(spot.facebook) },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(painter = painterResource(id = R.drawable.facebook), contentDescription = "")
+                Text(
+                    modifier = Modifier.padding(start = 22.dp),
+                    text = spot.facebook,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight(450)
+                )
+            }
+            Divider()
+        }
+
+
+
+        if (spot.twitter.isNotEmpty()) {
+            Row(
+                modifier = Modifier
+                    .padding(vertical = 16.dp)
+                    .clickable { uriHandler.openUri(spot.twitter) },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(painter = painterResource(id = R.drawable.twitter), contentDescription = "")
+                Text(
+                    modifier = Modifier.padding(start = 22.dp),
+                    text = spot.twitter,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight(450)
+                )
+            }
+            Divider()
+        }
+
+
+        if (spot.youtube.isNotEmpty()) {
+            Row(
+                modifier = Modifier
+                    .padding(vertical = 16.dp)
+                    .clickable { uriHandler.openUri(spot.youtube) },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(painter = painterResource(id = R.drawable.youtube), contentDescription = "")
+                Text(
+                    modifier = Modifier.padding(start = 22.dp),
+                    text = spot.youtube,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight(450)
+                )
+            }
+            Divider()
         }
     }
-
-
-
-    if (spot.facebook.isNotEmpty()) {
-        Row {
-            Image(painter = painterResource(id = R.drawable.facebook), contentDescription = "")
-            Text(
-                modifier = Modifier.padding(start = 22.dp),
-                text = spot.facebook,
-                fontSize = 12.sp,
-                fontWeight = FontWeight(450)
-            )
-        }
-    }
-
-
-
-    if (spot.twitter.isNotEmpty()) {
-        Row {
-            Image(painter = painterResource(id = R.drawable.twitter), contentDescription = "")
-            Text(
-                modifier = Modifier.padding(start = 22.dp),
-                text = spot.twitter,
-                fontSize = 12.sp,
-                fontWeight = FontWeight(450)
-            )
-        }
-    }
-
-
-    if (spot.youtube.isNotEmpty()) {
-        Row {
-            Image(painter = painterResource(id = R.drawable.youtube), contentDescription = "")
-            Text(
-                modifier = Modifier.padding(start = 22.dp),
-                text = spot.youtube,
-                fontSize = 12.sp,
-                fontWeight = FontWeight(450)
-            )
-        }
-    }
-
 }
 
 fun Modifier.customTabIndicator(

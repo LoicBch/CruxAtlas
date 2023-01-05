@@ -243,21 +243,21 @@ fun LastSearchItem(search: String, onSearchDelete: () -> Unit, onSelectSearch: (
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            imageVector = Icons.Outlined.Close,
-            contentDescription = "",
-            tint = AppColor.Secondary
+            painter = painterResource(id = R.drawable.historic),
+            contentDescription = "", tint = AppColor.Primary
         )
 
         Text(
             modifier = Modifier
                 .padding(start = 15.dp)
-                .fillMaxWidth()
                 .clickable { onSelectSearch(search) },
             text = search,
             fontSize = 14.sp,
             fontWeight = FontWeight(450),
             color = AppColor.Tertiary
         )
+        
+        Spacer(modifier = Modifier.weight(1f))
 
         Icon(
             modifier = Modifier.clickable { onSearchDelete() },

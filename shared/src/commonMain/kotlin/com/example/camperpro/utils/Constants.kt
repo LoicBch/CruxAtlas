@@ -1,5 +1,7 @@
 package com.example.camperpro.utils
 
+import com.example.camperpro.domain.model.Location
+
 object Constants {
 
     object API {
@@ -22,9 +24,14 @@ object Constants {
         const val SEARCH_CATEGORY_LOCATION = "LOCATION"
     }
 
+    val DEFAULT_LOCATION = Location(45.87, 2.50)
     const val RADIUS_AROUND_LIMIT = 1330
     const val GPS_UPDATE_INTERVAL = 10000L
     const val SUGGESTION_START_LENGTH = 3
     const val WEBSERVICE_VERSION = "v4"
     const val BASE_URL = "https://camper-pro.com/services/$WEBSERVICE_VERSION/"
+}
+
+enum class SortOption{
+    NONE, DIST_FROM_YOU, DIST_FROM_SEARCHED, BY_DATE
 }

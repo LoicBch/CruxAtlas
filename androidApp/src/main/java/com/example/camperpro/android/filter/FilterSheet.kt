@@ -6,6 +6,7 @@ import androidx.compose.runtime.*
 import com.example.camperpro.android.LocalDependencyContainer
 import com.example.camperpro.android.R
 import com.example.camperpro.domain.model.Search
+import com.example.camperpro.utils.BottomSheetOption
 
 @Composable
 fun FilterSheet() {

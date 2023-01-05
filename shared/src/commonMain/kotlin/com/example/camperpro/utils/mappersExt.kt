@@ -14,8 +14,8 @@ fun SpotDto.toVo() =
         id,
         name,
         distance,
-        brands.split(","),
-        services.split(","),
+        brands.split(",").dropLast(1),
+        services.split(",").dropLast(1),
         address,
         postalCode,
         countryIso,
@@ -49,7 +49,7 @@ fun StarterResponse.toVo() = Starter(
     lists.menuLinks.toVo()
 )
 
-fun SuggestionResponse.toPairList() = results.map { Pair(it.name, Location(it.lat, it.lng)) }
+fun SuggestionResponse.toPlaces() = results.map { Place(it.name, Location(it.lat, it.lng)) }
 
 fun MenuLinkDto.toVo() = MenuLink(name, subtitle, icon, url, urlstat)
 

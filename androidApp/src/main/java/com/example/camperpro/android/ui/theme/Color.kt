@@ -18,6 +18,18 @@ object AppColor {
     val neutralText = Color(0xFF787579)
     val outlineText = Color(0xFFCAC4D0)
     val suggestionsLabel = Color(0xFF33417D)
+
+    val BlueToWhite = Brush.linearGradient(
+        colors = listOf(Primary, Color.White),
+        start = Offset(0f, Float.POSITIVE_INFINITY),
+        end = Offset(Float.POSITIVE_INFINITY, 0f)
+    )
+
+    val WhiteToBlue = Brush.linearGradient(
+        colors = listOf(Color.White, Primary),
+        start = Offset(0f, Float.POSITIVE_INFINITY),
+        end = Offset(Float.POSITIVE_INFINITY, 0f)
+    )
 }
 
 object M3 {
@@ -32,8 +44,3 @@ val Teal200 = Color(0xFF03DAC5)
 
 
 val Yellow = Color(0xFFF7e6b7)
-val YellowGradient = Brush.linearGradient(
-    colors = listOf(Yellow, Color.Transparent),
-    start = Offset(0f, Float.POSITIVE_INFINITY),
-    end = Offset(Float.POSITIVE_INFINITY, 0f)
-)

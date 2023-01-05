@@ -54,6 +54,7 @@
     <string name="none">None</string>
     <string name="by_distance_from_you">By distance from you</string>
     <string name="distance_from_searched_location">By distance from searched location</string>
+    <string name="by_date">By date (soonest first)</string>
     <string name="apply_sorting">Apply sorting</string>
 
     <!--  Content description  -->

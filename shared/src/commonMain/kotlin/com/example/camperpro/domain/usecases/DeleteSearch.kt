@@ -5,7 +5,7 @@ import com.example.camperpro.domain.model.Search
 import com.jetbrains.kmm.shared.data.ResultWrapper
 
 class DeleteSearch(private val searches: Searches ): IBaseUsecase {
-    suspend operator fun invoke(searchLabel: String) {
-         searches.delete(searchLabel)
+    suspend operator fun invoke(search: Search) {
+         searches.delete(search)
     }
 }

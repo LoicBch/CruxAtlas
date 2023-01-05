@@ -3,9 +3,14 @@ package com.example.camperpro.utils
 import com.example.camperpro.domain.model.Location
 import com.example.camperpro.domain.model.MenuLink
 import kotlinx.coroutines.Job
+import kotlin.jvm.JvmStatic
+import kotlin.native.concurrent.ThreadLocal
 
-// to replace by class with dependecy injection if this get to messy
+// TODO: to replace by class with dependecy injection if this get to messy
+
 object Globals {
+
+    @ThreadLocal
     object geoLoc {
         var lastKnownLocation: Location? = null
         var lastSearchedLocation: Location? = null
@@ -15,21 +20,21 @@ object Globals {
         lateinit var appLanguage: String
     }
 
+    @ThreadLocal
     object filters {
         lateinit var brands: List<Pair<String, String>>
         lateinit var services: List<Pair<String, String>>
     }
 
+    @ThreadLocal
     object network {
         var status: ConnectivityObserver.NetworkStatus = ConnectivityObserver.NetworkStatus.Unavailable
     }
 
-    var currentBottomSheetOption: BottomSheetOption = BottomSheetOption.FILTER
-    var lastTimeStarterWasLoaded: Int = 0
     lateinit var menuLinks: List<MenuLink>
 }
 
 
-enum class BottomSheetOption{
-    FILTER, SORT, MAPLAYER
+enum class BottomSheetOption {
+    FILTER, FILTER_EVENT, SORT, SORT_AROUND_PLACE, SORT_EVENTS,  MAPLAYER
 }

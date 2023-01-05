@@ -12,6 +12,7 @@ import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -22,17 +23,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.camperpro.android.LocalDependencyContainer
 import com.example.camperpro.android.R
 import com.example.camperpro.android.composables.SearchField
 import com.example.camperpro.android.filter.LastSearchItem
 import com.example.camperpro.android.ui.theme.AppColor
-import com.example.camperpro.domain.model.Location
 import com.example.camperpro.domain.model.Place
 import com.example.camperpro.domain.model.Search
 import com.example.camperpro.utils.Constants
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.result.ResultBackNavigator
+import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.compose.getViewModel
 
 @Destination
@@ -42,7 +42,22 @@ fun AroundLocationScreen(
     viewModel: AroundLocationViewModel = getViewModel()
 ) {
 
-    val suggestionsList = viewModel.suggestionList.collectAsState()
+    val suggestionsList by viewModel.suggestionList.collectAsState()
+    val placesHistoric = viewModel.placesHistoric
+
+    LaunchedEffect(true) {
+        viewModel.loadPlacesHistoric()
+    }
+
+    LaunchedEffect(viewModel.placeSelected) {
+        viewModel.placeSelected.collect {
+            if (viewModel.placeSelected.value.name != "") {
+                resultNavigator.navigateBack(
+                    result = it
+                )
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -51,8 +66,7 @@ fun AroundLocationScreen(
     ) {
         Row(
             Modifier
-                .fillMaxWidth()
-                .padding(bottom = 40.dp), verticalAlignment = Alignment.CenterVertically
+                .fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.around_location_selected),
@@ -85,44 +99,46 @@ fun AroundLocationScreen(
             }
         )
 
+        if (suggestionsList.isEmpty()) {
 
-
-        if (suggestionsList.value.isEmpty()) {
             Text(
                 modifier = Modifier.padding(top = 54.dp),
                 text = stringResource(id = R.string.last_searched), fontSize = 14.sp, fontWeight =
                 FontWeight.W500, color = Color.Black
             )
+
             Divider(modifier = Modifier.padding(top = 12.dp))
-            LastSearchedLocationList(Constants.Persistence.SEARCH_CATEGORY_LOCATION) {
-                resultNavigator.navigateBack(
-                    result = Place(it.searchLabel, Location(it.lat!!, it.lon!!))
-                )
-            }
+
+            LastSearchedLocationList(
+                placesHistoric,
+                { viewModel.onDeleteSearch(it) },
+                { viewModel.onSelectPlace(it) })
+
         } else {
-            SuggestionsList(list = suggestionsList.value) {
-                resultNavigator.navigateBack(result = Place(it.first, it.second))
+            SuggestionsList(list = suggestionsList) {
+                val search = Search(
+                    0,
+                    Constants.Persistence.SEARCH_CATEGORY_LOCATION,
+                    it.name,
+                    System.currentTimeMillis(),
+                    it.location.latitude,
+                    it.location.longitude
+                )
+                viewModel.onSelectPlace(search)
             }
         }
     }
 }
 
 @Composable
-fun LastSearchedLocationList(categorySelected: String, onSelectSearch: (Search) -> Unit) {
+fun LastSearchedLocationList(
+    placeHistoric: StateFlow<List<Search>>,
+    onDeleteSearch: (Search) -> Unit,
+    onSelectPlace: (Search) -> Unit
+) {
 
-    val appViewmodel = LocalDependencyContainer.current.appViewModel
-    val searches by appViewmodel.historicSearches.collectAsState()
+    val searches by placeHistoric.collectAsState()
     val scrollState = rememberScrollState()
-
-    appViewmodel.getSearchesOfCategory(categorySelected)
-
-    Text(
-        modifier = Modifier.padding(top = 20.dp),
-        text = stringResource(id = R.string.last_searched),
-        color = AppColor.outlineText,
-        fontSize = 14.sp,
-        fontWeight = FontWeight.W500
-    )
 
     LazyColumn(
         modifier = Modifier
@@ -133,10 +149,9 @@ fun LastSearchedLocationList(categorySelected: String, onSelectSearch: (Search) 
     ) {
         items(searches) { search ->
             LastSearchItem(onSearchDelete = {
-                searches.remove(search)
-                appViewmodel.deleteSearch(search.searchLabel)
+                onDeleteSearch(search)
             }, onSelectSearch = { searchLabelSelected ->
-                onSelectSearch(searches[searches.indexOfFirst { it.searchLabel == searchLabelSelected }])
+                onSelectPlace(searches[searches.indexOfFirst { it.searchLabel == searchLabelSelected }])
             }, search = search.searchLabel)
         }
     }
@@ -144,8 +159,8 @@ fun LastSearchedLocationList(categorySelected: String, onSelectSearch: (Search) 
 
 @Composable
 fun SuggestionsList(
-    list: List<Pair<String, Location>>,
-    onItemClicked: (Pair<String, Location>) -> Unit
+    list: List<Place>,
+    onItemClicked: (Place) -> Unit
 ) {
 
     val scrollState = rememberScrollState()
@@ -166,7 +181,7 @@ fun SuggestionsList(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = search.first,
+                    text = search.name,
                     fontWeight = FontWeight(450),
                     fontSize = 18.sp,
                     color = AppColor.suggestionsLabel

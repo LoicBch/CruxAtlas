@@ -6,12 +6,15 @@ import com.example.camperpro.data.repositories.*
 import com.example.camperpro.domain.repositories.*
 import com.example.camperpro.domain.usecases.*
 import com.example.camperpro.utils.Constants
+import com.example.camperpro.utils.KMMContext
+import com.example.camperpro.utils.LanguageManager
 import io.ktor.client.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import kotlinx.coroutines.channels.Channel
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
@@ -58,10 +61,7 @@ val useCasesDependencies = module {
     factoryOf(::SetupApp)
     factoryOf(::AddSearch)
     factoryOf(::DeleteSearch)
+    factoryOf(::SortSpots)
+    factory { (context: Any?) -> LanguageManager(context) }
 }
-
-//val utilityDependencies = module {
-//    factoryOf(::KMMCalendar)
-//    factoryOf(::KMMPreference)
-//}
 

@@ -1,31 +1,53 @@
 package com.example.camperpro.android.onBoarding
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.camperpro.domain.usecases.SetupApp
+import com.example.camperpro.utils.Globals
+import com.example.camperpro.utils.LanguageManager
 import com.jetbrains.kmm.shared.data.ResultWrapper
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-class SplashScreenViewModel(private val setupApp: SetupApp) : ViewModel() {
+class SplashScreenViewModel(
+    private val setupApp: SetupApp,
+    private val languageManager : LanguageManager
+) : ViewModel() {
 
-    private val _setupIsComplete = MutableStateFlow(false)
-    var setupIsComplete: StateFlow<Boolean> = _setupIsComplete
+    private val gpsLocationIsAsked = MutableStateFlow(false)
+    private val globalsVarsAreSet = MutableStateFlow(false)
 
+    var setupIsComplete = combine(
+        gpsLocationIsAsked, globalsVarsAreSet
+    ) { gpsLocationIsObserved, globalVarsAreSet ->
+        gpsLocationIsObserved && globalVarsAreSet
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
 
     fun initApp() {
+        setDeviceConstants()
         viewModelScope.launch {
-            when (val call = setupApp.invoke()) {
+            when (setupApp.invoke()) {
                 is ResultWrapper.Failure -> {
                 }
 
                 is ResultWrapper.Success -> {
-                    _setupIsComplete.update { true }
+                    globalsVarsAreSet.update { true }
                 }
             }
         }
     }
+
+    fun onUserRespondToLocationPermission(allowing: Boolean) {
+        gpsLocationIsAsked.update { true }
+    }
+
+    private fun setDeviceConstants() {
+        Globals.geoLoc.appLanguage = "FR"
+        Globals.geoLoc.deviceLanguage = languageManager.getDeviceLanguage()
+        Globals.geoLoc.deviceCountry = languageManager.getDeviceCountry()
+        globalsVarsAreSet.update { true }
+    }
+
 }

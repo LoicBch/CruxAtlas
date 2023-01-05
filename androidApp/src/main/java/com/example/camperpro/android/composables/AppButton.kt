@@ -3,7 +3,6 @@ package com.example.camperpro.android.composables
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -15,7 +14,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.camperpro.android.ui.theme.AppColor
 import com.example.camperpro.android.ui.theme.Dimensions
@@ -31,8 +29,8 @@ fun AppButton(isActive: Boolean, onClick: () -> Unit, modifier: Modifier, @Strin
         onClick = onClick,
         enabled = isActive,
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = if (isActive) AppColor
-                .unSelectedFilterOption else AppColor.Secondary
+            backgroundColor = if (isActive) AppColor.Secondary
+            else AppColor.unSelectedFilterOption
         )
     ) {
         Text(
@@ -41,5 +39,4 @@ fun AppButton(isActive: Boolean, onClick: () -> Unit, modifier: Modifier, @Strin
             ), color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.W700
         )
     }
-
 }

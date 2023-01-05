@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -40,10 +41,7 @@ import com.example.camperpro.android.destinations.SpotSheetDestination
 import com.example.camperpro.android.ui.theme.AppColor
 import com.example.camperpro.android.ui.theme.Dimensions
 import com.example.camperpro.domain.model.*
-import com.example.camperpro.utils.BottomSheetOption
-import com.example.camperpro.utils.Globals
-import com.example.camperpro.utils.LocationClient
-import com.example.camperpro.utils.hasLocationPermission
+import com.example.camperpro.utils.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -55,6 +53,7 @@ import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
 
@@ -64,7 +63,8 @@ import org.koin.androidx.compose.getViewModel
 @Composable
 fun MainMap(
     locationSearch: ResultRecipient<AroundLocationScreenDestination, Place>,
-    navigator: DestinationsNavigator, viewModel: MainMapViewModel = getViewModel()
+    navigator: DestinationsNavigator,
+    viewModel: MainMapViewModel = getViewModel()
 ) {
     val state by viewModel.state.collectAsState()
     val locationSearched by viewModel.placeSearched.collectAsState()
@@ -79,14 +79,42 @@ fun MainMap(
                 ), 10f
             )
         } else {
-            CameraPosition.fromLatLngZoom(LatLng(45.87, 2.50), 10f)
+            CameraPosition.fromLatLngZoom(
+                LatLng(
+                    Constants.DEFAULT_LOCATION.latitude, Constants.DEFAULT_LOCATION.longitude
+                ), 10f
+            )
         }
     }
 
     val appViewModel = LocalDependencyContainer.current.appViewModel
 
     LaunchedEffect(true) {
-        viewModel.getAds()
+        if (state.spotRepresentation.source == SpotSource.DEFAULT) {
+            viewModel.getAds()
+            if (context.hasLocationPermission) {
+                cameraPositionState.move(
+                    CameraUpdateFactory.newLatLng(
+                        LatLng(
+                            Globals.geoLoc.lastKnownLocation?.latitude!!,
+                            Globals.geoLoc.lastKnownLocation?.longitude!!
+                        )
+                    )
+                )
+                viewModel.showSpots(Globals.geoLoc.lastKnownLocation!!)
+            } else {
+                cameraPositionState.move(
+                    CameraUpdateFactory.newLatLng(
+                        LatLng(
+                            Constants.DEFAULT_LOCATION.latitude,
+                            Constants.DEFAULT_LOCATION.longitude
+                        )
+                    )
+                )
+                viewModel.showSpots(Constants.DEFAULT_LOCATION)
+            }
+        }
+
     }
 
     LaunchedEffect(appViewModel.loadAroundMeIsPressed) {
@@ -101,11 +129,8 @@ fun MainMap(
                             )
                         )
                     )
-                    LocationClient(context).getCurrentLocation { location ->
-                        viewModel.showSpots(location)
-                    }
-                } else {
-                    // TODO: display missing gps modal
+                    viewModel.showSpots(Globals.geoLoc.lastKnownLocation!!)
+                } else { // TODO: display message
                 }
             }
         }
@@ -116,7 +141,14 @@ fun MainMap(
         when (result) {
             is NavResult.Canceled -> {}
             is NavResult.Value -> {
-               viewModel.showSpotsAroundPlace(result.value)
+                cameraPositionState.move(
+                    CameraUpdateFactory.newLatLng(
+                        LatLng(
+                            result.value.location.latitude, result.value.location.longitude
+                        )
+                    )
+                )
+                viewModel.showSpotsAroundPlace(result.value)
             }
         }
     }
@@ -130,7 +162,7 @@ fun MainMap(
             ),
             cameraPositionState = cameraPositionState
         ) {
-            state.spots.forEach { spot ->
+            state.spotRepresentation.spots.forEach { spot ->
                 Marker(state = MarkerState(position = LatLng(spot.latitude, spot.longitude)),
                        title = spot.name,
                        snippet = spot.name,
@@ -150,16 +182,35 @@ fun MainMap(
                 }
 
                 if (locationSearched.isNotEmpty()) LocationSearchContainer(locationSearched)
-                if (state.spots.isNotEmpty()) HorizontalSpotsList(spots = state.spots)
+                if (state.spotRepresentation.spots.isNotEmpty()) {
+                    HorizontalSpotsList(spots = state.spotRepresentation.spots, onItemClicked = {
+                        navigator.navigate(
+                            SpotSheetDestination(
+                                it
+                            )
+                        )
+                    })
+                }
                 if (state.ads.isNotEmpty()) MainMapAdContainer(state.ads)
             }
         }
 
-        if (state.verticalListIsShowing) VerticalSpotsList(spots = state.spots)
+        if (state.verticalListIsShowing) {
+            VerticalSpotsList(spotsSortedFlow = viewModel.sortedSpots,
+                              { viewModel.onSortingOptionSelected(it) }) {
+                navigator.navigate(
+                    SpotSheetDestination(
+                        it
+                    )
+                )
+            }
+        }
+
 
         TopButtons(
             isVerticalListOpen = state.verticalListIsShowing,
-            onListButtonClick = { viewModel.swapVerticalList() }
+            onListButtonClick = { viewModel.swapVerticalList() },
+            source = state.spotRepresentation.source
         )
 
         //        Box(
@@ -183,7 +234,8 @@ fun LocationSearchContainer(label: String) {
         modifier = Modifier
             .fillMaxWidth()
             .height(44.dp)
-            .padding(bottom = 15.dp, start = 16.dp, end = 16.dp),
+            .padding(bottom = 15.dp, start = 16.dp, end = 16.dp)
+            .background(Color.White, RoundedCornerShape(5)),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -238,7 +290,21 @@ fun SearchHereButton(onClick: () -> Unit) {
 }
 
 @Composable
-fun VerticalSpotsList(spots: List<Spot>) {
+fun VerticalSpotsList(
+    spotsSortedFlow: StateFlow<List<Spot>>,
+    onSortOptionSelected: (SortOption) -> Unit,
+    onItemClicked: (Spot) -> Unit
+) {
+
+    val sorting = LocalDependencyContainer.current.appViewModel.verticalListSortingOption
+    val spotsSorted by spotsSortedFlow.collectAsState()
+
+    LaunchedEffect(sorting) {
+        sorting.collect {
+            onSortOptionSelected(it)
+        }
+    }
+
     val scrollState = rememberScrollState()
     LazyColumn(
         modifier = Modifier
@@ -249,51 +315,52 @@ fun VerticalSpotsList(spots: List<Spot>) {
             .fillMaxSize()
             .padding(top = 100.dp),
     ) {
-        items(spots) { item ->
-            VerticalListItem(item)
+        items(spotsSorted) { item ->
+            Row(modifier = Modifier
+                .padding(start = 15.dp, end = 15.dp, bottom = 20.dp)
+                .shadow(2.dp, RoundedCornerShape(8))
+                .zIndex(1f)
+                .fillMaxWidth()
+                .height(130.dp)
+                .background(Color.White, RoundedCornerShape(8))
+                .clickable { onItemClicked(item) }) {
+                VerticalListItem(item)
+            }
         }
     }
 }
 
 @Composable
 fun VerticalListItem(spot: Spot) {
-    Row(
-        modifier = Modifier
-            .padding(start = 15.dp, end = 15.dp, bottom = 20.dp)
-            .shadow(2.dp, RoundedCornerShape(8))
-            .zIndex(1f)
-            .fillMaxWidth()
-            .height(130.dp)
-            .background(Color.White, RoundedCornerShape(8))
-    ) {
-        if (spot.isPremium) {
 
-            Box {
-                Image(
-                    painter = painterResource(id = R.drawable.dealerex),
-                    contentDescription = "",
-                    contentScale = ContentScale.FillHeight,
-                    modifier = Modifier.clip(
+    if (spot.isPremium) {
+        Box {
+            GlideImage(
+                modifier = Modifier
+                    .clip(
                         RoundedCornerShape(
-                            topStart = 8.dp,
-                            bottomStart = 8.dp
+                            topStart = 8.dp, bottomStart = 8.dp
                         )
                     )
+                    .size(130.dp),
+                imageModel = { spot.photos[0].url },
+                imageOptions = ImageOptions(
+                    contentScale = ContentScale.FillHeight, alignment = Alignment.Center
                 )
+            )
 
-                Image(
-                    imageVector = Icons.Filled.Check,
-                    contentDescription = "",
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(end = 5.dp, bottom = 5.dp)
-                        .shadow(2.dp, RoundedCornerShape(15))
-                        .zIndex(1f)
-                        .background(Color.White, RoundedCornerShape(15))
-                        .padding(5.dp)
+            Image(
+                imageVector = Icons.Filled.Check,
+                contentDescription = "",
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 5.dp, bottom = 5.dp)
+                    .shadow(2.dp, RoundedCornerShape(15))
+                    .zIndex(1f)
+                    .background(Color.White, RoundedCornerShape(15))
+                    .padding(5.dp)
 
-                )
-            }
+            )
         }
     }
 
@@ -301,13 +368,16 @@ fun VerticalListItem(spot: Spot) {
         Text(
             modifier = Modifier.padding(bottom = 5.dp),
             fontWeight = FontWeight.W500,
+            maxLines = 1,
             fontSize = 14.sp,
             text = spot.name
         )
         Text(
             modifier = Modifier.padding(bottom = 5.dp),
             fontWeight = FontWeight(450),
-            fontSize = 10.sp, text = spot.name,
+            fontSize = 12.sp,
+            maxLines = 1,
+            text = spot.fullLocation,
             color = AppColor.neutralText
         )
         Spacer(modifier = Modifier.weight(1f))
@@ -325,7 +395,7 @@ fun VerticalListItem(spot: Spot) {
                 )
             }
 
-            if (spot.isPremium) {
+            if (spot.services.isNotEmpty()) {
                 Image(
                     painter = painterResource(id = R.drawable.repair),
                     contentDescription = "",
@@ -338,7 +408,7 @@ fun VerticalListItem(spot: Spot) {
                 )
             }
 
-            if (spot.isPremium) {
+            if (spot.brands.isNotEmpty()) {
                 Image(
                     painter = painterResource(id = R.drawable.dealers),
                     contentDescription = "",
@@ -350,7 +420,7 @@ fun VerticalListItem(spot: Spot) {
                 )
             }
 
-            if (spot.isPremium) {
+            if (spot.brands.isNotEmpty()) {
                 Image(
                     painter = painterResource(id = R.drawable.accessories),
                     contentDescription = "",
@@ -364,153 +434,7 @@ fun VerticalListItem(spot: Spot) {
 
             Spacer(modifier = Modifier.weight(1f))
 
-            Row(
-                modifier = Modifier
-                    .shadow(2.dp, RoundedCornerShape(15))
-                    .zIndex(1f)
-                    .background(Color.White, RoundedCornerShape(15))
-                    .padding(5.dp), verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    modifier = Modifier.padding(end = 5.dp),
-                    painter = painterResource(id = R.drawable.distance),
-                    contentDescription = "", tint = AppColor.Primary
-                )
-                Text(
-                    text = "30 km",
-                    color = AppColor.neutralText,
-                    fontWeight = FontWeight.W500,
-                    fontSize = 12.sp
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun HorizontalSpotsList(spots: List<Spot>) {
-    val scrollState = rememberScrollState()
-    LazyRow(
-        modifier = Modifier
-            .scrollable(
-                state = scrollState, orientation = Orientation.Vertical
-            )
-            .fillMaxWidth()
-            .height(130.dp)
-    ) {
-        items(spots) { item ->
-            HorizontalListItem(item)
-        }
-    }
-}
-
-@Composable
-fun LazyItemScope.HorizontalListItem(spot: Spot) {
-    Row(
-        modifier = Modifier
-            .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
-            .shadow(2.dp, RoundedCornerShape(8))
-            .zIndex(1f)
-            .fillMaxHeight()
-            .fillParentMaxWidth(0.85f)
-            .background(Color.White, RoundedCornerShape(8))
-    ) {
-
-        if (spot.isPremium && spot.photos.isNotEmpty()) {
-            Box {
-                Image(
-                    painter = painterResource(id = R.drawable.dealerex),
-                    contentDescription = "",
-                    contentScale = ContentScale.FillHeight,
-                    modifier = Modifier.clip(
-                        RoundedCornerShape(
-                            topStart = 8.dp,
-                            bottomStart = 8.dp
-                        )
-                    )
-                )
-
-                Image(
-                    imageVector = Icons.Filled.Check,
-                    contentDescription = "",
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(end = 5.dp, bottom = 5.dp)
-                        .shadow(2.dp, RoundedCornerShape(15))
-                        .zIndex(1f)
-                        .background(Color.White, RoundedCornerShape(15))
-                        .padding(5.dp)
-                )
-            }
-        }
-
-        Column(modifier = Modifier.padding(8.dp)) {
-            Text(
-                modifier = Modifier.padding(bottom = 5.dp),
-                fontWeight = FontWeight.W500,
-                fontSize = 14.sp,
-                text = spot.name
-            )
-            Text(
-                modifier = Modifier.padding(bottom = 5.dp),
-                fontWeight = FontWeight(450),
-                fontSize = 10.sp, text = spot.name,
-                color = AppColor.neutralText
-            )
-            Spacer(modifier = Modifier.weight(1f))
-
-            Row {
-                if (spot.isPremium) {
-                    Image(
-                        painter = painterResource(id = R.drawable.premium_badge),
-                        contentDescription = "",
-                        modifier = Modifier
-                            .shadow(2.dp, RoundedCornerShape(15))
-                            .zIndex(1f)
-                            .background(Color.White, RoundedCornerShape(15))
-                            .padding(5.dp)
-                    )
-                }
-
-                if (spot.isPremium) {
-                    Image(
-                        painter = painterResource(id = R.drawable.repair),
-                        contentDescription = "",
-                        modifier = Modifier
-                            .padding(horizontal = 5.dp)
-                            .shadow(2.dp, RoundedCornerShape(15))
-                            .zIndex(1f)
-                            .background(Color.White, RoundedCornerShape(15))
-                            .padding(5.dp)
-                    )
-                }
-
-                if (spot.isPremium) {
-                    Image(
-                        painter = painterResource(id = R.drawable.dealers),
-                        contentDescription = "",
-                        modifier = Modifier
-                            .shadow(2.dp, RoundedCornerShape(15))
-                            .zIndex(1f)
-                            .background(Color.White, RoundedCornerShape(15))
-                            .padding(5.dp)
-                    )
-                }
-
-                if (spot.isPremium) {
-                    Image(
-                        painter = painterResource(id = R.drawable.accessories),
-                        contentDescription = "",
-                        modifier = Modifier
-                            .shadow(2.dp, RoundedCornerShape(15))
-                            .zIndex(1f)
-                            .background(Color.White, RoundedCornerShape(15))
-                            .padding(5.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.weight(1f))
-
+            if (spot.photos.isEmpty()) {
                 Row(
                     modifier = Modifier
                         .shadow(2.dp, RoundedCornerShape(15))
@@ -521,15 +445,222 @@ fun LazyItemScope.HorizontalListItem(spot: Spot) {
                     Icon(
                         modifier = Modifier.padding(end = 5.dp),
                         painter = painterResource(id = R.drawable.distance),
-                        contentDescription = "", tint = AppColor.Primary
+                        contentDescription = "",
+                        tint = AppColor.Primary
                     )
                     Text(
-                        text = "30 km",
+                        text = Location(
+                            spot.latitude, spot.longitude
+                        ).distanceFromUserLocationText!!,
                         color = AppColor.neutralText,
                         fontWeight = FontWeight.W500,
                         fontSize = 12.sp
                     )
                 }
+            }
+        }
+        if (spot.isPremium && spot.photos.isNotEmpty()) {
+            Row(
+                modifier = Modifier
+                    .shadow(2.dp, RoundedCornerShape(15))
+                    .zIndex(1f)
+                    .background(Color.White, RoundedCornerShape(15))
+                    .padding(5.dp), verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    modifier = Modifier.padding(end = 5.dp),
+                    painter = painterResource(id = R.drawable.distance),
+                    contentDescription = "",
+                    tint = AppColor.Primary
+                )
+                Text(
+                    text = Location(spot.latitude, spot.longitude).distanceFromUserLocationText!!,
+                    color = AppColor.neutralText,
+                    fontWeight = FontWeight.W500,
+                    fontSize = 12.sp
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun HorizontalSpotsList(spots: List<Spot>, onItemClicked: (Spot) -> Unit) {
+    val scrollState = rememberScrollState()
+    LazyRow(
+        modifier = Modifier
+            .scrollable(
+                state = scrollState, orientation = Orientation.Vertical
+            )
+            .fillMaxWidth()
+            .height(130.dp)
+    ) {
+        items(spots) { item ->
+            Row(modifier = Modifier
+                .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
+                .shadow(2.dp, RoundedCornerShape(8))
+                .zIndex(1f)
+                .fillMaxHeight()
+                .fillParentMaxWidth(0.85f)
+                .background(Color.White, RoundedCornerShape(8))
+                .clickable { onItemClicked(item) }) {
+                HorizontalListItem(item)
+            }
+        }
+    }
+}
+
+@Composable
+fun HorizontalListItem(spot: Spot) {
+
+    if (spot.isPremium && spot.photos.isNotEmpty()) {
+        Box {
+
+            GlideImage(
+                modifier = Modifier
+                    .clip(
+                        RoundedCornerShape(
+                            topStart = 8.dp, bottomStart = 8.dp
+                        )
+                    )
+                    .size(130.dp),
+                imageModel = { spot.photos[0].url },
+                imageOptions = ImageOptions(
+                    contentScale = ContentScale.FillHeight, alignment = Alignment.Center
+                )
+            )
+
+            Image(
+                painter = painterResource(id = R.drawable.premium_badge),
+                contentDescription = "",
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 5.dp, bottom = 5.dp)
+                    .shadow(2.dp, RoundedCornerShape(15))
+                    .zIndex(1f)
+                    .background(Color.White, RoundedCornerShape(15))
+                    .padding(5.dp)
+            )
+        }
+    }
+
+    Column(modifier = Modifier.padding(8.dp)) {
+        Text(
+            modifier = Modifier.padding(bottom = 5.dp),
+            fontWeight = FontWeight.W500,
+            maxLines = 1,
+            fontSize = 14.sp,
+            text = spot.name
+        )
+        Text(
+            modifier = Modifier.padding(bottom = 5.dp),
+            fontWeight = FontWeight(450),
+            maxLines = 1,
+            fontSize = 12.sp,
+            text = spot.fullLocation,
+            color = AppColor.neutralText
+        )
+        Spacer(modifier = Modifier.weight(1f))
+
+        Row {
+            if (spot.isPremium && spot.photos.isEmpty()) {
+                Image(
+                    painter = painterResource(id = R.drawable.premium_badge),
+                    contentDescription = "",
+                    modifier = Modifier
+                        .shadow(2.dp, RoundedCornerShape(15))
+                        .zIndex(1f)
+                        .background(Color.White, RoundedCornerShape(15))
+                        .padding(5.dp)
+                )
+            }
+
+            if (spot.services.isNotEmpty()) {
+                Image(
+                    painter = painterResource(id = R.drawable.repair),
+                    contentDescription = "",
+                    modifier = Modifier
+                        .padding(horizontal = 5.dp)
+                        .shadow(2.dp, RoundedCornerShape(15))
+                        .zIndex(1f)
+                        .background(Color.White, RoundedCornerShape(15))
+                        .padding(5.dp)
+                )
+            }
+
+            if (spot.brands.isNotEmpty()) {
+                Image(
+                    painter = painterResource(id = R.drawable.dealers),
+                    contentDescription = "",
+                    modifier = Modifier
+                        .padding(horizontal = 5.dp)
+                        .shadow(2.dp, RoundedCornerShape(15))
+                        .zIndex(1f)
+                        .background(Color.White, RoundedCornerShape(15))
+                        .padding(5.dp)
+                )
+            }
+
+            if (spot.brands.isNotEmpty()) {
+                Image(
+                    painter = painterResource(id = R.drawable.accessories),
+                    contentDescription = "",
+                    modifier = Modifier
+                        .padding(horizontal = 5.dp)
+                        .shadow(2.dp, RoundedCornerShape(15))
+                        .zIndex(1f)
+                        .background(Color.White, RoundedCornerShape(15))
+                        .padding(5.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            if (spot.photos.isEmpty()) {
+                Row(
+                    modifier = Modifier
+                        .shadow(2.dp, RoundedCornerShape(15))
+                        .zIndex(1f)
+                        .background(Color.White, RoundedCornerShape(15))
+                        .padding(5.dp), verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        modifier = Modifier.padding(end = 5.dp),
+                        painter = painterResource(id = R.drawable.distance),
+                        contentDescription = "",
+                        tint = AppColor.Primary
+                    )
+                    Text(
+                        text = Location(
+                            spot.latitude, spot.longitude
+                        ).distanceFromUserLocationText!!,
+                        color = AppColor.neutralText,
+                        fontWeight = FontWeight.W500,
+                        fontSize = 12.sp
+                    )
+                }
+            }
+        }
+        if (spot.isPremium && spot.photos.isNotEmpty()) {
+            Row(
+                modifier = Modifier
+                    .shadow(2.dp, RoundedCornerShape(15))
+                    .zIndex(1f)
+                    .background(Color.White, RoundedCornerShape(15))
+                    .padding(5.dp), verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    modifier = Modifier.padding(end = 5.dp),
+                    painter = painterResource(id = R.drawable.distance),
+                    contentDescription = "",
+                    tint = AppColor.Primary
+                )
+                Text(
+                    text = Location(spot.latitude, spot.longitude).distanceFromUserLocationText!!,
+                    color = AppColor.neutralText,
+                    fontWeight = FontWeight.W500,
+                    fontSize = 12.sp
+                )
             }
         }
     }
@@ -538,13 +669,16 @@ fun LazyItemScope.HorizontalListItem(spot: Spot) {
 @Composable
 fun MainMapAdContainer(ad: List<Ad>) {
 
-    val scope = rememberCoroutineScope()
+    val uriHandler = LocalUriHandler.current
 
     GlideImage(
         modifier = Modifier
             .fillMaxWidth()
-            .height(50.dp)
-            .clickable { scope.launch { ad.first().click } },
+            .height(80.dp)
+            .clickable {
+                uriHandler.openUri(ad.first().url)
+                uriHandler.openUri(ad.first().click)
+                       },
         imageModel = { ad.first().url },
         imageOptions = ImageOptions(
             contentScale = ContentScale.FillBounds, alignment = Alignment.Center
@@ -554,8 +688,7 @@ fun MainMapAdContainer(ad: List<Ad>) {
 
 @Composable
 fun TopButtons(
-    onListButtonClick: () -> Unit,
-    isVerticalListOpen: Boolean
+    onListButtonClick: () -> Unit, isVerticalListOpen: Boolean, source: SpotSource
 ) {
     val appViewModel = LocalDependencyContainer.current.appViewModel
     val scope = rememberCoroutineScope()
@@ -577,8 +710,7 @@ fun TopButtons(
             Image(
                 painter = if (isVerticalListOpen) painterResource(id = R.drawable.map) else painterResource(
                     id = R.drawable.list
-                ),
-                contentDescription = stringResource(id = R.string.cd_button_vertical_list)
+                ), contentDescription = stringResource(id = R.string.cd_button_vertical_list)
             )
         }
 
@@ -588,20 +720,25 @@ fun TopButtons(
             .padding(end = 10.dp)
             .shadow(2.dp, RoundedCornerShape(Dimensions.radiusRound))
             .zIndex(1f)
-            .background(Color.White, RoundedCornerShape(Dimensions.radiusRound)),
-                   onClick = {
-                       scope.launch {
-                           if (isVerticalListOpen) Globals.currentBottomSheetOption =
-                               BottomSheetOption.SORT else Globals.currentBottomSheetOption =
-                               BottomSheetOption.FILTER
-                           appViewModel.bottomSheetIsShowing.show()
-                       }
-                   }) {
+            .background(Color.White, RoundedCornerShape(Dimensions.radiusRound)), onClick = {
+            scope.launch {
+                appViewModel.onBottomSheetContentChange(
+                    if (isVerticalListOpen) {
+                        if (source == SpotSource.AROUND_PLACE) {
+                            BottomSheetOption.SORT_AROUND_PLACE
+                        }
+                        BottomSheetOption.SORT
+                    } else {
+                        BottomSheetOption.FILTER
+                    }
+                )
+                appViewModel.bottomSheetIsShowing.show()
+            }
+        }) {
             Image(
                 painter = if (isVerticalListOpen) painterResource(id = R.drawable.sort) else painterResource(
                     id = R.drawable.map_layer
-                ),
-                contentDescription = stringResource(
+                ), contentDescription = stringResource(
                     id = R.string.cd_button_mapstyle
                 )
             )

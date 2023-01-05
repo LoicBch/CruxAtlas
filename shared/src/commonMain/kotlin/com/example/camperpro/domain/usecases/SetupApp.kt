@@ -11,6 +11,7 @@ class SetupApp(
     suspend operator fun invoke(): ResultWrapper<Nothing> {
         return when (val starter = camperProApi.starter()) {
             is ResultWrapper.Success -> {
+                // TODO: Add persistence, does it really make sens tho ?
                 starter.value?.let { const ->
                     Globals.filters.brands = const.filterBrands
                     Globals.filters.services = const.filterServices

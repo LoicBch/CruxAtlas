@@ -11,6 +11,7 @@ import androidx.compose.material.icons.sharp.Close
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -20,24 +21,35 @@ import androidx.compose.ui.unit.sp
 import com.example.camperpro.android.LocalDependencyContainer
 import com.example.camperpro.android.R
 import com.example.camperpro.android.composables.AppButton
-import com.example.camperpro.android.filter.RadioGroupItem
 import com.example.camperpro.android.ui.theme.AppColor
+import com.example.camperpro.utils.BottomSheetOption
+import com.example.camperpro.utils.SortOption
 import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun SortingSheet() {
+fun SortingSheet(spotsSource: BottomSheetOption) {
 
     var categorySelected by remember {
         mutableStateOf(SortCategory.NONE)
     }
 
     val coroutine = rememberCoroutineScope()
-    val sheetState = LocalDependencyContainer.current.appViewModel.bottomSheetIsShowing
+    val appViewModel = LocalDependencyContainer.current.appViewModel
+    val sheetState = appViewModel.bottomSheetIsShowing
 
-    Column {
-        Row(modifier = Modifier.fillMaxWidth()) {
+    Column(
+        modifier = Modifier
+            .fillMaxHeight()
+            .padding(horizontal = 16.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 30.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             IconButton(onClick = { coroutine.launch { sheetState.hide() } }) {
                 Icon(
                     imageVector = Icons.Sharp.Close,
@@ -50,8 +62,8 @@ fun SortingSheet() {
                 fontSize = 16.sp,
                 fontWeight = FontWeight.W500,
                 text = stringResource(
-                    id = R.string.filters_title
-                )
+                    id = R.string.sorting
+                ), color = Color.Black
             )
             Spacer(modifier = Modifier.weight(0.5f))
             if (categorySelected != SortCategory.NONE) {
@@ -76,11 +88,11 @@ fun SortingSheet() {
 
         Divider(modifier = Modifier.padding(top = 13.dp))
 
-        SortCategory.values().forEach { category ->
+        SortCategory.values().availableSorting(spotsSource).forEach { category ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 20.dp)
+                    .height(40.dp)
                     .selectable(
                         selected = (categorySelected == category),
                         onClick = { categorySelected = category },
@@ -97,9 +109,12 @@ fun SortingSheet() {
         Spacer(modifier = Modifier.weight(1f))
 
         AppButton(
-            isActive = categorySelected.optionSelected != null,
-            onClick = { /*TODO*/ },
-            modifier = Modifier,
+            modifier = Modifier.padding(bottom = 25.dp),
+            isActive = categorySelected != SortCategory.NONE,
+            onClick = {
+                appViewModel.onSortingOptionSelected(categorySelected.toSortOption())
+                coroutine.launch { sheetState.hide() }
+            },
             textRes = R.string.apply_sorting
         )
     }
@@ -121,7 +136,6 @@ fun RowScope.SortRadioGroupItem(sortCategory: SortCategory, sortCategorySelected
     )
     Spacer(modifier = Modifier.weight(0.5f))
     RadioButton(
-        modifier = Modifier.padding(end = 16.dp),
         selected = (sortCategorySelected == sortCategory),
         onClick = null,
         colors = RadioButtonDefaults.colors(selectedColor = if (sortCategorySelected == sortCategory) AppColor.Primary else AppColor.Tertiary)
@@ -130,18 +144,50 @@ fun RowScope.SortRadioGroupItem(sortCategory: SortCategory, sortCategorySelected
 
 enum class SortCategory(
     @StringRes val title: Int,
-    @DrawableRes val icon: Int,
-    var optionSelected: String?
+    @DrawableRes val icon: Int
 ) {
     NONE(
         R.string.none,
-        R.drawable.circle_cross, null
+        R.drawable.circle_cross
     ),
     DIST_FROM_YOU(
         R.string.by_distance_from_you,
-        R.drawable.distance, null
+        R.drawable.distance
     ),
     DIST_FROM_SEARCHED(
-        R.string.distance_from_searched_location, R.drawable.distance, null
+        R.string.distance_from_searched_location, R.drawable.distance
+    ),
+    BY_DATE(
+        R.string.by_date, R.drawable.events
     )
+}
+
+// TODO: clean ca
+fun SortCategory.toSortOption(): SortOption {
+    return when (this) {
+        SortCategory.NONE -> SortOption.NONE
+        SortCategory.DIST_FROM_YOU -> SortOption.DIST_FROM_YOU
+        SortCategory.DIST_FROM_SEARCHED -> SortOption.DIST_FROM_SEARCHED
+        SortCategory.BY_DATE -> SortOption.BY_DATE
+    }
+}
+
+fun Array<SortCategory>.availableSorting(spotsSource: BottomSheetOption): List<SortCategory> {
+    return when (spotsSource) {
+        BottomSheetOption.SORT -> listOf(SortCategory.NONE, SortCategory.DIST_FROM_YOU)
+        BottomSheetOption.SORT_AROUND_PLACE -> listOf(
+            SortCategory.NONE,
+            SortCategory.DIST_FROM_YOU,
+            SortCategory.DIST_FROM_SEARCHED
+        )
+        BottomSheetOption.SORT_EVENTS -> listOf(
+            SortCategory.NONE,
+            SortCategory.DIST_FROM_YOU,
+            SortCategory.DIST_FROM_SEARCHED,
+            SortCategory.BY_DATE
+        )
+        else -> {
+            this.toList()
+        }
+    }
 }

@@ -5,6 +5,12 @@ import com.example.camperpro.utils.CommonParcelable
 import com.example.camperpro.utils.CommonParcelize
 
 @CommonParcelize
+data class SpotPresentation(val spots: List<Spot>, val source: SpotSource): CommonParcelable
+enum class SpotSource {
+    AROUND_ME, AROUND_PLACE, ITINERARY, AROUND_POSITION, DEFAULT
+}
+
+@CommonParcelize
 data class Spot(
     var id: String,
     var name: String,

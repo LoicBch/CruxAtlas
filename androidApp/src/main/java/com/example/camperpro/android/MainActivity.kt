@@ -3,8 +3,9 @@ package com.example.camperpro.android
 import android.Manifest
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.window.SplashScreen
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -15,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -30,15 +32,21 @@ import com.example.camperpro.android.di.AppDependencyContainer
 import com.example.camperpro.android.di.platformModule
 import com.example.camperpro.android.home.HomeScreen
 import com.example.camperpro.android.onBoarding.SplashScreen
+import com.example.camperpro.android.onBoarding.SplashScreenViewModel
+import com.example.camperpro.domain.model.Location
+import com.example.camperpro.domain.usecases.SetupApp
 import com.example.camperpro.utils.*
 import com.example.camperpro.utils.di.sharedModule
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
+import org.koin.core.parameter.parametersOf
 
 val LocalDependencyContainer = compositionLocalOf<AppDependencyContainer> {
     error("No dependency container provided!")
@@ -88,10 +96,6 @@ class MainActivity : ComponentActivity() {
             modules(sharedModule() + platformModule())
         }
 
-        startNetworkObserver(this)
-        checkPermission(this)
-        initGlobalsVar(this.applicationContext)
-
         setContent {
             MyApplicationTheme {
                 val appViewModel: AppViewModel = getViewModel()
@@ -104,14 +108,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    //    mettre dans un networkmanager
-    private fun startNetworkObserver(activity: Activity) {
-        NetworkConnectivityObserver(activity.applicationContext).observe().onEach {
-            Globals.network.status = it
-        }.launchIn(lifecycleScope)
-    }
-
-
     @Composable
     fun RootNavGraph(navController: NavHostController) {
         NavHost(
@@ -120,7 +116,10 @@ class MainActivity : ComponentActivity() {
         ) {
 
             composable(route = SplashScreenDestination.route) {
-                SplashScreen(navController = navController)
+                val context = LocalContext.current
+                val setupApp : SetupApp by inject()
+                val languageManager: LanguageManager by inject{ parametersOf(context) }
+                        SplashScreen(navController = navController, SplashScreenViewModel(setupApp, languageManager))
             }
 
             composable(route = Graphs.HOME) {
@@ -132,71 +131,5 @@ class MainActivity : ComponentActivity() {
     object Graphs {
         const val ROOT = "root_graph"
         const val HOME = "home_graph"
-    }
-
-    override fun onResume() {
-        super.onResume()
-        startService(this)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        stopService(this)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        stopService(this)
-    }
-}
-
-private fun initGlobalsVar(context: Context) {
-    Globals.geoLoc.appLanguage = "FR"
-    Globals.geoLoc.deviceLanguage = LanguageManager(context).getDeviceLanguage()
-    Globals.geoLoc.deviceCountry = LanguageManager(context).getDeviceCountry()
-}
-
-
-//Placer ca dans le Splash
-fun checkPermission(activity: ComponentActivity) {
-    val locationPermissionRequest = activity.registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        when {
-            permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true -> {
-                LocationClient(activity.applicationContext).startLocationObserver()
-            }
-            permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true -> {
-                LocationClient(activity.applicationContext).startLocationObserver()
-            }
-            else -> {
-                // No location access granted.
-            }
-        }
-    }
-
-    if (!activity.hasLocationPermission) {
-        locationPermissionRequest.launch(
-            arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            )
-        )
-    } else {
-        startService(activity)
-    }
-}
-
-private fun startService(activity: Activity) {
-    Intent(activity.applicationContext, LocationService::class.java).apply {
-        action = LocationService.ACTION_START
-        activity.startService(this)
-    }
-}
-
-private fun stopService(activity: Activity) {
-    Intent(activity.applicationContext, LocationService::class.java).apply {
-        action = LocationService.ACTION_STOP
-        activity.stopService(this)
     }
 }

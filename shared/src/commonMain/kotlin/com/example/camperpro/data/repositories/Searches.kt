@@ -6,6 +6,7 @@ import com.example.camperpro.domain.model.Search
 import com.example.camperpro.domain.repositories.SearchesRepository
 import com.example.camperpro.utils.Constants
 import toDto
+import toLocationDto
 import toVo
 
 class Searches(
@@ -13,8 +14,12 @@ class Searches(
     private val locationSearchDto: LocationSearchDao
 ) : SearchesRepository {
 
-    override suspend fun delete(label: String) {
-        searchDao.deleteSearchByLabel(label)
+    override suspend fun delete(search: Search) {
+        if (search.lat != null && search.lon != null) {
+            locationSearchDto.deleteSearchByLabel(search.toLocationDto().label)
+        } else {
+            searchDao.deleteSearchByLabel(search.searchLabel)
+        }
     }
 
     override suspend fun allOfCategory(category: String): List<Search>? {
@@ -26,6 +31,10 @@ class Searches(
     }
 
     override suspend fun add(search: Search) {
-        searchDao.insertSearch(search.toDto())
+        if (search.lat != null && search.lon != null) {
+            locationSearchDto.insertSearch(search.toLocationDto())
+        } else {
+            searchDao.insertSearch(search.toDto())
+        }
     }
 }

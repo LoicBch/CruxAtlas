@@ -27,5 +27,5 @@ data class Result(
     val name: String,
 
     @SerialName("place_rank")
-    val placeRank: Long
+    val placeRank: Int? = null
 )

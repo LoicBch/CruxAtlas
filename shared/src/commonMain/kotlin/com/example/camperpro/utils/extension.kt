@@ -17,5 +17,5 @@ fun Double.toDMS(): String {
 val Spot.fullLocation get() = "$address, $city, $postalCode"
 val Spot.fullGeolocalisation
     get() =
-        "$latitude, $longitude (lat, lng)\rN ${latitude.toDMS()}, E ${longitude.toDMS()}"
+        "$latitude, $longitude (lat, lng)\nN ${latitude.toDMS()}, E ${longitude.toDMS()}"
 

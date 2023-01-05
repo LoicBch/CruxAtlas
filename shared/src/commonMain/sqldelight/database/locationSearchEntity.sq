@@ -1,9 +1,9 @@
 CREATE TABLE locationSearchEntity (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    label TEXT NOT NULL,
+    label TEXT UNIQUE NOT NULL,
     timeStamp INTEGER NOT NULL,
-    lat INTEGER NOT NULL,
-    long INTEGER NOT NULL
+    lat REAL NOT NULL,
+    long REAL NOT NULL
 );
 
 getAllSearchs:
