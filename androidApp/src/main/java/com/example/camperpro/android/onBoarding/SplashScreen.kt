@@ -24,14 +24,8 @@ import androidx.navigation.NavController
 import com.example.camperpro.android.MainActivity
 import com.example.camperpro.android.R
 import com.example.camperpro.android.ui.theme.AppColor
-import com.example.camperpro.utils.LocationClient
 import com.example.camperpro.utils.hasLocationPermission
 import com.ramcosta.composedestinations.annotation.Destination
-import org.koin.androidx.compose.get
-import org.koin.androidx.compose.inject
-import org.koin.androidx.compose.koinViewModel
-import org.koin.core.parameter.parametersOf
-import org.koin.java.KoinJavaComponent.inject
 
 // TODO: optimize permissions management
 @Destination
@@ -86,7 +80,7 @@ fun SplashScreen(navController: NavController, viewModel: SplashScreenViewModel)
                     Manifest.permission.ACCESS_COARSE_LOCATION
                 )
             )
-        }else{
+        } else {
             viewModel.onUserRespondToLocationPermission(true)
         }
     }

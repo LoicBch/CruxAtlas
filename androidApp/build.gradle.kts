@@ -60,6 +60,8 @@ dependencies {
     }
 
 
+    implementation ("androidx.startup:startup-runtime:1.1.1")
+
     //Google maps
     with(Deps.Maps) {
         implementation(compose)

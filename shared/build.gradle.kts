@@ -51,7 +51,6 @@ kotlin {
                 implementation(Deps.Kotlinx.serializationJson)
 
                 implementation("com.google.android.gms:play-services-location:21.0.1")
-
             }
         }
         val commonTest by getting {
@@ -109,4 +108,5 @@ android {
 }
 dependencies {
     implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("androidx.startup:startup-runtime:1.1.1")
 }

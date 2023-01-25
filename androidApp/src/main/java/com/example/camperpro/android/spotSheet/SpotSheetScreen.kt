@@ -32,11 +32,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.example.camperpro.android.R
-import com.example.camperpro.android.components.dial
-import com.example.camperpro.android.components.navigateByGmaps
-import com.example.camperpro.android.components.sendMail
-import com.example.camperpro.android.components.share
 import com.example.camperpro.android.composables.AppButton
+import com.example.camperpro.android.extensions.dial
+import com.example.camperpro.android.extensions.navigateByGmaps
+import com.example.camperpro.android.extensions.sendMail
+import com.example.camperpro.android.extensions.share
 import com.example.camperpro.android.ui.theme.AppColor
 import com.example.camperpro.android.ui.theme.Dimensions
 import com.example.camperpro.domain.model.Location

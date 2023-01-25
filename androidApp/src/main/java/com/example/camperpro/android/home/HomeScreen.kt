@@ -70,7 +70,7 @@ fun HomeScreen(navController: NavHostController = rememberNavController()) {
                 Lifecycle.Event.ON_ANY -> Log.d("lifecycle", "onAny")
             }
         }
-        
+
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)

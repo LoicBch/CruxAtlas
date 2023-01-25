@@ -21,8 +21,13 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".LocationService"/>
-
+            <provider
+                android:name="androidx.startup.InitializationProvider"
+                android:authorities="${applicationId}.androidx-startup"
+                android:exported="false">
+                <meta-data  android:name="com.example.camperpro.managers.location.utils.ModuleInitializer"
+                    android:value="androidx.startup" />
+            </provider>
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyBJ9mguurlc3Z30pYQzUgEIaF9L0FiGn3M" />

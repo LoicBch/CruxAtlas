@@ -13,8 +13,8 @@ class FetchSpotAtLocationUseCase(private val spots: Spots) : IBaseUsecase {
         return spots.atLocation(location)
     }
 
-    suspend fun executeIos(): List<Spot> {
-        val res = spots.atLocation(Location(23.3, 23.3))
+    suspend fun executeIos(location: Location): List<Spot> {
+        val res = spots.atLocation(location)
         return if (res is ResultWrapper.Success) {
             res.value!!
         } else {
@@ -27,5 +27,5 @@ class FetchSpotAtLocationUseCase(private val spots: Spots) : IBaseUsecase {
 class RFetchSpotAtLocationUseCase : KoinComponent {
     private val fetchSpotAtLocationUseCase: FetchSpotAtLocationUseCase by inject()
     suspend fun execute(location: Location): List<Spot> =
-        fetchSpotAtLocationUseCase.executeIos()
+        fetchSpotAtLocationUseCase.executeIos(location)
 }
