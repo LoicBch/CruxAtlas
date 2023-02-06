@@ -2,6 +2,8 @@ import com.example.camperpro.data.model.dto.*
 import com.example.camperpro.data.model.responses.StarterResponse
 import com.example.camperpro.data.model.responses.SuggestionResponse
 import com.example.camperpro.domain.model.*
+import com.example.camperpro.domain.model.composition.Location
+import com.example.camperpro.domain.model.composition.Marker
 import com.example.camperpro.utils.Constants
 import com.example.camperpro.utils.toBool
 import database.LocationSearchEntity
@@ -9,11 +11,10 @@ import database.SearchEntity
 import kotlin.jvm.JvmName
 
 //Data to domain layer
-fun SpotDto.toVo() =
-    Spot(
+fun DealerDto.toVo() =
+    Dealer(
         id,
         name,
-        distance,
         brands.split(",").dropLast(1),
         services.split(",").dropLast(1),
         address,
@@ -33,15 +34,71 @@ fun SpotDto.toVo() =
         photos.toVo()
     )
 
+fun EventDto.toVo() = Event(
+    id,
+    name,
+    descriptionFr,
+    descriptionEn,
+    descriptionEs,
+    descriptionDe,
+    descriptionNl,
+    dateBegin,
+    dateEnd,
+    lat,
+    lon,
+    address,
+    postalCode,
+    city,
+    country,
+    countryIso,
+    url
+)
+
+fun PartnerDto.toVo() = Partner(
+    id,
+    name,
+    brands.split(",").dropLast(1),
+    services.split(",").dropLast(1),
+    address,
+    postalCode,
+    countryIso,
+    phone,
+    email,
+    website,
+    facebook,
+    "youtube",
+    "instagram",
+    twitter,
+    premium.toBool(),
+    city,
+    photos.toVo()
+)
+
+@JvmName("toPartnerList")
+fun List<PartnerDto>.toVo() = this.map { it.toVo() }
+
+fun Event.toMarker() = Marker(this.latitude, this.longitude, this)
+
+@JvmName("listEventsToMListMarker")
+fun List<Event>.toMarker() = map { it.toMarker() }
+fun Dealer.toMarker() = Marker(this.latitude, this.longitude, this)
+
+@JvmName("listDealersToMListMarker")
+fun List<Dealer>.toMarker() = map { it.toMarker() }
+
+@JvmName("toEventsVo")
+fun List<EventDto>.toVo() = map { it.toVo() }
+
 fun PhotoDto.toVo() = Photo(url)
 
 @JvmName("toPhotoVo")
 fun List<PhotoDto>.toVo() = map { it.toVo() }
-fun List<SpotDto>.toVo() = map { it.toVo() }
-fun AdDto.toVo() = Ad(type, url, click)
+fun List<DealerDto>.toVo() = map { it.toVo() }
+
 
 @JvmName("toAdVo")
 fun List<AdDto>.toVo() = map { it.toVo() }
+fun AdDto.toVo() = Ad(type, url, redirect, click)
 
 fun StarterResponse.toVo() = Starter(
     lists.services.map { Pair(it.id, it.label) },
@@ -58,11 +115,11 @@ fun List<MenuLinkDto>.toVo() = map { it.toVo() }
 
 
 //Domain to data layer
-fun Spot.toDto() = SpotDto(
+fun Dealer.toDto() = DealerDto(
     name = name, latitude = latitude.toString(), longitude = longitude.toString()
 )
 
-fun List<Spot>.toDto() = map { it.toDto() }
+fun List<Dealer>.toDto() = map { it.toDto() }
 
 
 //SQL DELIGHT
@@ -80,7 +137,9 @@ fun List<Search>.toDto() = map { it.toDto() }
 fun List<SearchDto>.toVo() = map { it.toVo() }
 
 
-fun LocationSearchEntity.toDto() = LocationSearchDto(id, label, timeStamp, lat.toDouble(), long.toDouble())
+fun LocationSearchEntity.toDto() =
+    LocationSearchDto(id, label, timeStamp, lat, long.toDouble())
+
 fun Search.toLocationDto() = LocationSearchDto(id, searchLabel, timeStamp, lat!!, lon!!)
 fun LocationSearchDto.toVo() =
     Search(id, Constants.Persistence.SEARCH_CATEGORY_LOCATION, label, timeStamp, lat, lon)

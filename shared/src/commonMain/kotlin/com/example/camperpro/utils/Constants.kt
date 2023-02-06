@@ -1,13 +1,13 @@
 package com.example.camperpro.utils
 
-import com.example.camperpro.domain.model.Location
+import com.example.camperpro.domain.model.composition.Location
 
 object Constants {
 
     object API {
         const val DEALERS = "dealers.php"
         const val STARTER = "app_general.php"
-        const val PARTNERS = "partners.php"
+        const val EVENTS = "events.php"
         const val ADS = "ads.php"
         const val GEOCODING = "geocoding.php"
     }
@@ -32,6 +32,6 @@ object Constants {
     const val BASE_URL = "https://camper-pro.com/services/$WEBSERVICE_VERSION/"
 }
 
-enum class SortOption{
+enum class SortOption {
     NONE, DIST_FROM_YOU, DIST_FROM_SEARCHED, BY_DATE
 }

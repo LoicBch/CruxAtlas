@@ -8,3 +8,4 @@ class AddSearch(private val searches: Searches): IBaseUsecase {
         searches.add(search)
     }
 }
+

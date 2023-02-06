@@ -6,11 +6,9 @@
     <string name="step">Step</string>
 
 
-
     <!--  MainMap Screen  -->
     <string name="appbar_around_me">Around me</string>
     <string name="appbar_around_location">Around a place</string>
-    <string name="appbar_events">Events</string>
     <string name="appbar_partners">Partners</string>
     <string name="appbar_menu">More</string>
     <string name="search_this_area">Search this area</string>
@@ -20,7 +18,6 @@
     <string name="cd_button_mapstyle">Change map layer</string>
     <string name="cd_around_me">display places around me</string>
     <string name="cd_around_location">open screen to search around a location</string>
-    <string name="cd_events">open events screen</string>
     <string name="cd_partners">open partners screen</string>
     <string name="cd_menu">open menu</string>
     <string name="cd_search_here">search at this location</string>
@@ -43,6 +40,8 @@
     <string name="filter_step1_option1">Repair, upgrade or buy motorhome</string>
     <string name="filter_step1_option2">Find official motorhome dealers</string>
     <string name="filter_step1_option3">Search motorhome accessories</string>
+    <string name="choose_country">Choose country</string>
+    <string name="confirm_selection">Confirm selection</string>
 
     <!--  Content description  -->
     <string name="cd_filter_icon">filter icon</string>
@@ -69,14 +68,16 @@
 
     <!--  Menu  -->
     <string name="menu_travel_tools">Travel tools</string>
-    <string name="menu_travel_checklists">Travel checklists</string>
+    <string name="menu_events">Events</string>
     <string name="menu_leveler">Leveler</string>
     <string name="menu_my_location">My location</string>
     <string name="menu_app_settings">App settings</string>
+    <string name="menu_travel_checklists">Travel checklists</string>
     <!--  Content description  -->
     <string name="cd_travel_tools">travel tools icon</string>
     <string name="cd_travel_checklist">travel checklist icon</string>
     <string name="cd_leveler">leveler icon</string>
+    <string name="cd_events">open events map</string>
     <string name="cd_my_location">my location icon</string>
     <string name="cd_app_settings">app settings icon</string>
 
@@ -104,10 +105,8 @@
     <string name="accessories_subtitle">These brands are sold and/or serviced at this place.</string>
 
 
-
     <!--  Content description  -->
     <string name="serv">go back</string>
-
 
 
 </resources>

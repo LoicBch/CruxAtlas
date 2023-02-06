@@ -41,7 +41,6 @@ fun AroundLocationScreen(
     resultNavigator: ResultBackNavigator<Place>,
     viewModel: AroundLocationViewModel = getViewModel()
 ) {
-
     val suggestionsList by viewModel.suggestionList.collectAsState()
     val placesHistoric = viewModel.placesHistoric
 

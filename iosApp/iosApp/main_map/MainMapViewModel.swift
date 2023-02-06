@@ -69,7 +69,7 @@ extension MainMapScreen {
         }
         
         func hideVerticalList(){
-            verticalListIsShowing = true
+            verticalListIsShowing = false
         }
         
         func permuteVerticalList(){

@@ -1,14 +1,8 @@
 package com.example.camperpro.android
 
-import android.Manifest
-import android.app.Activity
-import android.content.Context
 import android.os.Bundle
-import android.util.Log
-import android.window.SplashScreen
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -22,7 +16,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -33,13 +26,9 @@ import com.example.camperpro.android.di.platformModule
 import com.example.camperpro.android.home.HomeScreen
 import com.example.camperpro.android.onBoarding.SplashScreen
 import com.example.camperpro.android.onBoarding.SplashScreenViewModel
-import com.example.camperpro.domain.model.Location
 import com.example.camperpro.domain.usecases.SetupApp
 import com.example.camperpro.utils.*
 import com.example.camperpro.utils.di.sharedModule
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger

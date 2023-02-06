@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.sp
 import com.example.camperpro.android.R
 import com.example.camperpro.android.composables.ResultsList
 import com.example.camperpro.android.composables.SearchField
-import com.example.camperpro.android.composables.SearchList
+import com.example.camperpro.android.composables.HistoricSearchList
 import com.example.camperpro.android.ui.theme.AppColor
 import com.example.camperpro.android.ui.theme.Dimensions
 import com.example.camperpro.utils.Globals
@@ -63,7 +63,7 @@ fun FilterOptions(
         )
 
         if (textState.value.text.isEmpty()) {
-            SearchList(categorySelected, onSelectFilter = onItemClick)
+            HistoricSearchList(categorySelected, onSelectFilter = onItemClick)
         }
 
         val label = if (textState.value.text.isEmpty()) {

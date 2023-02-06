@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.sp
 import com.example.camperpro.android.LocalDependencyContainer
 import com.example.camperpro.android.R
 import com.example.camperpro.android.composables.AppButton
-import com.example.camperpro.android.composables.SearchList
+import com.example.camperpro.android.composables.HistoricSearchList
 import com.example.camperpro.android.ui.theme.AppColor
 import com.example.camperpro.android.ui.theme.Dimensions
 import kotlinx.coroutines.launch
@@ -50,7 +50,7 @@ fun FilterCategorySelection(
 
         if (categorySelected != FilterCategory.UNSELECTED) {
             FilterStepTwo(onSelectButtonClick, categorySelected)
-        }else{
+        } else {
             Spacer(modifier = Modifier.weight(1f))
         }
     }
@@ -118,7 +118,7 @@ fun FilterStepTwo(
             )
         }
 
-        SearchList(categorySelected, onSelectFilter = {
+        HistoricSearchList(categorySelected, onSelectFilter = {
             categorySelected.optionSelected = it
             buttonLabel = it
         })
@@ -256,7 +256,7 @@ fun LastSearchItem(search: String, onSearchDelete: () -> Unit, onSelectSearch: (
             fontWeight = FontWeight(450),
             color = AppColor.Tertiary
         )
-        
+
         Spacer(modifier = Modifier.weight(1f))
 
         Icon(
@@ -284,7 +284,7 @@ fun FilterStepOne(
         val sheetState = LocalDependencyContainer.current.appViewModel.bottomSheetIsShowing
         val coroutine = rememberCoroutineScope()
 
-        IconButton(onClick = { coroutine.launch { sheetState.hide() }}) {
+        IconButton(onClick = { coroutine.launch { sheetState.hide() } }) {
             Icon(imageVector = Icons.Sharp.Close, contentDescription = "", tint = AppColor.Tertiary)
         }
         Spacer(modifier = Modifier.weight(0.5f))

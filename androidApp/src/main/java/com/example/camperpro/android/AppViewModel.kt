@@ -12,7 +12,7 @@ import com.example.camperpro.domain.usecases.DeleteSearch
 import com.example.camperpro.domain.usecases.GetAllSearchForACategory
 import com.example.camperpro.utils.BottomSheetOption
 import com.example.camperpro.utils.SortOption
-import com.jetbrains.kmm.shared.data.ResultWrapper
+import com.example.camperpro.data.ResultWrapper
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -93,5 +93,3 @@ class AppViewModel(
         }
     }
 }
-
-data class Filter(val filterKey: String, val selected: Boolean)

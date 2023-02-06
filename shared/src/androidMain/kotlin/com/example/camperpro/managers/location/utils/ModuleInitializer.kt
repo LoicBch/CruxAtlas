@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.startup.Initializer
 import com.example.camperpro.managers.location.LocationManager
 import com.example.camperpro.managers.location.extension.configure
+import com.example.camperpro.managers.network.extension.configure
 
 
 @Suppress("UNUSED")

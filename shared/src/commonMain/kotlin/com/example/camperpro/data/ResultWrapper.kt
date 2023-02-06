@@ -1,8 +1,10 @@
-package com.jetbrains.kmm.shared.data
+package com.example.camperpro.data
 
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
 import io.ktor.utils.io.errors.*
+
+typealias ApiCallBlock<T> = suspend () -> T
 
 //covar != Swift
 sealed class ResultWrapper<out T> {
@@ -12,7 +14,7 @@ sealed class ResultWrapper<out T> {
 
 
 @Throws(IllegalStateException::class)
-suspend fun <T> safeApiCall(apiCall: suspend () -> T): ResultWrapper<T> {
+suspend fun <T> safeApiCall(apiCall: ApiCallBlock<T>): ResultWrapper<T> {
     return try {
         ResultWrapper.Success(apiCall.invoke())
     } catch (throwable: Throwable) {

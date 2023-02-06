@@ -1,7 +1,7 @@
 package com.example.camperpro.android
 
-import com.example.camperpro.android.destinations.SpotSheetDestination
+import com.example.camperpro.android.destinations.DealerDetailsScreenDestination
 
 object AndroidConstants {
-    val ScreensOverBottomBar = listOf(SpotSheetDestination)
+        val ScreensOverBottomBar = listOf(DealerDetailsScreenDestination)
 }

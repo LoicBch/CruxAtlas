@@ -22,7 +22,7 @@ struct HomeScreen: View {
                 BottomBar(viewModel: viewModel)
             }.edgesIgnoringSafeArea(.bottom)
                 .sheet(isPresented: $viewModel.bottomSheetIsOpen) {
-                Text("SHEET")
+                    BottomSheetController(option: viewModel.bottomOption)
             }
         }
     }
@@ -41,11 +41,7 @@ struct BottomBar: View {
             }
             
             NavigationView {
-                NavigationLink {
-                    AroundLocationScreen()
-                } label: {
-                    Text("Aller à la vue de détail")
-                }
+                AroundLocationScreen()
             }.tabItem {
                 Image(systemName: "person.fill")
                 Text("Around a place")

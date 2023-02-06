@@ -7,5 +7,6 @@ import com.example.camperpro.utils.CommonParcelize
 class Ad(
     val type: String,
     val url: String,
+    val redirect: String,
     val click: String
 ): CommonParcelable

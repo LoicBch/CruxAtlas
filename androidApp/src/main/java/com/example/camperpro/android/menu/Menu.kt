@@ -1,5 +1,7 @@
 package com.example.camperpro.android.menu
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,7 +12,6 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.ArrowForward
-import androidx.compose.material.icons.sharp.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,88 +31,48 @@ import com.example.camperpro.android.ui.theme.Dimensions
 import com.example.camperpro.domain.model.MenuLink
 import com.example.camperpro.utils.Globals
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 
-enum class MenuItems(val item: @Composable () -> Unit) {
-    TRAVEL_CHECKLIST({
-                         MenuItem(
-                             label = stringResource(id = R.string.menu_travel_checklists),
-                             onclick = { /*TODO*/ },
-                             menuIcon = {
-                                 Image(
-                                     modifier = Modifier
-                                         .size(30.dp)
-                                         .padding(start = 16.dp),
-                                     painter = painterResource(id = R.drawable.checklist),
-                                     contentDescription = stringResource(id = R.string.cd_travel_checklist)
-                                 )
-                             }, trailingIcon = {
-                                 androidx.compose.material.Icon(
-                                     imageVector = Icons.Sharp.ArrowForward,
-                                     contentDescription = "",
-                                     tint = AppColor.Secondary
-                                 )
-                             }, isSubMenu = true
-                         )
-                     }),
-    LEVELER({
-                MenuItem(
-                    label = stringResource(id = R.string.menu_leveler),
-                    onclick = { /*TODO*/ },
-                    menuIcon = {
-                        Image(
-                            modifier = Modifier.size(30.dp),
-                            imageVector = Icons.Sharp.Star,
-                            contentDescription = stringResource(id = R.string.cd_leveler)
-                        )
-                    }, trailingIcon = null
-                )
-            }),
-    MY_LOCATION({
-                    MenuItem(
-                        label = stringResource(id = R.string.menu_my_location),
-                        onclick = { /*TODO*/ },
-                        menuIcon = {
-                            Image(
-                                modifier = Modifier
-                                    .size(30.dp)
-                                    .padding(start = 16.dp),
-                                painter = painterResource(id = R.drawable.my_location),
-                                contentDescription = stringResource(id = R.string.cd_my_location)
-                            )
-                        }, trailingIcon = {
-                            androidx.compose.material.Icon(
-                                imageVector = Icons.Sharp.ArrowForward,
-                                contentDescription = "",
-                                tint = AppColor.Secondary
-                            )
-                        }, isSubMenu = true
-                    )
-                }),
-    APP_SETTINGS({
-                     MenuItem(
-                         label = stringResource(id = R.string.menu_app_settings),
-                         onclick = { /*TODO*/ },
-                         menuIcon = {
-                             Image(
-                                 modifier = Modifier.size(50.dp),
-                                 painter = painterResource(id = R.drawable.settings),
-                                 contentDescription = stringResource(id = R.string.cd_app_settings)
-                             )
-                         }, trailingIcon = {
-                             androidx.compose.material.Icon(
-                                 imageVector = Icons.Sharp.ArrowForward,
-                                 contentDescription = "", tint = AppColor.Secondary
-                             )
-                         }
-                     )
-                 })
-}
+data class MenuItem(
+    @StringRes val labelRes: Int,
+    val onclick: () -> Unit,
+    @DrawableRes val drawableRes: Int,
+    @StringRes val contentDescriptionRes: Int,
+    val isSubMenu: Boolean
+)
 
+
+// TODO:  Mettre en place un systeme d'event avec un consumer pour le resultNavigator
 @Destination
 @Composable
-fun MenuScreen() {
+fun MenuScreen(
+    navigator: DestinationsNavigator, resultNavigator: ResultBackNavigator<Boolean>
+) {
+
+    val menuItems: List<MenuItem> = listOf(
+        MenuItem(R.string.menu_events, {
+            resultNavigator.navigateBack(true)
+            navigator.popBackStack()
+        }, R.drawable.events, R.string.cd_events, false),
+        MenuItem(
+            R.string.menu_travel_checklists,
+            {},
+            R.drawable.checklist,
+            R.string.cd_travel_checklist,
+            true
+        ),
+//        MenuItem(R.string.menu_leveler, {}, R.drawable.events, R.string.cd_leveler, false),
+        MenuItem(
+            R.string.menu_my_location, {}, R.drawable.my_location, R.string.cd_my_location, true
+        ),
+        MenuItem(
+            R.string.menu_app_settings, {}, R.drawable.settings, R.string.cd_app_settings, false
+        )
+    )
+
     Column(
         Modifier
             .background(Color.White)
@@ -150,13 +111,13 @@ fun MenuScreen() {
             modifier = Modifier.padding(horizontal = 16.dp)
         ) {
             Column() {
-                MenuItems.TRAVEL_CHECKLIST.item.invoke()
-                MenuItems.MY_LOCATION.item.invoke()
+                MenuItem(menuItem = menuItems.find { it.labelRes == R.string.menu_travel_checklists }!!)
+                MenuItem(menuItem = menuItems.find { it.labelRes == R.string.menu_my_location }!!)
             }
         }
 
-        MenuItems.values().toMutableList().subList(3, MenuItems.values().size).forEach {
-            it.item()
+        menuItems.filter { !it.isSubMenu }.forEach {
+            MenuItem(menuItem = it)
             Divider(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -177,8 +138,7 @@ fun MenuScreen() {
 
 @Composable
 fun MenuItem(
-    label: String, onclick: () -> Unit, menuIcon: @Composable () -> Unit, trailingIcon:
-    @Composable (() -> Unit?)?, isSubMenu: Boolean = false
+    menuItem: MenuItem
 ) {
     Row(
         Modifier
@@ -186,22 +146,26 @@ fun MenuItem(
             .height(65.dp)
             .padding(vertical = 15.dp)
     ) {
-        IconButton(onClick = onclick) {
-            menuIcon()
+        IconButton(onClick = menuItem.onclick) {
+            Image(
+                modifier = Modifier.size(50.dp),
+                painter = painterResource(id = menuItem.drawableRes),
+                contentDescription = stringResource(id = menuItem.contentDescriptionRes)
+            )
         }
         Text(
             modifier = Modifier.align(Alignment.CenterVertically),
-            text = label,
-            fontWeight = if (isSubMenu) FontWeight.W500 else FontWeight.W700,
-            fontSize = if (isSubMenu) 14.sp else 16.sp,
+            text = stringResource(id = menuItem.labelRes),
+            fontWeight = if (menuItem.isSubMenu) FontWeight.W500 else FontWeight.W700,
+            fontSize = if (menuItem.isSubMenu) 14.sp else 16.sp,
             color = AppColor.Tertiary
         )
         Spacer(modifier = Modifier.weight(1f))
-        trailingIcon?.let {
-            IconButton(onClick = onclick) {
-                trailingIcon()
-            }
-        }
+        Icon(
+            imageVector = Icons.Sharp.ArrowForward,
+            contentDescription = "",
+            tint = AppColor.Secondary
+        )
     }
 }
 
@@ -218,19 +182,15 @@ fun PubContainerMenu(pub: MenuLink) {
             .clickable {
                 uriHandler.openUri(pub.url)
                 uriHandler.openUri(pub.urlstat)
-            },
-        verticalAlignment = Alignment.CenterVertically
+            }, verticalAlignment = Alignment.CenterVertically
     ) {
         GlideImage(
-            modifier = Modifier.size(30.dp),
-            imageModel = { pub.icon },
-            imageOptions = ImageOptions(
+            modifier = Modifier.size(30.dp), imageModel = { pub.icon }, imageOptions = ImageOptions(
                 contentScale = ContentScale.FillBounds, alignment = Alignment.Center
             )
         )
         Column(
-            modifier = Modifier.padding(start = 16.dp),
-            verticalArrangement = Arrangement.Center
+            modifier = Modifier.padding(start = 16.dp), verticalArrangement = Arrangement.Center
         ) {
             Text(
                 text = pub.name,

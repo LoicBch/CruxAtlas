@@ -19,7 +19,8 @@ import com.example.camperpro.android.LocalDependencyContainer
 import com.example.camperpro.android.NavGraphs
 import com.example.camperpro.android.composables.AppScaffold
 import com.example.camperpro.android.composables.BottomBar
-import com.example.camperpro.domain.model.Location
+import com.example.camperpro.domain.model.composition.Location
+import com.example.camperpro.managers.location.LocationManager
 import com.example.camperpro.utils.*
 import com.ramcosta.composedestinations.DestinationsNavHost
 import kotlinx.coroutines.flow.*
@@ -39,19 +40,17 @@ fun HomeScreen(navController: NavHostController = rememberNavController()) {
     val observersAreSet by appViewModel.observersAreSet.collectAsState()
 
     DisposableEffect(lifecycleOwner) {
-
-        LocationClient(context).getLocationUpdates(Constants.GPS_UPDATE_INTERVAL)
-            .catch { e -> e.printStackTrace() }
-            .onEach { location ->
-                val lat = location.latitude
-                val long = location.longitude
-                Log.d("location", "$lat, $long")
-                Globals.geoLoc.lastKnownLocation = Location(lat, long)
-                if (Globals.geoLoc.lastSearchedLocation == null) {
-                    Globals.geoLoc.lastSearchedLocation = Location(lat, long)
-                }
-                if (!locationIsObserved) appViewModel.onLocationObserveStarted()
-            }.launchIn(lifecycleOwner.lifecycleScope)
+        //            est ce vraiment utile d'observer la loc ???
+        LocationManager.onLocationUpdated(this) {
+            val lat = it.coordinates.latitude
+            val long = it.coordinates.longitude
+            Log.d("location", "$lat, $long")
+            Globals.geoLoc.lastKnownLocation = Location(lat, long)
+            if (Globals.geoLoc.lastSearchedLocation == null) {
+                Globals.geoLoc.lastSearchedLocation = Location(lat, long)
+            }
+            appViewModel.onLocationObserveStarted()
+        }.startLocationUpdating()
 
         NetworkConnectivityObserver(context).observe()
             .onEach {
@@ -77,12 +76,6 @@ fun HomeScreen(navController: NavHostController = rememberNavController()) {
         }
     }
 
-    //    Box(
-    //        modifier = Modifier
-    //            .fillMaxSize()
-    //            .background(Color.Transparent)
-    //    ) {
-
     if (observersAreSet) {
         AppScaffold(
             sheetState = sheetState,
@@ -96,14 +89,6 @@ fun HomeScreen(navController: NavHostController = rememberNavController()) {
             )
         }
     }
-
-    //        Text(
-    //            modifier = Modifier.align(Alignment.Center),
-    //            text = "Test",
-    //            color = Color.Yellow,
-    //            fontSize = 24.sp
-    //        )
-    //    }
 }
 
 

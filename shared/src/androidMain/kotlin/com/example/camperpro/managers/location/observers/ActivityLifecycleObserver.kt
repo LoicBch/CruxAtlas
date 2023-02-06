@@ -5,6 +5,7 @@ import android.app.Application
 import android.os.Bundle
 import com.example.camperpro.managers.location.LocationManager
 import com.example.camperpro.managers.location.extension.activity
+import com.example.camperpro.managers.network.extension.activity
 
 internal object ActivityLifecycleObserver : Application.ActivityLifecycleCallbacks {
     override fun onActivityPaused(p0: Activity) {}

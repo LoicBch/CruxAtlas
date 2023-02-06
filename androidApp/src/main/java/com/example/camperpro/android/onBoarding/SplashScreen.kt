@@ -1,6 +1,7 @@
 package com.example.camperpro.android.onBoarding
 
 import android.Manifest
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.Animatable
@@ -23,8 +24,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import com.example.camperpro.android.MainActivity
 import com.example.camperpro.android.R
+import com.example.camperpro.android.extensions.hasLocationPermission
 import com.example.camperpro.android.ui.theme.AppColor
-import com.example.camperpro.utils.hasLocationPermission
 import com.ramcosta.composedestinations.annotation.Destination
 
 // TODO: optimize permissions management
@@ -69,7 +70,7 @@ fun SplashScreen(navController: NavController, viewModel: SplashScreenViewModel)
             .background(color = color.value), contentAlignment = Alignment
             .Center
     ) {
-        Image(painter = painterResource(id = R.drawable.logo), contentDescription = "")
+        Image(painter = painterResource(id = R.drawable.premium_badge), contentDescription = "")
     }
 
     LaunchedEffect(true) {
@@ -83,9 +84,6 @@ fun SplashScreen(navController: NavController, viewModel: SplashScreenViewModel)
         } else {
             viewModel.onUserRespondToLocationPermission(true)
         }
+        viewModel.initApp()
     }
-
-
-    viewModel.initApp()
-
 }

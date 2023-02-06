@@ -1,6 +1,7 @@
 package com.example.camperpro.utils
 
-import com.example.camperpro.domain.model.Spot
+import com.example.camperpro.domain.model.Event
+import com.example.camperpro.domain.model.Dealer
 import kotlin.math.floor
 import kotlin.math.round
 
@@ -14,8 +15,13 @@ fun Double.toDMS(): String {
 }
 
 
-val Spot.fullLocation get() = "$address, $city, $postalCode"
-val Spot.fullGeolocalisation
+//Faire un objet location et mettre cette extension sur location
+val Dealer.fullLocation get() = "$address, $city, $postalCode"
+val Dealer.fullGeolocalisation
     get() =
         "$latitude, $longitude (lat, lng)\nN ${latitude.toDMS()}, E ${longitude.toDMS()}"
 
+val Event.fullLocation get() = "$address, $city, $postalCode"
+val Event.fullGeolocalisation
+    get() =
+        "$latitude, $longitude (lat, lng)\nN ${latitude.toDMS()}, E ${longitude.toDMS()}"

@@ -11,6 +11,7 @@ import android.os.Looper
 import androidx.core.app.ActivityCompat
 import com.example.camperpro.managers.location.LocationManager.Companion.notifyOnLocationUnavailable
 import com.example.camperpro.managers.location.extension.toLocationData
+import com.example.camperpro.managers.location.observers.ActivityLifecycleObserver
 import com.example.camperpro.managers.location.utils.LocationUtil
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.CancellationTokenSource
@@ -152,7 +153,7 @@ internal actual class LocationLoyal {
 
     internal fun configure(context: Context) {
         val application = context.applicationContext as? Application
-        application?.registerActivityLifecycleCallbacks(com.example.camperpro.managers.location.observers.ActivityLifecycleObserver)
+        application?.registerActivityLifecycleCallbacks(ActivityLifecycleObserver)
             ?: run {
                 val activity = context.applicationContext as? Activity
                 this.activity = WeakReference(activity)

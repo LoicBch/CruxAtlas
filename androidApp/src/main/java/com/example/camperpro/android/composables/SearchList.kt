@@ -22,7 +22,7 @@ import com.example.camperpro.android.filter.LastSearchItem
 import com.example.camperpro.android.ui.theme.AppColor
 
 @Composable
-fun SearchList(categorySelected: FilterCategory, onSelectFilter: (String) -> Unit) {
+fun HistoricSearchList(categorySelected: FilterCategory, onSelectFilter: (String) -> Unit) {
 
     val appViewmodel = LocalDependencyContainer.current.appViewModel
     val searches by appViewmodel.historicSearches.collectAsState()

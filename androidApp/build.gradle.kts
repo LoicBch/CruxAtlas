@@ -24,7 +24,7 @@ android {
     namespace = "com.example.camperpro.android"
     compileSdk = 33
     defaultConfig {
-        applicationId = "com.example.camperpro.android"
+        applicationId = "com.appmobiledition.camperpro.android"
         minSdk = 24
         targetSdk = 33
         versionCode = 1

@@ -16,6 +16,8 @@
 		CE6B66132979B52C00F600F7 /* AroundLocationScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6B66122979B52C00F600F7 /* AroundLocationScreen.swift */; };
 		CE6B66152979B55500F600F7 /* MoreScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6B66142979B55500F600F7 /* MoreScreen.swift */; };
 		CE6B66172979B56800F600F7 /* PartnersScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6B66162979B56800F600F7 /* PartnersScreen.swift */; };
+		CE725DB72982A1B10088AC04 /* FilterScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE725DB62982A1B10088AC04 /* FilterScreen.swift */; };
+		CE725DB92982A3B30088AC04 /* BottomSheetController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE725DB82982A3B30088AC04 /* BottomSheetController.swift */; };
 		CE7818C82912D600009C4032 /* MainMapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7818C72912D600009C4032 /* MainMapViewModel.swift */; };
 		CE7818CA2912D61C009C4032 /* MainMapScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7818C92912D61C009C4032 /* MainMapScreen.swift */; };
 		CEC42B7629184C77008577E3 /* MarkerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC42B7529184C77008577E3 /* MarkerView.swift */; };
@@ -37,6 +39,8 @@
 		CE6B66122979B52C00F600F7 /* AroundLocationScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AroundLocationScreen.swift; sourceTree = "<group>"; };
 		CE6B66142979B55500F600F7 /* MoreScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreScreen.swift; sourceTree = "<group>"; };
 		CE6B66162979B56800F600F7 /* PartnersScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartnersScreen.swift; sourceTree = "<group>"; };
+		CE725DB62982A1B10088AC04 /* FilterScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterScreen.swift; sourceTree = "<group>"; };
+		CE725DB82982A3B30088AC04 /* BottomSheetController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetController.swift; sourceTree = "<group>"; };
 		CE7818C72912D600009C4032 /* MainMapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMapViewModel.swift; sourceTree = "<group>"; };
 		CE7818C92912D61C009C4032 /* MainMapScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMapScreen.swift; sourceTree = "<group>"; };
 		CEC42B7529184C77008577E3 /* MarkerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkerView.swift; sourceTree = "<group>"; };
@@ -102,6 +106,7 @@
 		7555FF7D242A565900829871 /* iosApp */ = {
 			isa = PBXGroup;
 			children = (
+				CE725DB52982A1970088AC04 /* filter */,
 				CE6B66112979B4C200F600F7 /* around_location */,
 				CE6B66102979B49700F600F7 /* more */,
 				CE6B660E2979B45D00F600F7 /* partners */,
@@ -136,6 +141,15 @@
 				CE6B66122979B52C00F600F7 /* AroundLocationScreen.swift */,
 			);
 			path = around_location;
+			sourceTree = "<group>";
+		};
+		CE725DB52982A1970088AC04 /* filter */ = {
+			isa = PBXGroup;
+			children = (
+				CE725DB62982A1B10088AC04 /* FilterScreen.swift */,
+				CE725DB82982A3B30088AC04 /* BottomSheetController.swift */,
+			);
+			path = filter;
 			sourceTree = "<group>";
 		};
 		CE7818C62912D5E7009C4032 /* main_map */ = {
@@ -250,11 +264,13 @@
 			files = (
 				2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */,
 				CE451CE2297AD2A3004761B2 /* BottomSheetViewModel.swift in Sources */,
+				CE725DB92982A3B30088AC04 /* BottomSheetController.swift in Sources */,
 				CE7818CA2912D61C009C4032 /* MainMapScreen.swift in Sources */,
 				CE6B66172979B56800F600F7 /* PartnersScreen.swift in Sources */,
 				CE6B66152979B55500F600F7 /* MoreScreen.swift in Sources */,
 				CE6B660D2979A97700F600F7 /* HomeScreen.swift in Sources */,
 				CE7818C82912D600009C4032 /* MainMapViewModel.swift in Sources */,
+				CE725DB72982A1B10088AC04 /* FilterScreen.swift in Sources */,
 				CEC42B7629184C77008577E3 /* MarkerView.swift in Sources */,
 				CEC42B8629191B04008577E3 /* MarkerIos.swift in Sources */,
 				CEE12B4C2929848F00E70B62 /* SpotSheetScreen.swift in Sources */,

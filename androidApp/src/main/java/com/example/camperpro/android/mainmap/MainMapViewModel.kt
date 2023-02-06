@@ -3,29 +3,35 @@ package com.example.camperpro.android.mainmap
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.camperpro.domain.model.*
+import com.example.camperpro.data.ResultWrapper
+import com.example.camperpro.domain.model.Ad
+import com.example.camperpro.domain.model.Dealer
+import com.example.camperpro.domain.model.Place
+import com.example.camperpro.domain.model.composition.Location
+import com.example.camperpro.domain.model.composition.Marker
+import com.example.camperpro.domain.model.composition.UpdateSource
 import com.example.camperpro.domain.usecases.FetchAds
+import com.example.camperpro.domain.usecases.FetchEvents
 import com.example.camperpro.domain.usecases.FetchSpotAtLocationUseCase
 import com.example.camperpro.domain.usecases.SortSpots
 import com.example.camperpro.utils.SortOption
-import com.jetbrains.kmm.shared.data.ResultWrapper
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import toMarker
 
 class MainMapViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val fetchSpotAtLocationUseCase: FetchSpotAtLocationUseCase,
+    private val fetchEvents: FetchEvents,
     private val fetchAds: FetchAds,
     private val sortSpots: SortSpots
 ) : ViewModel() {
 
-    private val spots = savedStateHandle.getStateFlow("spots", emptyList<Spot>())
-
-    private val spotRepresentation = savedStateHandle.getStateFlow(
-        "spotRepresentation",
-        SpotPresentation(emptyList<Spot>(), SpotSource.DEFAULT)
+    private val markersUpdate = savedStateHandle.getStateFlow(
+        "markersUpdate",
+        Pair<UpdateSource, List<Marker<Any>>>(UpdateSource.DEFAULT, emptyList())
     )
 
     private val ads = savedStateHandle.getStateFlow("ads", emptyList<Ad>())
@@ -35,15 +41,15 @@ class MainMapViewModel(
     private val cameraIsOutOfRadiusLimit =
         savedStateHandle.getStateFlow("cameraIsOutOfRadiusLimit", false)
 
-    //    flow can only take 5 element max?
     val placeSearched = savedStateHandle.getStateFlow("placeSearched", "")
-    val sortedSpots = savedStateHandle.getStateFlow("spotsSorted", emptyList<Spot>())
+    val verticalListItems = savedStateHandle.getStateFlow("verticalListItems", emptyList<Any>())
 
+    //    flow can only take 5 element max? :(
     val state = combine(
-        spotRepresentation, ads, loading, verticalListIsShowing, cameraIsOutOfRadiusLimit
-    ) { spotRepresentation, ads, isLoading, verticalListIsShowing, cameraIsOutOfRadiusLimit ->
+        markersUpdate, ads, loading, verticalListIsShowing, cameraIsOutOfRadiusLimit
+    ) { markersUpdate, ads, isLoading, verticalListIsShowing, cameraIsOutOfRadiusLimit ->
         MainMapState(
-            spotRepresentation = spotRepresentation,
+            markersUpdate = markersUpdate,
             ads = ads,
             isLoading,
             verticalListIsShowing,
@@ -51,7 +57,7 @@ class MainMapViewModel(
         )
     }.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), MainMapState(
-            spotRepresentation = SpotPresentation(emptyList(), SpotSource.DEFAULT),
+            markersUpdate = Pair(UpdateSource.DEFAULT, emptyList()),
             emptyList(),
             isLoading = false,
             verticalListIsShowing = false,
@@ -67,16 +73,37 @@ class MainMapViewModel(
         savedStateHandle["loading"] = true
         viewModelScope.launch {
             when (val call = fetchSpotAtLocationUseCase(location)) {
+
+                is ResultWrapper.Failure -> {
+                    savedStateHandle["loading"] = false
+                }
+
+                is ResultWrapper.Success -> {
+                    savedStateHandle["markersUpdate"] = Pair(
+                        UpdateSource.AROUND_ME,
+                        call.value!!.toMarker()
+                    )
+                    savedStateHandle["verticalListItems"] = call.value
+                    savedStateHandle["placeSearched"] = ""
+                    savedStateHandle["loading"] = false
+                }
+            }
+        }
+    }
+
+    fun showEvents() {
+        savedStateHandle["loading"] = true
+        viewModelScope.launch {
+            when (val call = fetchEvents()) {
                 is ResultWrapper.Failure -> {
                     savedStateHandle["loading"] = false
                 }
                 is ResultWrapper.Success -> {
-                    savedStateHandle["spotRepresentation"] = SpotPresentation(
-                        call.value!!,
-                        SpotSource.AROUND_ME
+                    savedStateHandle["markersUpdate"] = Pair(
+                        UpdateSource.EVENTS,
+                        call.value!!.toMarker()
                     )
-                    savedStateHandle["spotsSorted"] = call.value
-                    savedStateHandle["placeSearched"] = ""
+                    savedStateHandle["verticalListItems"] = call.value
                     savedStateHandle["loading"] = false
                 }
             }
@@ -92,8 +119,8 @@ class MainMapViewModel(
                 }
                 is ResultWrapper.Success -> {
                     //                    savedStateHandle["spots"] = call.value
-                    savedStateHandle["spotRepresentation"] =
-                        SpotPresentation(call.value!!, SpotSource.AROUND_PLACE)
+                    savedStateHandle["markersUpdate"] =
+                        Pair(UpdateSource.AROUND_PLACE, call.value!!.toMarker())
                     savedStateHandle["placeSearched"] = place.name
                     savedStateHandle["loading"] = false
                 }
@@ -112,9 +139,13 @@ class MainMapViewModel(
 
     fun onSortingOptionSelected(sortOption: SortOption) {
         viewModelScope.launch {
-            when (val res = sortSpots(sortOption, spotRepresentation.value.spots)) {
+            // TODO: Faire une fonction d'extension / enum de map pour get le type de value actuellement afficher a partir de la source
+            when (val res =
+                sortSpots(
+                    sortOption,
+                    markersUpdate.value.second.map { it.content } as List<Dealer>)) {
                 is ResultWrapper.Failure -> {}
-                is ResultWrapper.Success -> savedStateHandle["spotsSorted"] = res.value
+                is ResultWrapper.Success -> savedStateHandle["verticalListItems"] = res.value
             }
         }
     }

@@ -183,7 +183,6 @@ fun Array<SortCategory>.availableSorting(spotsSource: BottomSheetOption): List<S
         BottomSheetOption.SORT_EVENTS -> listOf(
             SortCategory.NONE,
             SortCategory.DIST_FROM_YOU,
-            SortCategory.DIST_FROM_SEARCHED,
             SortCategory.BY_DATE
         )
         else -> {

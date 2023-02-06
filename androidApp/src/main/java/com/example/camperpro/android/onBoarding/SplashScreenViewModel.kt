@@ -1,18 +1,18 @@
 package com.example.camperpro.android.onBoarding
 
-import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.camperpro.data.ResultWrapper
 import com.example.camperpro.domain.usecases.SetupApp
 import com.example.camperpro.utils.Globals
 import com.example.camperpro.utils.LanguageManager
-import com.jetbrains.kmm.shared.data.ResultWrapper
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class SplashScreenViewModel(
     private val setupApp: SetupApp,
-    private val languageManager : LanguageManager
+    private val languageManager: LanguageManager
 ) : ViewModel() {
 
     private val gpsLocationIsAsked = MutableStateFlow(false)
@@ -40,14 +40,13 @@ class SplashScreenViewModel(
     }
 
     fun onUserRespondToLocationPermission(allowing: Boolean) {
-        gpsLocationIsAsked.update { true }
+        gpsLocationIsAsked.update { allowing }
     }
 
     private fun setDeviceConstants() {
         Globals.geoLoc.appLanguage = "FR"
         Globals.geoLoc.deviceLanguage = languageManager.getDeviceLanguage()
         Globals.geoLoc.deviceCountry = languageManager.getDeviceCountry()
-        globalsVarsAreSet.update { true }
     }
 
 }

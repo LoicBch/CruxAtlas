@@ -16,9 +16,13 @@ import MapKit
     init(){
         
     }
-    @Published var bottomSheetIsOpen = false
     
-    func openSheet(){
+    @Published var bottomSheetIsOpen = false
+    @Published var bottomOption = BottomSheetOption.FILTER
+    
+    
+    func openSheet(option: BottomSheetOption){
+        setOption(option: option)
         bottomSheetIsOpen = true
     }
     
@@ -26,5 +30,13 @@ import MapKit
         bottomSheetIsOpen = false
     }
     
+    private func setOption(option: BottomSheetOption){
+        bottomOption = option
+    }
+    
+}
+
+public enum BottomSheetOption {
+    case FILTER, FILTER_EVENT, SORT, SORT_AROUND_PLACE, SORT_EVENT, MAP_LAYER
 }
 

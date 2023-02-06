@@ -1,17 +1,17 @@
 package com.example.camperpro.domain.usecases
 
-import com.example.camperpro.domain.model.Location
-import com.example.camperpro.domain.model.Spot
-import com.example.camperpro.domain.model.distanceFromLastSearch
-import com.example.camperpro.domain.model.distanceFromUserLocation
+import com.example.camperpro.domain.model.composition.Location
+import com.example.camperpro.domain.model.Dealer
+import com.example.camperpro.domain.model.composition.distanceFromLastSearch
+import com.example.camperpro.domain.model.composition.distanceFromUserLocation
 import com.example.camperpro.utils.SortOption
-import com.jetbrains.kmm.shared.data.ResultWrapper
+import com.example.camperpro.data.ResultWrapper
 
 class SortSpots() : IBaseUsecase {
     suspend operator fun invoke(
         sortOption: SortOption,
-        spotsToSort: List<Spot>
-    ): ResultWrapper<List<Spot>> {
+        spotsToSort: List<Dealer>
+    ): ResultWrapper<List<Dealer>> {
         return when (sortOption) {
             SortOption.NONE -> {
                 ResultWrapper.Success(spotsToSort)

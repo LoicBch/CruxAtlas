@@ -6,7 +6,6 @@ import com.example.camperpro.data.repositories.*
 import com.example.camperpro.domain.repositories.*
 import com.example.camperpro.domain.usecases.*
 import com.example.camperpro.utils.Constants
-import com.example.camperpro.utils.KMMContext
 import com.example.camperpro.utils.LanguageManager
 import io.ktor.client.*
 import io.ktor.client.plugins.*
@@ -14,7 +13,6 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
-import kotlinx.coroutines.channels.Channel
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
@@ -46,9 +44,11 @@ val apiDependency = module {
 val repositoriesDependencies = module {
     singleOf(::Ads) { bind<AdRepository>() }
     singleOf(::AllNews) { bind<NewsRepository>() }
-    singleOf(::Spots) { bind<SpotRepository>() }
+    singleOf(::Dealers) { bind<DealerRepository>() }
     singleOf(::CheckLists) { bind<CheckListRepository>() }
     singleOf(::Searches) { bind<SearchesRepository>() }
+    singleOf(::Events) { bind<EventRepository>() }
+    singleOf(::Partners) { bind<PartnerRepository>() }
 }
 
 val useCasesDependencies = module {
@@ -62,6 +62,8 @@ val useCasesDependencies = module {
     factoryOf(::AddSearch)
     factoryOf(::DeleteSearch)
     factoryOf(::SortSpots)
+    factoryOf(::FetchPartners)
+    factoryOf(::FetchEvents)
     factory { (context: Any?) -> LanguageManager(context) }
 }
 

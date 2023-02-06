@@ -3,7 +3,7 @@ package com.example.camperpro.android.aroundLocation
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.camperpro.domain.model.Location
+import com.example.camperpro.domain.model.composition.Location
 import com.example.camperpro.domain.model.Place
 import com.example.camperpro.domain.model.Search
 import com.example.camperpro.domain.usecases.AddSearch
@@ -11,7 +11,7 @@ import com.example.camperpro.domain.usecases.DeleteSearch
 import com.example.camperpro.domain.usecases.FetchSuggestionsFromInput
 import com.example.camperpro.domain.usecases.GetAllSearchForACategory
 import com.example.camperpro.utils.Constants
-import com.jetbrains.kmm.shared.data.ResultWrapper
+import com.example.camperpro.data.ResultWrapper
 import kotlinx.coroutines.launch
 
 class AroundLocationViewModel(

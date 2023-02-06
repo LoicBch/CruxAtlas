@@ -7,6 +7,7 @@ class AdDto(
     val id: Int,
     val type: String,
     val url: String,
+    val redirect: String,
     val click: String,
 
     @SerialName("with")

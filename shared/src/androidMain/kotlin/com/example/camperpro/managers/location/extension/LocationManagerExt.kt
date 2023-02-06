@@ -40,9 +40,3 @@ fun Location.toLocationData(): LocationData = LocationData(
     speed.toDouble(),
     Coordinates(latitude, longitude)
 )
-
-// on utilise cette extension pour camperPro car on a seulement besoin des coord
-fun Location.toCoordinate(): com.example.camperpro.domain.model.Location =
-    com.example.camperpro.domain.model.Location(
-        latitude, longitude
-    )

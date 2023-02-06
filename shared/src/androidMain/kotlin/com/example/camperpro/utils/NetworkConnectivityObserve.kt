@@ -14,8 +14,7 @@ actual class NetworkConnectivityObserver actual constructor(private val context:
     @SuppressLint("MissingPermission")
     actual override fun observe(): Flow<ConnectivityObserver.NetworkStatus> {
 
-        val connectivityManager =
-            (context as Context).getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager = (context as Context).getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
         return callbackFlow {
             val callBack = object : ConnectivityManager.NetworkCallback() {

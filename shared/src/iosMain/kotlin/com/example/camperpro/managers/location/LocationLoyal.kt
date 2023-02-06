@@ -3,7 +3,7 @@ package com.example.camperpro.managers.location
 import com.example.camperpro.managers.location.extension.OnAlwaysAllowsPermissionRequiredBlock
 import com.example.camperpro.managers.location.extension.appending
 import com.example.camperpro.managers.location.extension.removed
-import com.example.camperpro.managers.location.native.NativeAtomicReference
+import com.example.camperpro.managers.network.native.NativeAtomicReference
 import com.example.camperpro.managers.location.utils.Version
 import platform.CoreLocation.CLLocationManager
 import platform.CoreLocation.kCLLocationAccuracyBestForNavigation

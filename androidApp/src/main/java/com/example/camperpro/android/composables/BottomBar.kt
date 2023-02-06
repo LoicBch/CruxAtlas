@@ -60,13 +60,6 @@ fun BottomBar(navController: NavHostController) {
                         modifier = Modifier.align(Alignment.CenterVertically),
                         selected = selected,
                         onClick = {
-
-                            //                        // TODO: find a better solution for this
-                            //                        if (destination.ordinal == 0 && !appViewModel.userClickedAroundMe.value) {
-                            //                            appViewModel.userClickedAroundMe.update { true }
-                            //                        }
-
-
                             if (destination.ordinal == 0){
                                 navController.popBackStack(
                                     MainMapDestination.route, false
@@ -85,19 +78,13 @@ fun BottomBar(navController: NavHostController) {
 
 
                             navController.navigate(destination.direction) {
-                                // Pop up to the root of the graph to
-                                // avoid building up a large stack of destinations
-                                // on the back stack as users select items
+
                                 if (destination.ordinal != 0) {
                                     popUpTo(MainMapDestination.route) {
                                         saveState = true
                                     }
                                 }
-
-                                // Avoid multiple copies of the same destination when
-                                // reselecting the same item
                                 launchSingleTop = true
-                                // Restore state when reselecting a previously selected item
                                 restoreState = true
                             }
                         },

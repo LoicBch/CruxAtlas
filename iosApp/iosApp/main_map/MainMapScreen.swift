@@ -18,11 +18,6 @@ struct MainMapScreen: View {
     public var body: some View {
         
         ZStack(alignment: .top){
-            
-            if(viewModel.verticalListIsShowing){
-                VerticalSpotsList(spots : viewModel.spots)
-            }
-            
             Map(coordinateRegion: .constant(viewModel.mapRegion), annotationItems: viewModel.markers){ marker in
                 MapAnnotation(coordinate: marker.coordinate) {
                     MarkerView(title: marker.name).onTapGesture {
@@ -31,17 +26,102 @@ struct MainMapScreen: View {
                 }
             }
             
-            VStack(){
-                TopButtons(showVerticalList: { viewModel.permuteVerticalList() }, ShowSheetView: { bottomSheetViewModel.openSheet()})
-                Spacer()
-                HorizontalSpotsList(spots: viewModel.spots)
-                if (!viewModel.ads.isEmpty){
-                    MainMapAdContainer()
+            
+            if(viewModel.verticalListIsShowing){
+                ZStack(alignment: .top){
+                    VerticalSpotsList(spots : viewModel.spots)
+                    TopButtons(showVerticalList: { viewModel.permuteVerticalList() }, ShowSheetView: { bottomSheetViewModel.openSheet(option: BottomSheetOption.FILTER)})
+                }
+            }else{
+                VStack(){
+                    TopButtons(showVerticalList: { viewModel.permuteVerticalList() }, ShowSheetView: { bottomSheetViewModel.openSheet(option: BottomSheetOption.FILTER)})
+                    Spacer()
+                    HorizontalSpotsList(spots: viewModel.spots)
+                    if (!viewModel.ads.isEmpty){
+                        MainMapAdContainer()
+                    }
                 }
             }
         }
     }
 }
+
+struct VerticalSpotsList: View {
+    
+    var spots: [Spot]
+    @State private var scrollViewContentSize: CGSize = .zero
+    
+    var body: some View{
+        ScrollView(){
+            LazyVStack{
+                ForEach(spots , id: \.self) { spot in
+                    VerticalListItem(spot: spot)
+                        .frame(width: scrollViewContentSize.width, height: 130)
+                        .background(RoundedRectangle(cornerRadius: 25)
+                        .fill(Color.white))
+                        .shadow(radius: 25, x: 0, y: 2)
+                }
+            }
+        }.background(
+            GeometryReader { geo -> Color in
+                DispatchQueue.main.async {
+                    scrollViewContentSize = geo.size
+                }
+                return Color.white
+            }
+        ).frame(width: .infinity, height: .infinity)
+    }
+}
+    
+    
+    struct VerticalListItem: View {
+        
+        var spot: Spot
+        
+        var body: some View{
+            
+            if (spot.isPremium){
+                ZStack{
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.blue)
+                        .padding(.trailing, 5)
+                        .padding(.bottom, 5)
+                        .shadow(radius: 2)
+                        .background(Color.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 15))
+                        .padding(5)
+                        .zIndex(1)
+                }
+            }
+            
+            VStack{
+                Spacer()
+                HStack{
+                    if (spot.isPremium && !spot.photos.isEmpty) {
+                        
+                    }
+                    
+                    if (!spot.services.isEmpty) {
+                        
+                    }
+                    
+                    if (!spot.brands.isEmpty) {
+                        
+                    }
+                    
+                    if (!spot.brands.isEmpty) {
+                        
+                    }
+                    
+                    if (!spot.photos.isEmpty) {
+                        
+                    }
+                    
+                }
+                
+            }.padding(8)
+        }
+    }
 
 struct HorizontalSpotsList: View {
     var spots: [Spot]
@@ -58,8 +138,9 @@ struct HorizontalSpotsList: View {
                         .frame(width: scrollViewContentSize.width, height: 130)
                         .background(RoundedRectangle(cornerRadius: 25)
                         .fill(Color.white))
+                        .shadow(radius: 25, x: 0, y: 2)
                 }
-            }.frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity,alignment: .leading).border(Color.red)
+            }.frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity,alignment: .leading)
         }.gesture(
             DragGesture().updating($dragOffset){value, state, _ in
                 state = value.translation.width
@@ -131,7 +212,6 @@ struct HorizontalListItem: View {
                             Text("test")
                         }
                     }
-    
                 }
             }
         }
@@ -160,6 +240,7 @@ struct TopButtons: View {
             .frame(width: 50, height: 50)
             .background(Color(red: 136, green: 175, blue: 255))
             .cornerRadius(25)
+            .shadow(radius: 25, x: 1, y: 2)
             .buttonStyle(.plain)
             
             Spacer()
@@ -172,6 +253,7 @@ struct TopButtons: View {
             .frame(width: 50, height: 50)
             .background(Color(red: 136, green: 175, blue: 255))
             .cornerRadius(25)
+            .shadow(radius: 25, x: 1, y: 2)
             .buttonStyle(.plain)
             
             
@@ -183,6 +265,7 @@ struct TopButtons: View {
             .frame(width: 50, height: 50)
             .background(Color(red: 136, green: 175, blue: 255))
             .cornerRadius(25)
+            .shadow(radius: 25, x: 1, y: 2)
             .buttonStyle(.plain)
         }
         .padding(EdgeInsets(top: 8, leading: 16, bottom: 0, trailing: 16))
@@ -241,87 +324,9 @@ struct SearchHereButton: View {
         
     }
 }
-
-
-struct VerticalSpotsList: View {
-    
-    var spots: [Spot]
-    @State private var scrollViewContentSize: CGSize = .zero
-    
-    var body: some View{
-        ScrollView(){
-            LazyVStack{
-                ForEach(spots , id: \.self) { spot in
-                    VerticalListItem(spot: spot)
-                        .frame(width: scrollViewContentSize.width, height: 130)
-                        .background(RoundedRectangle(cornerRadius: 25)
-                            .fill(Color.white))
-                }
-            }
-        }.background(
-            GeometryReader { geo -> Color in
-                DispatchQueue.main.async {
-                    scrollViewContentSize = geo.size
-                }
-                return Color.clear
-            }
-        ).frame(width: .infinity, height: 130)
-    }
-    
-    
-    
-    struct VerticalListItem: View {
-        
-        var spot: Spot
-        
-        var body: some View{
-            
-            if (spot.isPremium){
-                ZStack{
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.blue)
-                        .padding(.trailing, 5)
-                        .padding(.bottom, 5)
-                        .shadow(radius: 2)
-                        .background(Color.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 15))
-                        .padding(5)
-                        .zIndex(1)
-                }
-            }
-            
-            VStack{
-                Spacer()
-                HStack{
-                    if (spot.isPremium && !spot.photos.isEmpty) {
-                        
-                    }
-                    
-                    if (!spot.services.isEmpty) {
-                        
-                    }
-                    
-                    if (!spot.brands.isEmpty) {
-                        
-                    }
-                    
-                    if (!spot.brands.isEmpty) {
-                        
-                    }
-                    
-                    if (!spot.photos.isEmpty) {
-                        
-                    }
-                    
-                }
-                
-            }.padding(8)
-        }
-    }
     
     struct MainMapScreen_Previews: PreviewProvider {
         static var previews: some View {
             EmptyView()
         }
     }
-}
