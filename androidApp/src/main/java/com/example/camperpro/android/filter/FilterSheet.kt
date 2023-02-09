@@ -1,13 +1,15 @@
 package com.example.camperpro.android.filter
 
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.*
 import com.example.camperpro.android.LocalDependencyContainer
 import com.example.camperpro.android.R
 import com.example.camperpro.domain.model.Search
-import com.example.camperpro.utils.BottomSheetOption
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun FilterSheet() {
 
@@ -19,7 +21,16 @@ fun FilterSheet() {
         mutableStateOf(false)
     }
 
+    Log.d("COMPOSE", "FilterSheet: ")
+
+    LaunchedEffect(Unit) {
+        isSelectingOption = false
+        Log.d("COMPOSE", "FilterSheet: launcheffect")
+    }
+
     val appViewmodel = LocalDependencyContainer.current.appViewModel
+
+    if (!appViewmodel.bottomSheetIsShowing.isVisible) isSelectingOption = false
 
     if (isSelectingOption) {
         FilterOptions(
@@ -28,10 +39,7 @@ fun FilterSheet() {
                 isSelectingOption = false
                 appViewmodel.addSearch(
                     Search(
-                        0,
-                        categorySelected.name.lowercase(),
-                        it,
-                        System.currentTimeMillis()
+                        0, categorySelected.name.lowercase(), it, System.currentTimeMillis()
                     )
                 )
             },
@@ -48,17 +56,13 @@ fun FilterSheet() {
 }
 
 enum class FilterCategory(
-    @StringRes val title: Int,
-    @DrawableRes val icon: Int,
-    var optionSelected: String?
+    @StringRes val title: Int, @DrawableRes val icon: Int, var optionSelected: String?
 ) {
     GARAGE(
-        R.string.filter_step1_option1,
-        R.drawable.repair, null
+        R.string.filter_step1_option1, R.drawable.repair, null
     ),
     DEALERS(
-        R.string.filter_step1_option2,
-        R.drawable.dealers, null
+        R.string.filter_step1_option2, R.drawable.dealers, null
     ),
     ACCESSORIES(
         R.string.filter_step1_option3, R.drawable.accessories, null

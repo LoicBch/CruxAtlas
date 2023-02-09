@@ -42,6 +42,8 @@
     <string name="filter_step1_option3">Search motorhome accessories</string>
     <string name="choose_country">Choose country</string>
     <string name="confirm_selection">Confirm selection</string>
+    <string name="where_do_you_want_to_go">Where do you want to go</string>
+
 
     <!--  Content description  -->
     <string name="cd_filter_icon">filter icon</string>

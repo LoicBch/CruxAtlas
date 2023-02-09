@@ -37,11 +37,16 @@ import com.example.camperpro.android.ui.theme.Dimensions
 import com.example.camperpro.utils.Globals
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun FilterEventsSheet() {
 
     var countriesSelected by remember { mutableStateOf("") }
     var isSelectingCountry by remember { mutableStateOf(false) }
+
+    val appViewmodel = LocalDependencyContainer.current.appViewModel
+
+    if (!appViewmodel.bottomSheetIsShowing.isVisible) isSelectingCountry = false
 
     if (isSelectingCountry) {
         SelectCountryLayout(onValidSelection = {
@@ -61,7 +66,7 @@ fun SelectCountryLayout(
 ) {
     val textState = remember { mutableStateOf(TextFieldValue()) }
 
-    var countriesSelected by remember {
+    val countriesSelected by remember {
         mutableStateOf(mutableListOf(""))
     }
 
@@ -76,44 +81,61 @@ fun SelectCountryLayout(
                 )
             }
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(0.5f))
             Text(
                 text = stringResource(id = R.string.choose_country),
                 fontWeight = FontWeight.W500,
                 fontSize = 16.sp,
                 color = Color.Black
             )
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(0.5f))
         }
 
         SearchField(modifier = Modifier.padding(top = 22.dp),
                     placeHolder = R.string.search_placeholder,
                     onUserSearch = { textState.value = it })
 
+        val items = if (textState.value.text.isEmpty()) {
+            Globals.filters.countries
+        } else {
+            Globals.filters.countries.filter {
+                it.lowercase()
+                    .startsWith(textState.value.text.lowercase())
+            }.take(5)
+        }
+
         if (textState.value.text.isEmpty()) {
             HistoricSearchList(
                 onSelectFilter = onValidSelection
             )
-        }
 
-        val items = if (textState.value.text.isEmpty()) {
-            Globals.filters.countries
+            CountriesResultsList(countriesSelected, {
+                if (countriesSelected.contains(it)) {
+                    countriesSelected.remove(it)
+                } else {
+                    countriesSelected.add(it)
+                }
+            }, stringResource(id = R.string.choose_country), items)
         } else {
-            Globals.filters.countries.filter { it.startsWith(textState.value.text) }.take(5)
+            CountriesResultsList(countriesSelected, {
+                if (countriesSelected.contains(it)) {
+                    countriesSelected.remove(it)
+                } else {
+                    countriesSelected.add(it)
+                }
+            }, stringResource(id = R.string.search_result), items)
         }
 
-        CountriesResultsList(countriesSelected, {
-            if (countriesSelected.contains(it)) {
-                countriesSelected.remove(it)
-            } else {
-                countriesSelected.add(it)
-            }
-        }, stringResource(id = R.string.choose_country), items)
+        Spacer(modifier = Modifier.weight(1f))
 
         AppButton(
             isActive = countriesSelected.isNotEmpty(),
-            onClick = { onValidSelection(countriesSelected.joinToString { "," }) },
-            modifier = Modifier,
+            onClick = {
+                onValidSelection(countriesSelected.joinToString(separator = ", ").drop(1))
+            },
+            modifier = Modifier.padding(
+                bottom = 16.dp
+            ),
             textRes = R.string.confirm_selection
         )
     }
@@ -159,7 +181,7 @@ fun CountriesResultsList(
 @Composable
 fun CountryOptionItem(onButtonClick: (String) -> Unit, option: String, selected: Boolean) {
 
-    var checkedState by remember { mutableStateOf(true) }
+    var checkedState by remember { mutableStateOf(selected) }
 
     Row(
         modifier = Modifier
@@ -180,8 +202,9 @@ fun CountryOptionItem(onButtonClick: (String) -> Unit, option: String, selected:
             fontWeight = FontWeight(450)
         )
 
-        Checkbox(checked = selected, onCheckedChange = {
-
+        Checkbox(checked = checkedState, enabled = true, onCheckedChange = {
+            onButtonClick(option)
+            checkedState = !checkedState
         })
     }
 }
@@ -196,9 +219,12 @@ fun BaseLayout(
     val sheetState = LocalDependencyContainer.current.appViewModel.bottomSheetIsShowing
     val coroutine = rememberCoroutineScope()
 
-    Column {
+    Column(
+        modifier = Modifier.padding(top = 30.dp, start = 21.dp, end = 21.dp),
+    ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
 
@@ -210,23 +236,26 @@ fun BaseLayout(
                 )
             }
 
+            Spacer(modifier = Modifier.weight(0.5f))
             Text(
                 fontSize = 16.sp, fontWeight = FontWeight.W500, text = stringResource(
                     id = R.string.filters_title
                 )
             )
+            Spacer(modifier = Modifier.weight(0.5f))
+
         }
 
         Text(
-            modifier = Modifier.padding(top = 12.dp),
+            modifier = Modifier.padding(top = 60.dp),
             fontSize = 22.sp,
             fontWeight = FontWeight.W700,
             text = stringResource(
-                id = R.string.filter_step1_title
+                id = R.string.where_do_you_want_to_go
             )
         )
 
-        Divider(modifier = Modifier.padding(top = 13.dp))
+        Divider(modifier = Modifier.padding(top = 13.dp, bottom = 20.dp))
 
         if (countrySelected.isNotEmpty()) {
             MaterialTextField(
@@ -244,7 +273,7 @@ fun BaseLayout(
         Spacer(modifier = Modifier.weight(1f))
 
         AppButton(isActive = countrySelected.isNotEmpty(), onClick = { // TODO: filter elements
-        }, modifier = Modifier, textRes = R.string.apply_filters)
+        }, modifier = Modifier.padding(bottom = 16.dp), textRes = R.string.apply_filters)
     }
 }
 
@@ -282,63 +311,66 @@ fun MaterialTextField(
     onSelectButtonClick: (String) -> Unit, countrySelected: String
 ) {
 
-    BasicTextField(value = countrySelected,
-                   modifier = Modifier
-                       .height(Dimensions.buttonHeight)
-                       .fillMaxWidth()
-                       .clickable { onSelectButtonClick(countrySelected) },
-                   onValueChange = { },
-                   enabled = false,
-                   readOnly = true,
-                   textStyle = TextStyle(
-                       color = AppColor.Primary, fontWeight = FontWeight.W500, fontSize = 16.sp
-                   ),
-                   singleLine = true,
-                   decorationBox = @Composable { innerTextField ->
-                       TextFieldDefaults.OutlinedTextFieldDecorationBox(value = countrySelected,
-                                                                        visualTransformation = VisualTransformation.None,
-                                                                        innerTextField = innerTextField,
-                                                                        placeholder = null,
-                                                                        interactionSource = remember { MutableInteractionSource() },
-                                                                        label = {
-                                                                            Text(
-                                                                                text = countrySelected.lowercase(),
-                                                                                fontWeight = FontWeight.W500,
-                                                                                fontSize = 11.sp,
-                                                                                color = AppColor.Primary
-                                                                            )
-                                                                        },
-                                                                        trailingIcon = {
-                                                                            Icon(
-                                                                                painter = painterResource(
-                                                                                    id = R.drawable.unfold
-                                                                                ),
-                                                                                contentDescription = "",
-                                                                                tint = AppColor.Primary
-                                                                            )
-                                                                        },
-                                                                        singleLine = true,
-                                                                        enabled = false,
-                                                                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                                                                            textColor = AppColor.Primary,
-                                                                            focusedBorderColor = AppColor.Primary,
-                                                                            unfocusedBorderColor = AppColor.Primary
-                                                                        ),
-                                                                        border = {
-                                                                            TextFieldDefaults.BorderBox(
-                                                                                false,
-                                                                                isError = false,
-                                                                                interactionSource = remember { MutableInteractionSource() },
-                                                                                colors = TextFieldDefaults.outlinedTextFieldColors(
-                                                                                    textColor = AppColor.Primary,
-                                                                                    focusedBorderColor = AppColor.Primary,
-                                                                                    unfocusedBorderColor = AppColor.Primary
-                                                                                ),
-                                                                                focusedBorderThickness = 2.dp,
-                                                                                unfocusedBorderThickness = 2.dp
-                                                                            )
-                                                                        })
-                   })
+    BasicTextField(
+        value = countrySelected,
+        modifier = Modifier
+            .height(Dimensions.buttonHeight)
+            .fillMaxWidth()
+            .clickable { onSelectButtonClick(countrySelected) },
+        onValueChange = { },
+        enabled = false,
+        readOnly = true,
+        textStyle = TextStyle(
+            color = AppColor.Primary,
+            fontWeight = FontWeight.W500,
+            fontSize = 16.sp
+        ),
+        singleLine = true,
+        decorationBox = @Composable { innerTextField ->
+            TextFieldDefaults.OutlinedTextFieldDecorationBox(
+                value = countrySelected,
+                visualTransformation = VisualTransformation.None,
+                innerTextField = innerTextField,
+                placeholder = null,
+                interactionSource = remember { MutableInteractionSource() },
+                label = {
+                    Text(
+                        text = "countries",
+                        fontWeight = FontWeight.W500,
+                        fontSize = 11.sp,
+                        color = AppColor.Primary
+                    )
+                },
+                trailingIcon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.unfold),
+                        contentDescription = "", tint = AppColor.Primary
+                    )
+                },
+                singleLine = true,
+                enabled = false,
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    textColor = AppColor.Primary,
+                    focusedBorderColor = AppColor.Primary,
+                    unfocusedBorderColor = AppColor.Primary
+                ),
+                border = {
+                    TextFieldDefaults.BorderBox(
+                        false,
+                        isError = false,
+                        interactionSource = remember { MutableInteractionSource() },
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            textColor = AppColor.Primary,
+                            focusedBorderColor = AppColor.Primary,
+                            unfocusedBorderColor = AppColor.Primary
+                        ),
+                        focusedBorderThickness = 2.dp,
+                        unfocusedBorderThickness = 2.dp
+                    )
+                }
+            )
+        }
+    )
 }
 
 // TODO: make this composable unique merge it with the one used in filter for dealers: Make a list of possible search history type

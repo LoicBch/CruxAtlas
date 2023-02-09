@@ -66,7 +66,7 @@ fun Header(partner: Partner, onClose: () -> Unit) {
             Gallery(photos = partner.photos)
         }
 
-        Column {
+        Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp)) {
 
             Row(
                 modifier = Modifier
@@ -83,6 +83,7 @@ fun Header(partner: Partner, onClose: () -> Unit) {
                 Spacer(modifier = Modifier.weight(1f))
 
                 IconButton(modifier = Modifier
+                    .padding(end = 5.dp)
                     .shadow(2.dp, RoundedCornerShape(Dimensions.radiusRound))
                     .zIndex(1f)
                     .background(Color.White, RoundedCornerShape(Dimensions.radiusRound)),
@@ -239,11 +240,12 @@ fun OverviewTab(partner: Partner, pagerState: PagerState) {
     val context = LocalContext.current
 
     Column(
-        modifier = Modifier.verticalScroll(scrollState)
+        modifier = Modifier
+            .fillMaxHeight()
     ) {
 
         RowContactPremium(partner = partner)
-        LocationInfos(partner)
+        //        LocationInfos(partner)
 
         Text(text = "PartnerOffer empty")
 
@@ -252,7 +254,7 @@ fun OverviewTab(partner: Partner, pagerState: PagerState) {
         AppButton(
             isActive = true,
             onClick = { },
-            modifier = Modifier.padding(top = 50.dp),
+            modifier = Modifier,
             textRes = R.string.navigate
         )
     }
@@ -435,33 +437,33 @@ fun ContactTab(partner: Partner) {
     val context = LocalContext.current
 
     Column(modifier = Modifier.fillMaxHeight()) {
-        Row(
-            modifier = Modifier.padding(vertical = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(painter = painterResource(id = R.drawable.pin_here), contentDescription = "")
-            Text(
-                modifier = Modifier.padding(start = 22.dp),
-                text = "partner.fullLocation",
-                fontSize = 12.sp,
-                fontWeight = FontWeight(450)
-            )
-        }
-        Divider()
-
-        Row(
-            modifier = Modifier.padding(vertical = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(painter = painterResource(id = R.drawable.my_location), contentDescription = "")
-            Text(
-                modifier = Modifier.padding(start = 22.dp),
-                text = "partner.fullGeolocalisation",
-                fontSize = 12.sp,
-                fontWeight = FontWeight(450)
-            )
-        }
-        Divider()
+        //        Row(
+        //            modifier = Modifier.padding(vertical = 16.dp),
+        //            verticalAlignment = Alignment.CenterVertically
+        //        ) {
+        //            Image(painter = painterResource(id = R.drawable.pin_here), contentDescription = "")
+        //            Text(
+        //                modifier = Modifier.padding(start = 22.dp),
+        //                text = "partner.fullLocation",
+        //                fontSize = 12.sp,
+        //                fontWeight = FontWeight(450)
+        //            )
+        //        }
+        //        Divider()
+        //
+        //        Row(
+        //            modifier = Modifier.padding(vertical = 16.dp),
+        //            verticalAlignment = Alignment.CenterVertically
+        //        ) {
+        //            Image(painter = painterResource(id = R.drawable.my_location), contentDescription = "")
+        //            Text(
+        //                modifier = Modifier.padding(start = 22.dp),
+        //                text = "partner.fullGeolocalisation",
+        //                fontSize = 12.sp,
+        //                fontWeight = FontWeight(450)
+        //            )
+        //        }
+        //        Divider()
 
         if (partner.website.isNotEmpty()) {
             Row(

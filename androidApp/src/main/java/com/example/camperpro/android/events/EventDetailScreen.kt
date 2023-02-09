@@ -53,6 +53,7 @@ fun Header(event: Event, onClose: () -> Unit) {
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp)
         ) {
             IconButton(modifier = Modifier
                 .shadow(2.dp, RoundedCornerShape(Dimensions.radiusRound))
@@ -65,6 +66,7 @@ fun Header(event: Event, onClose: () -> Unit) {
             Spacer(modifier = Modifier.weight(1f))
 
             IconButton(modifier = Modifier
+                .padding(end = 5.dp)
                 .shadow(2.dp, RoundedCornerShape(Dimensions.radiusRound))
                 .zIndex(1f)
                 .background(Color.White, RoundedCornerShape(Dimensions.radiusRound)),
@@ -104,7 +106,11 @@ fun Infos(modifier: Modifier, event: Event) {
         color = Color.Black
     )
 
-    Column(modifier = Modifier.fillMaxHeight()) {
+    Column(
+        modifier = Modifier
+            .fillMaxHeight()
+            .padding(horizontal = 16.dp)
+    ) {
         Row(
             modifier = Modifier.padding(vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -152,8 +158,13 @@ fun Infos(modifier: Modifier, event: Event) {
         }
 
         Spacer(modifier = Modifier.weight(1f))
-        AppButton(isActive = true, onClick = {
-            context.navigateByGmaps(context, event.latitude, event.longitude)
-        }, modifier = Modifier, textRes = R.string.navigate)
+        AppButton(
+            isActive = true,
+            onClick = {
+                context.navigateByGmaps(context, event.latitude, event.longitude)
+            },
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+            textRes = R.string.navigate
+        )
     }
 }

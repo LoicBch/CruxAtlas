@@ -50,9 +50,16 @@ fun FilterCategorySelection(
 
         if (categorySelected != FilterCategory.UNSELECTED) {
             FilterStepTwo(onSelectButtonClick, categorySelected)
-        } else {
-            Spacer(modifier = Modifier.weight(1f))
         }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        AppButton(
+            isActive = categorySelected.optionSelected != null,
+            onClick = { /*TODO*/ },
+            modifier = Modifier,
+            textRes = R.string.apply_filters
+        )
     }
 }
 
@@ -123,14 +130,6 @@ fun FilterStepTwo(
             buttonLabel = it
         })
     }
-
-    AppButton(
-        isActive = categorySelected.optionSelected != null,
-        onClick = { /*TODO*/ },
-        modifier = Modifier,
-        textRes = R.string.apply_filters
-    )
-
 }
 
 @Composable
@@ -338,7 +337,7 @@ fun FilterStepOne(
             .padding(top = 20.dp)
     ) {
 
-        FilterCategory.values().dropLast(1).forEach { option ->
+        FilterCategory.values().dropLast(2).forEach { option ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()

@@ -54,21 +54,17 @@ fun MenuScreen(
 
     val menuItems: List<MenuItem> = listOf(
         MenuItem(R.string.menu_events, {
-            resultNavigator.navigateBack(true)
-            navigator.popBackStack()
-        }, R.drawable.events, R.string.cd_events, false),
-        MenuItem(
+            resultNavigator.navigateBack(result = true, true)
+        }, R.drawable.events, R.string.cd_events, false), MenuItem(
             R.string.menu_travel_checklists,
             {},
             R.drawable.checklist,
             R.string.cd_travel_checklist,
             true
-        ),
-//        MenuItem(R.string.menu_leveler, {}, R.drawable.events, R.string.cd_leveler, false),
+        ), //        MenuItem(R.string.menu_leveler, {}, R.drawable.events, R.string.cd_leveler, false),
         MenuItem(
             R.string.menu_my_location, {}, R.drawable.my_location, R.string.cd_my_location, true
-        ),
-        MenuItem(
+        ), MenuItem(
             R.string.menu_app_settings, {}, R.drawable.settings, R.string.cd_app_settings, false
         )
     )
@@ -106,18 +102,28 @@ fun MenuScreen(
                 .padding(horizontal = 16.dp)
         )
 
-        Dropdown(
-            title = stringResource(id = R.string.menu_travel_tools),
-            modifier = Modifier.padding(horizontal = 16.dp)
-        ) {
-            Column() {
-                MenuItem(menuItem = menuItems.find { it.labelRes == R.string.menu_travel_checklists }!!)
-                MenuItem(menuItem = menuItems.find { it.labelRes == R.string.menu_my_location }!!)
-            }
-        }
+        menuItems.filter { !it.isSubMenu }.forEach { menuItem ->
+            MenuItem(menuItem = menuItem)
 
-        menuItems.filter { !it.isSubMenu }.forEach {
-            MenuItem(menuItem = it)
+            if (menuItem.labelRes == R.string.menu_events) {
+
+                Divider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                )
+
+                Dropdown(
+                    title = stringResource(id = R.string.menu_travel_tools),
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                ) {
+                    Column {
+                        MenuItem(menuItem = menuItems.find { it.labelRes == R.string.menu_travel_checklists }!!)
+                        MenuItem(menuItem = menuItems.find { it.labelRes == R.string.menu_my_location }!!)
+                    }
+                }
+            }
+
             Divider(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -143,12 +149,17 @@ fun MenuItem(
     Row(
         Modifier
             .fillMaxWidth()
-            .height(65.dp)
-            .padding(vertical = 15.dp)
+            .height(70.dp)
+            .padding(
+                top = 15.dp,
+                bottom = 15.dp,
+                end = 15.dp,
+                start = if (menuItem.isSubMenu) 30.dp else 0.dp
+            )
+            .clickable { menuItem.onclick() }, verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = menuItem.onclick) {
-            Image(
-                modifier = Modifier.size(50.dp),
+            Icon(
                 painter = painterResource(id = menuItem.drawableRes),
                 contentDescription = stringResource(id = menuItem.contentDescriptionRes)
             )
@@ -156,8 +167,8 @@ fun MenuItem(
         Text(
             modifier = Modifier.align(Alignment.CenterVertically),
             text = stringResource(id = menuItem.labelRes),
-            fontWeight = if (menuItem.isSubMenu) FontWeight.W500 else FontWeight.W700,
-            fontSize = if (menuItem.isSubMenu) 14.sp else 16.sp,
+            fontWeight = FontWeight.W700,
+            fontSize = 16.sp,
             color = AppColor.Tertiary
         )
         Spacer(modifier = Modifier.weight(1f))
@@ -177,7 +188,7 @@ fun PubContainerMenu(pub: MenuLink) {
     Row(
         Modifier
             .fillMaxWidth()
-            .height(65.dp)
+            .height(70.dp)
             .padding(start = 16.dp)
             .clickable {
                 uriHandler.openUri(pub.url)

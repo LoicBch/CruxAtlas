@@ -6,13 +6,13 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.datastore.preferences.core.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.camperpro.data.ResultWrapper
 import com.example.camperpro.domain.model.Search
 import com.example.camperpro.domain.usecases.AddSearch
 import com.example.camperpro.domain.usecases.DeleteSearch
 import com.example.camperpro.domain.usecases.GetAllSearchForACategory
 import com.example.camperpro.utils.BottomSheetOption
 import com.example.camperpro.utils.SortOption
-import com.example.camperpro.data.ResultWrapper
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch

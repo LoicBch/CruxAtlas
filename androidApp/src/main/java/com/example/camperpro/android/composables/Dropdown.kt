@@ -32,7 +32,7 @@ fun Dropdown(modifier: Modifier, title: String, content: @Composable () -> Unit)
     Column {
         Row(
             Modifier
-                .height(50.dp),
+                .height(70.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(

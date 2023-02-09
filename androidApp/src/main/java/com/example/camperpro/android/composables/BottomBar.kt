@@ -16,7 +16,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavAction
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -28,7 +27,7 @@ import com.example.camperpro.android.ui.theme.AppColor
 import com.example.camperpro.android.ui.theme.Dimensions
 import com.ramcosta.composedestinations.navigation.navigate
 
-val NavBackStackEntry.shouldShowBottomBar get() = AndroidConstants.ScreensOverBottomBar.all {  this.destination.route != it.route }
+val NavBackStackEntry.shouldShowBottomBar get() = AndroidConstants.ScreensOverBottomBar.all { this.destination.route != it.route }
 
 @Composable
 fun BottomBar(navController: NavHostController) {
@@ -48,7 +47,8 @@ fun BottomBar(navController: NavHostController) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 BottomBarDestination.values().forEach { destination ->
-                    val selected = currentBackStack.value?.destination?.route == destination.direction.route
+                    val selected =
+                        currentBackStack.value?.destination?.route == destination.direction.route
                     val appViewModel = LocalDependencyContainer.current.appViewModel
 
                     navController.backQueue.forEach {
@@ -60,7 +60,7 @@ fun BottomBar(navController: NavHostController) {
                         modifier = Modifier.align(Alignment.CenterVertically),
                         selected = selected,
                         onClick = {
-                            if (destination.ordinal == 0){
+                            if (destination.ordinal == 0) {
                                 navController.popBackStack(
                                     MainMapDestination.route, false
                                 )

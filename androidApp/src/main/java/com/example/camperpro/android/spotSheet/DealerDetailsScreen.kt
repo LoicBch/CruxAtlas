@@ -77,6 +77,7 @@ fun Header(dealer: Dealer, onClose: () -> Unit) {
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .fillMaxWidth()
+                .padding(start = 10.dp, end = 10.dp, top = 10.dp)
         ) {
             IconButton(modifier = Modifier
                 .shadow(2.dp, RoundedCornerShape(Dimensions.radiusRound))
@@ -89,10 +90,12 @@ fun Header(dealer: Dealer, onClose: () -> Unit) {
             Spacer(modifier = Modifier.weight(1f))
 
             IconButton(modifier = Modifier
+                .padding(end = 5.dp)
                 .shadow(2.dp, RoundedCornerShape(Dimensions.radiusRound))
                 .zIndex(1f)
                 .background(Color.White, RoundedCornerShape(Dimensions.radiusRound)),
-                       onClick = { /*TODO*/ }) {
+                       onClick = { /*TODO*/ }
+            ) {
                 Icon(painter = painterResource(id = R.drawable.help), contentDescription = "")
             }
 
@@ -285,7 +288,10 @@ fun OverviewTab(dealer: Dealer, pagerState: PagerState) {
     val context = LocalContext.current
 
     Column(
-        modifier = Modifier.verticalScroll(scrollState)
+        modifier = Modifier
+            .fillMaxHeight()
+            .padding(bottom = 15.dp)
+            .verticalScroll(scrollState)
     ) {
         if (dealer.isPremium) {
             RowContactPremium(dealer = dealer)
@@ -316,15 +322,7 @@ fun OverviewTab(dealer: Dealer, pagerState: PagerState) {
             )
         }
 
-        if (dealer.brands.isNotEmpty()) {
-            ItemsList(
-                dealer.services.take(3),
-                { scope.launch { pagerState.scrollToPage(1) } },
-                R.string.view_all_services,
-                title = R.string.accessories,
-                subtitle = R.string.accessories_subtitle, false
-            )
-        }
+        Spacer(modifier = Modifier.weight(1f))
 
         AppButton(
             isActive = true,
@@ -355,7 +353,7 @@ fun ServicesList(
         modifier = Modifier.padding(top = 8.dp),
         text = stringResource(id = subtitle),
         fontSize = 12.sp,
-        fontWeight = FontWeight(450),
+        fontWeight = FontWeight.Black,
         color = Color.Black
     )
     Divider(Modifier.padding(top = 8.dp))
@@ -378,7 +376,7 @@ fun ServicesList(
                 fontWeight = FontWeight.W500
             )
             Spacer(modifier = Modifier.weight(1f))
-            IconButton(onClick = { }) {
+            IconButton(onClick = { onExtend() }) {
                 Icon(
                     imageVector = Icons.Filled.ArrowForward,
                     contentDescription = "",
@@ -417,7 +415,7 @@ fun ItemsList(
         modifier = Modifier.padding(top = 8.dp),
         text = stringResource(id = subtitle),
         fontSize = 12.sp,
-        fontWeight = FontWeight(450),
+        fontWeight = FontWeight.Black,
         color = Color.Black
     )
     Divider(Modifier.padding(top = 8.dp))
@@ -453,7 +451,7 @@ fun ItemsList(
                 fontWeight = FontWeight.W500
             )
             Spacer(modifier = Modifier.weight(1f))
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = { onExtend() }) {
                 Icon(
                     imageVector = Icons.Filled.ArrowForward,
                     contentDescription = "",
@@ -524,13 +522,18 @@ fun LocationInfos(dealer: Dealer) {
 
 @Composable
 fun RowContact(dealer: Dealer) {
+
+    val uriHandler = LocalUriHandler.current
+    val context = LocalContext.current
+
     Row(modifier = Modifier.padding(top = 20.dp)) {
         if (dealer.website.isNotEmpty()) {
             Row(
                 modifier = Modifier
                     .background(Color.White, RoundedCornerShape(15))
                     .border(1.dp, AppColor.Secondary, RoundedCornerShape(Dimensions.radiusRound))
-                    .padding(vertical = 5.dp, horizontal = 12.dp),
+                    .padding(vertical = 5.dp, horizontal = 12.dp)
+                    .clickable { uriHandler.openUri(dealer.website) },
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
@@ -554,7 +557,8 @@ fun RowContact(dealer: Dealer) {
                 modifier = Modifier
                     .background(Color.White, RoundedCornerShape(15))
                     .border(1.dp, AppColor.Secondary, RoundedCornerShape(Dimensions.radiusRound))
-                    .padding(vertical = 5.dp, horizontal = 12.dp),
+                    .padding(vertical = 5.dp, horizontal = 12.dp)
+                    .clickable { context.dial(dealer.phone) },
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
@@ -578,6 +582,10 @@ fun RowContact(dealer: Dealer) {
 
 @Composable
 fun RowContactPremium(dealer: Dealer) {
+
+    val uriHandler = LocalUriHandler.current
+    val context = LocalContext.current
+
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier.padding(top = 20.dp)
@@ -589,7 +597,7 @@ fun RowContactPremium(dealer: Dealer) {
                 )
                 .padding(end = 12.dp)
                 .border(1.dp, AppColor.Secondary, RoundedCornerShape(Dimensions.radiusRound)),
-                       onClick = { /*TODO*/ }) {
+                       onClick = { uriHandler.openUri(dealer.website) }) {
                 Icon(
                     painter = painterResource(id = R.drawable.website),
                     contentDescription = "",
@@ -621,7 +629,11 @@ fun RowContactPremium(dealer: Dealer) {
                 )
                 .padding(end = 12.dp)
                 .border(1.dp, AppColor.Secondary, RoundedCornerShape(Dimensions.radiusRound)),
-                       onClick = { /*TODO*/ }) {
+                       onClick = {
+                           context.sendMail(
+                               dealer.email, ""
+                           )
+                       }) {
                 Icon(
                     painter = painterResource(id = R.drawable.mail),
                     contentDescription = "",
@@ -637,7 +649,7 @@ fun RowContactPremium(dealer: Dealer) {
                 )
                 .padding(end = 12.dp)
                 .border(1.dp, AppColor.Secondary, RoundedCornerShape(Dimensions.radiusRound)),
-                       onClick = { /*TODO*/ }) {
+                       onClick = { uriHandler.openUri(dealer.facebook) }) {
                 Icon(
                     painter = painterResource(id = R.drawable.facebook),
                     contentDescription = "",
@@ -653,7 +665,7 @@ fun RowContactPremium(dealer: Dealer) {
                 )
                 .padding(end = 12.dp)
                 .border(1.dp, AppColor.Secondary, RoundedCornerShape(Dimensions.radiusRound)),
-                       onClick = { /*TODO*/ }) {
+                       onClick = { uriHandler.openUri(dealer.twitter) }) {
                 Icon(
                     painter = painterResource(id = R.drawable.twitter),
                     contentDescription = "",
@@ -669,7 +681,7 @@ fun RowContactPremium(dealer: Dealer) {
                 )
                 .padding(end = 12.dp)
                 .border(1.dp, AppColor.Secondary, RoundedCornerShape(Dimensions.radiusRound)),
-                       onClick = { /*TODO*/ }) {
+                       onClick = { uriHandler.openUri(dealer.youtube) }) {
                 Icon(
                     painter = painterResource(id = R.drawable.youtube),
                     contentDescription = "",
@@ -697,15 +709,7 @@ fun DetailsTab(dealer: Dealer) {
             title = R.string.official_dealers,
             subtitle = R.string.dealers_subtitle, true
         )
-        ItemsList(
-            dealer.services,
-            {},
-            R.string.view_all_services,
-            title = R.string.accessories,
-            subtitle = R.string.accessories_subtitle, true
-        )
     }
-
 }
 
 @Composable

@@ -61,7 +61,8 @@ val useCasesDependencies = module {
     factoryOf(::SetupApp)
     factoryOf(::AddSearch)
     factoryOf(::DeleteSearch)
-    factoryOf(::SortSpots)
+    factoryOf(::SortDealer)
+    factoryOf(::SortEvents)
     factoryOf(::FetchPartners)
     factoryOf(::FetchEvents)
     factory { (context: Any?) -> LanguageManager(context) }

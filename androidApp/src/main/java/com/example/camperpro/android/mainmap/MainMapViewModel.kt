@@ -6,14 +6,12 @@ import androidx.lifecycle.viewModelScope
 import com.example.camperpro.data.ResultWrapper
 import com.example.camperpro.domain.model.Ad
 import com.example.camperpro.domain.model.Dealer
+import com.example.camperpro.domain.model.Event
 import com.example.camperpro.domain.model.Place
 import com.example.camperpro.domain.model.composition.Location
 import com.example.camperpro.domain.model.composition.Marker
 import com.example.camperpro.domain.model.composition.UpdateSource
-import com.example.camperpro.domain.usecases.FetchAds
-import com.example.camperpro.domain.usecases.FetchEvents
-import com.example.camperpro.domain.usecases.FetchSpotAtLocationUseCase
-import com.example.camperpro.domain.usecases.SortSpots
+import com.example.camperpro.domain.usecases.*
 import com.example.camperpro.utils.SortOption
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -26,7 +24,8 @@ class MainMapViewModel(
     private val fetchSpotAtLocationUseCase: FetchSpotAtLocationUseCase,
     private val fetchEvents: FetchEvents,
     private val fetchAds: FetchAds,
-    private val sortSpots: SortSpots
+    private val sortDealer: SortDealer,
+    private val sortEvents: SortEvents
 ) : ViewModel() {
 
     private val markersUpdate = savedStateHandle.getStateFlow(
@@ -140,12 +139,23 @@ class MainMapViewModel(
     fun onSortingOptionSelected(sortOption: SortOption) {
         viewModelScope.launch {
             // TODO: Faire une fonction d'extension / enum de map pour get le type de value actuellement afficher a partir de la source
-            when (val res =
-                sortSpots(
-                    sortOption,
-                    markersUpdate.value.second.map { it.content } as List<Dealer>)) {
-                is ResultWrapper.Failure -> {}
-                is ResultWrapper.Success -> savedStateHandle["verticalListItems"] = res.value
+            if (markersUpdate.value.first == UpdateSource.EVENTS) {
+                when (val res =
+                    sortEvents(
+                        sortOption,
+                        markersUpdate.value.second.map { it.content } as List<Event>)) {
+                    is ResultWrapper.Failure -> {}
+                    is ResultWrapper.Success -> savedStateHandle["verticalListItems"] = res.value
+                }
+            } else {
+
+                when (val res =
+                    sortDealer(
+                        sortOption,
+                        markersUpdate.value.second.map { it.content } as List<Dealer>)) {
+                    is ResultWrapper.Failure -> {}
+                    is ResultWrapper.Success -> savedStateHandle["verticalListItems"] = res.value
+                }
             }
         }
     }
