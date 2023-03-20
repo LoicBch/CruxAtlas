@@ -10,11 +10,18 @@ interface BaseLocationManagerCompanion {
     fun startLocationUpdating()
     fun stopLocationUpdating()
     fun onLocationUpdated(target: Any, block: OnLocationUpdatedBlock): BaseLocationManagerCompanion
-    fun onLocationUnavailable(target: Any, block: OnLocationUnavailableBlock): BaseLocationManagerCompanion
+    fun onLocationUnavailable(
+        target: Any,
+        block: OnLocationUnavailableBlock
+    ): BaseLocationManagerCompanion
 
     fun isPermissionAllowed(): Boolean
+    fun isLocationEnable(): Boolean
     fun requestPermission()
-    fun onPermissionUpdated(target: Any, block: OnPermissionUpdatedBlock): BaseLocationManagerCompanion
+    fun onPermissionUpdated(
+        target: Any,
+        block: OnPermissionUpdatedBlock
+    ): BaseLocationManagerCompanion
 
     fun removeAllListeners()
     fun removeListeners(target: Any)

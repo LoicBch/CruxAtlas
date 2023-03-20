@@ -35,7 +35,6 @@ import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import org.koin.androidx.compose.getViewModel
 
-//Faire un objet partner
 @Destination
 @Composable
 fun PartnersScreen(
@@ -104,6 +103,14 @@ fun VerticalListItem(partner: Partner) {
             maxLines = 1,
             fontSize = 14.sp,
             text = partner.name
+        )
+
+        Text(
+            modifier = Modifier.padding(5.dp),
+            fontWeight = FontWeight(450),
+            maxLines = 2,
+            fontSize = 10.sp,
+            text = partner.description
         )
 
         Spacer(modifier = Modifier.weight(1f))

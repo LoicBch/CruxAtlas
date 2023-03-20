@@ -1,13 +1,8 @@
 package com.example.camperpro.android.onBoarding
 
 import android.Manifest
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.Animatable
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -15,10 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
@@ -33,8 +26,10 @@ import com.ramcosta.composedestinations.annotation.Destination
 @Composable
 fun SplashScreen(navController: NavController, viewModel: SplashScreenViewModel) {
 
-    val setupIsComplete = viewModel.setupIsComplete.collectAsState()
+    //    val setupIsComplete = viewModel.setupIsComplete.collectAsState()
+    val setupIsComplete = viewModel.gpsLocationIsAsked.collectAsState()
     val context = LocalContext.current
+
     val locationPermission =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             when {
@@ -47,30 +42,19 @@ fun SplashScreen(navController: NavController, viewModel: SplashScreenViewModel)
             }
         }
 
-    val color = remember { Animatable(Color.White) }
-
     if (setupIsComplete.value) {
         LaunchedEffect(setupIsComplete) {
             navController.navigate(MainActivity.Graphs.HOME)
         }
     }
 
-    LaunchedEffect(Unit) {
-        color.animateTo(
-            AppColor.BlueCamperPro, animationSpec = infiniteRepeatable(
-                tween(2000),
-                RepeatMode.Reverse
-            )
-        )
-    }
-
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = color.value), contentAlignment = Alignment
+            .background(color = AppColor.SplashScreenBackground), contentAlignment = Alignment
             .Center
     ) {
-        Image(painter = painterResource(id = R.drawable.premium_badge), contentDescription = "")
+        Image(painter = painterResource(id = R.drawable.logo), contentDescription = "")
     }
 
     LaunchedEffect(true) {

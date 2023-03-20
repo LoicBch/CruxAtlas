@@ -115,4 +115,8 @@ internal actual class LocationLoyal {
         iosLocationProvider.startUpdatingHeading()
         iosLocationProvider.startUpdatingLocation()
     }
+
+    actual fun isLocationEnabled(): Boolean {
+        TODO("Not yet implemented")
+    }
 }

@@ -1,12 +1,18 @@
 package com.example.camperpro.android.home
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -17,8 +23,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.camperpro.android.LocalDependencyContainer
 import com.example.camperpro.android.NavGraphs
-import com.example.camperpro.android.composables.AppScaffold
-import com.example.camperpro.android.composables.BottomBar
+import com.example.camperpro.android.composables.*
 import com.example.camperpro.domain.model.composition.Location
 import com.example.camperpro.managers.location.LocationManager
 import com.example.camperpro.utils.*
@@ -35,28 +40,52 @@ fun HomeScreen(navController: NavHostController = rememberNavController()) {
     val sheetState = appViewModel.bottomSheetIsShowing
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
-    val locationIsObserved by appViewModel.locationIsObserved.collectAsState()
+
+    val popupState by appViewModel.globalPopup.collectAsState()
     val networkIsObserved by appViewModel.networkIsObserved.collectAsState()
     val observersAreSet by appViewModel.observersAreSet.collectAsState()
 
     DisposableEffect(lifecycleOwner) {
-        //            est ce vraiment utile d'observer la loc ???
         LocationManager.onLocationUpdated(this) {
+            appViewModel.removeGpsMissingNotification()
             val lat = it.coordinates.latitude
             val long = it.coordinates.longitude
             Log.d("location", "$lat, $long")
             Globals.geoLoc.lastKnownLocation = Location(lat, long)
-            if (Globals.geoLoc.lastSearchedLocation == null) {
+
+            if (Globals.geoLoc.lastSearchedLocation != Constants.DEFAULT_LOCATION) {
                 Globals.geoLoc.lastSearchedLocation = Location(lat, long)
             }
-            appViewModel.onLocationObserveStarted()
-        }.startLocationUpdating()
 
-        NetworkConnectivityObserver(context).observe()
-            .onEach {
-                Globals.network.status = it
-                if (!networkIsObserved) appViewModel.onNetworkObserveStarted()
-            }.launchIn(lifecycleOwner.lifecycleScope)
+            if (!appViewModel.locationIsObserved.value) {
+                appViewModel.onLocationObserveStarted()
+            }
+        }.onLocationUnavailable(this) {
+            if (!appViewModel.locationIsObserved.value) {
+                Globals.geoLoc.lastKnownLocation = Constants.DEFAULT_LOCATION
+                Globals.geoLoc.lastSearchedLocation = Constants.DEFAULT_LOCATION
+                appViewModel.onLocationObserveStarted()
+            }
+            appViewModel.showGlobalSlider(GlobalSliderState.GPS_MISSING)
+        }.startLocationUpdating()
+        appViewModel.onLocationObserveStarted()
+
+        // TODO: Use Network Manager for  that
+        NetworkConnectivityObserver(context).observe().onEach {
+            Globals.network.status = it
+            Log.d("NETWORK", it.name)
+
+            if (it == ConnectivityObserver.NetworkStatus.Lost || it == ConnectivityObserver.NetworkStatus.Unavailable) {
+                appViewModel.showGlobalSlider(GlobalSliderState.NETWORK_MISSING)
+            } else {
+                appViewModel.removeNetworkMissingNotification()
+            }
+        }.onStart {
+            if (Globals.network.status == ConnectivityObserver.NetworkStatus.Unavailable) {
+                appViewModel.showGlobalSlider(GlobalSliderState.NETWORK_MISSING)
+            }
+            if (!networkIsObserved) appViewModel.onNetworkObserveStarted()
+        }.launchIn(lifecycleOwner.lifecycleScope)
 
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
@@ -81,12 +110,33 @@ fun HomeScreen(navController: NavHostController = rememberNavController()) {
             sheetState = sheetState,
             bottomBar = { BottomBar(navController = navController) },
         ) {
-            DestinationsNavHost(
-                modifier = Modifier.padding(it),
-                navController = navController,
-                navGraph = NavGraphs.root,
-                startRoute = NavGraphs.root.startRoute
-            )
+
+            Box(modifier = Modifier.fillMaxSize()) {
+                DestinationsNavHost(
+                    modifier = Modifier.padding(it),
+                    navController = navController,
+                    navGraph = NavGraphs.root,
+                    startRoute = NavGraphs.root.startRoute
+                )
+
+                AnimatedVisibility(
+                    modifier =
+                    Modifier.align(Alignment.Center),
+                    visible = popupState != GlobalPopupState.HID,
+                    enter = fadeIn(), exit = fadeOut()
+                ) {
+                    GlobalPopup(
+                        Modifier, popupState
+                    ) {
+                        appViewModel.hideGlobalPopup()
+                    }
+                }
+
+                GlobalSliderModal(
+                    sliderState = appViewModel.globalSlider,
+                    onRemoveGpsNotification = { appViewModel.removeGpsMissingNotification() }
+                ) { appViewModel.removeNetworkMissingNotification() }
+            }
         }
     }
 }

@@ -11,11 +11,9 @@ import com.example.camperpro.utils.CommonParcelize
 class Partner(
     var id: String,
     var name: String,
+    var description: String,
     var brands: List<String>,
     var services: List<String>,
-    var address: String,
-    var postalCode: String,
-    var countryIso: String,
     var phone: String,
     var email: String,
     var website: String,
@@ -24,6 +22,5 @@ class Partner(
     var instagram: String,
     var twitter: String,
     var isPremium: Boolean,
-    var city: String,
     var photos: List<Photo> = listOf()
 ) : CommonParcelable

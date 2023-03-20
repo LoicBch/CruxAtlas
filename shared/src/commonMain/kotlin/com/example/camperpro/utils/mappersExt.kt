@@ -57,11 +57,9 @@ fun EventDto.toVo() = Event(
 fun PartnerDto.toVo() = Partner(
     id,
     name,
+    description,
     brands.split(",").dropLast(1),
     services.split(",").dropLast(1),
-    address,
-    postalCode,
-    countryIso,
     phone,
     email,
     website,
@@ -70,18 +68,17 @@ fun PartnerDto.toVo() = Partner(
     "instagram",
     twitter,
     premium.toBool(),
-    city,
     photos.toVo()
 )
 
 @JvmName("toPartnerList")
 fun List<PartnerDto>.toVo() = this.map { it.toVo() }
 
-fun Event.toMarker() = Marker(this.latitude, this.longitude, this)
+fun Event.toMarker() = Marker(this.id, false, this.latitude, this.longitude)
 
 @JvmName("listEventsToMListMarker")
 fun List<Event>.toMarker() = map { it.toMarker() }
-fun Dealer.toMarker() = Marker(this.latitude, this.longitude, this)
+fun Dealer.toMarker() = Marker(this.id, false, this.latitude, this.longitude)
 
 @JvmName("listDealersToMListMarker")
 fun List<Dealer>.toMarker() = map { it.toMarker() }

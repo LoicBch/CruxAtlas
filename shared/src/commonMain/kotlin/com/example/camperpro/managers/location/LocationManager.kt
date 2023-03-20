@@ -17,6 +17,8 @@ class LocationManager {
 
         override fun isPermissionAllowed() = locationLoyal.isPermissionAllowed()
 
+        override fun isLocationEnable() = locationLoyal.isLocationEnabled()
+
         override fun requestPermission() = locationLoyal.requestPermission()
 
         override fun startLocationUpdating() = locationLoyal.startLocationUpdating()

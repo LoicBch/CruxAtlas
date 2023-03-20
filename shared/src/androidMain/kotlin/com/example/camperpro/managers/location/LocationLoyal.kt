@@ -19,6 +19,8 @@ import java.lang.ref.WeakReference
 
 internal actual class LocationLoyal {
 
+    actual fun isLocationEnabled() = locationIsEnabled
+
     actual fun isPermissionAllowed() = focusedActivity?.let {
         ActivityCompat.checkSelfPermission(
             it,
@@ -57,12 +59,15 @@ internal actual class LocationLoyal {
             return
         }
 
+        locationIsEnabled = LocationUtil.checkLocationEnable(activity)
+
         if (!isPermissionAllowed()) {
             requestPermission()
             notifyOnLocationUnavailable()
-        } else if (!LocationUtil.checkLocationEnable(activity)) {
-            notifyOnLocationUnavailable()
         } else {
+            if (!locationIsEnabled) {
+                notifyOnLocationUnavailable()
+            }
             fusedLocationClient.requestLocationUpdates(
                 locationRequest,
                 locationCallback,
@@ -162,6 +167,7 @@ internal actual class LocationLoyal {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
+                locationIsEnabled = true
                 val location = locationResult.locations.last()
                 val data = LocationData(
                     location.accuracy.toDouble(),
@@ -172,6 +178,13 @@ internal actual class LocationLoyal {
                     Coordinates(location.latitude, location.longitude)
                 )
                 LocationManager.notifyOnLocationUpdated(data)
+            }
+
+            override fun onLocationAvailability(p0: LocationAvailability) {
+                if (!p0.isLocationAvailable) {
+                    locationIsEnabled = false
+                    notifyOnLocationUnavailable()
+                }
             }
         }
 
@@ -219,6 +232,7 @@ internal actual class LocationLoyal {
 
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private var locationIsEnabled = false
 
     private lateinit var locationCallback: LocationCallback
     private var locationRequest: LocationRequest = LocationRequest.create().apply {
@@ -227,7 +241,6 @@ internal actual class LocationLoyal {
         interval = 10 * 1000L
     }
 
-    // si on veut modifier la request depuis android
     fun setLocationRequest(androidLocationRequest: AndroidLocationRequest) {
         locationRequest = LocationRequest.create().apply {
             priority = androidLocationRequest.priority.value

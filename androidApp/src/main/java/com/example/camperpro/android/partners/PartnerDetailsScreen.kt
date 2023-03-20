@@ -70,7 +70,7 @@ fun Header(partner: Partner, onClose: () -> Unit) {
 
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth().padding(bottom = 30.dp)
             ) {
                 IconButton(modifier = Modifier
                     .shadow(2.dp, RoundedCornerShape(Dimensions.radiusRound))
@@ -154,11 +154,20 @@ fun BasePartnerInfos(modifier: Modifier, partner: Partner) {
         fontWeight = FontWeight.W500,
         color = Color.Black
     )
+
     Text(
-        modifier = modifier.padding(bottom = 16.dp),
+        modifier = modifier.padding(bottom = 12.dp),
         text = partner.name,
         fontSize = 22.sp,
         fontWeight = FontWeight.W700,
+        color = Color.Black
+    )
+
+    Text(
+        modifier = modifier.padding(bottom = 24.dp),
+        text = partner.description,
+        fontSize = 14.sp,
+        fontWeight = FontWeight(450),
         color = Color.Black
     )
 }
@@ -171,7 +180,7 @@ fun Tabs(partner: Partner) {
 
     val tabScreensTitle = listOf(
         stringResource(id = R.string.overview),
-        stringResource(id = R.string.details),
+//        stringResource(id = R.string.details),
         stringResource(id = R.string.contact_info)
     )
 
@@ -224,8 +233,8 @@ fun Tabs(partner: Partner) {
         ) { page ->
             when (page) {
                 0 -> OverviewTab(partner, pagerState)
-                1 -> DetailsTab(partner)
-                2 -> ContactTab(partner)
+                1 -> ContactTab(partner)
+//                1 -> DetailsTab(partner)
             }
         }
     }
@@ -245,17 +254,14 @@ fun OverviewTab(partner: Partner, pagerState: PagerState) {
     ) {
 
         RowContactPremium(partner = partner)
-        //        LocationInfos(partner)
-
-        Text(text = "PartnerOffer empty")
 
         Spacer(modifier = Modifier.weight(1f))
 
         AppButton(
             isActive = true,
             onClick = { },
-            modifier = Modifier,
-            textRes = R.string.navigate
+            modifier = Modifier.padding(bottom = 30.dp),
+            textRes = R.string.get_offer
         )
     }
 }
@@ -328,8 +334,8 @@ fun LocationInfos(partner: Partner) {
 @Composable
 fun RowContactPremium(partner: Partner) {
     Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier.padding(top = 20.dp)
+        horizontalArrangement = Arrangement.SpaceAround,
+        modifier = Modifier.padding(top = 20.dp).fillMaxWidth()
     ) {
         if (partner.website.isNotEmpty()) {
             IconButton(modifier = Modifier

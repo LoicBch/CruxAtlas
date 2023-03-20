@@ -2,6 +2,7 @@
 
 package com.example.camperpro.android.mainmap
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -31,9 +32,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.navigation.NavController
 import com.example.camperpro.android.LocalDependencyContainer
 import com.example.camperpro.android.MyApplicationTheme
 import com.example.camperpro.android.R
+import com.example.camperpro.android.composables.LoadingModal
 import com.example.camperpro.android.destinations.AroundLocationScreenDestination
 import com.example.camperpro.android.destinations.DealerDetailsScreenDestination
 import com.example.camperpro.android.destinations.MenuScreenDestination
@@ -44,6 +47,7 @@ import com.example.camperpro.android.ui.theme.AppColor
 import com.example.camperpro.android.ui.theme.Dimensions
 import com.example.camperpro.domain.model.*
 import com.example.camperpro.domain.model.composition.*
+import com.example.camperpro.managers.location.LocationManager
 import com.example.camperpro.utils.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -69,44 +73,59 @@ fun MainMap(
     locationSearchRecipient: ResultRecipient<AroundLocationScreenDestination, Place>,
     launchEventsSearchRecipient: ResultRecipient<MenuScreenDestination, Boolean>,
     navigator: DestinationsNavigator,
+    navController: NavController,
     viewModel: MainMapViewModel = getViewModel()
 ) {
     val state by viewModel.state.collectAsState()
     val locationSearched by viewModel.placeSearched.collectAsState()
+    val currentlyLoading by viewModel.loading.collectAsState()
+    val markersState by viewModel.markersFlow.collectAsState()
+    val updateSource by viewModel.updateSource.collectAsState()
+
+    val dealers by viewModel.dealers.collectAsState()
+    val events by viewModel.events.collectAsState()
+
+    var properties by remember {
+        mutableStateOf(MapProperties(isMyLocationEnabled = true, mapType = MapType.NORMAL))
+    }
+
     val context = LocalContext.current
 
     val cameraPositionState = rememberCameraPositionState {
-        position = if (context.hasLocationPermission) {
-            CameraPosition.fromLatLngZoom(
-                LatLng(
-                    Globals.geoLoc.lastKnownLocation?.latitude!!,
-                    Globals.geoLoc.lastKnownLocation?.longitude!!
-                ), 10f
-            )
-        } else {
-            CameraPosition.fromLatLngZoom(
-                LatLng(
-                    Constants.DEFAULT_LOCATION.latitude, Constants.DEFAULT_LOCATION.longitude
-                ), 10f
-            )
-        }
+        position =
+            if (!LocationManager.isPermissionAllowed() || !LocationManager.isLocationEnable()) {
+                Log.d("LOCATION", "MainMap: ")
+                CameraPosition.fromLatLngZoom(
+                    LatLng(
+                        Constants.DEFAULT_LOCATION.latitude, Constants.DEFAULT_LOCATION.longitude
+                    ), 5f
+                )
+            } else {
+                Log.d("LOCATION", Globals.geoLoc.lastKnownLocation.latitude.toString())
+                CameraPosition.fromLatLngZoom(
+                    LatLng(
+                        Globals.geoLoc.lastKnownLocation.latitude,
+                        Globals.geoLoc.lastKnownLocation.longitude
+                    ), 15f
+                )
+            }
     }
 
     val appViewModel = LocalDependencyContainer.current.appViewModel
 
     LaunchedEffect(true) {
-        if (state.markersUpdate.first == UpdateSource.DEFAULT) {
+        if (updateSource == UpdateSource.DEFAULT) {
             viewModel.getAds()
             if (context.hasLocationPermission) {
                 cameraPositionState.move(
                     CameraUpdateFactory.newLatLng(
                         LatLng(
-                            Globals.geoLoc.lastKnownLocation?.latitude!!,
-                            Globals.geoLoc.lastKnownLocation?.longitude!!
+                            Globals.geoLoc.lastKnownLocation.latitude,
+                            Globals.geoLoc.lastKnownLocation.longitude
                         )
                     )
                 )
-                viewModel.showSpots(Globals.geoLoc.lastKnownLocation!!)
+                viewModel.showSpots(Globals.geoLoc.lastKnownLocation)
             } else {
                 cameraPositionState.move(
                     CameraUpdateFactory.newLatLng(
@@ -119,8 +138,8 @@ fun MainMap(
                 viewModel.showSpots(Constants.DEFAULT_LOCATION)
             }
         }
-
     }
+
 
     LaunchedEffect(appViewModel.loadAroundMeIsPressed) {
         appViewModel.loadAroundMeIsPressed.collect {
@@ -129,21 +148,18 @@ fun MainMap(
                     cameraPositionState.move(
                         CameraUpdateFactory.newLatLng(
                             LatLng(
-                                Globals.geoLoc.lastKnownLocation?.latitude!!,
-                                Globals.geoLoc.lastKnownLocation?.longitude!!
+                                Globals.geoLoc.lastKnownLocation.latitude,
+                                Globals.geoLoc.lastKnownLocation.longitude
                             )
                         )
                     )
-                    viewModel.showSpots(Globals.geoLoc.lastKnownLocation!!)
-                } else { // TODO: display message
+                    viewModel.showSpots(Globals.geoLoc.lastKnownLocation)
                 }
             }
         }
-
     }
 
     launchEventsSearchRecipient.onNavResult { result ->
-
         when (result) {
             is NavResult.Canceled -> {}
             is NavResult.Value -> {
@@ -171,29 +187,29 @@ fun MainMap(
 
     Box {
         GoogleMap(
-            modifier = Modifier.fillMaxSize(),
-            properties = MapProperties(isMyLocationEnabled = true),
-            uiSettings = MapUiSettings(
-                zoomControlsEnabled = false, myLocationButtonEnabled = false
-            ),
-            cameraPositionState = cameraPositionState
+            modifier = Modifier.fillMaxSize(), properties = properties, uiSettings = MapUiSettings(
+                zoomControlsEnabled = false, myLocationButtonEnabled = false,
+            ), cameraPositionState = cameraPositionState
         ) {
-            state.markersUpdate.second.forEach { marker ->
-                Marker(icon = BitmapDescriptorFactory.fromResource(R.drawable.marker),
-                       state = MarkerState(
-                           position = LatLng(
-                               marker.latitude,
-                               marker.longitude
-                           )
-                       ),
-                       onClick = {
-                           if (state.markersUpdate.first == UpdateSource.EVENTS) { //                               navigator.navigate(SpotSheetDestination(spot))
-                               true
-                           } else {
-                               navigator.navigate(DealerDetailsScreenDestination(marker.content as Dealer))
-                               true
-                           }
-                       })
+            markersState.forEach { marker ->
+                val markerState = MarkerState(position = LatLng(marker.latitude, marker.longitude))
+                Log.d("SELECTED", marker.selected.toString())
+                Marker(icon = if (marker.selected) {
+                    BitmapDescriptorFactory.fromResource(R.drawable.marker_selected)
+                } else {
+                    BitmapDescriptorFactory.fromResource(R.drawable.marker)
+                }, state = markerState, onClick = {
+                    if (updateSource == UpdateSource.EVENTS) {
+                        true
+                    } else {
+                        navigator.navigate(
+                            DealerDetailsScreenDestination(
+                                dealers.find { it.id == marker.placeLinkedId }!!
+                            )
+                        )
+                        true
+                    }
+                })
             }
         }
 
@@ -206,25 +222,46 @@ fun MainMap(
                 }
 
                 if (locationSearched.isNotEmpty()) LocationSearchContainer(locationSearched)
-                if (state.markersUpdate.second.isNotEmpty()) {
-                    if (state.markersUpdate.first == UpdateSource.EVENTS) {
+                if (updateSource == UpdateSource.EVENTS) {
+                    if (events.isNotEmpty()) {
+
+                        cameraPositionState.move(
+                            CameraUpdateFactory.newLatLngZoom(
+                                LatLng(
+                                    events.first().latitude,
+                                    events.first().longitude
+                                ), 15f
+                            )
+                        )
                         HorizontalEventsList(cameraPositionState = cameraPositionState,
-                                             events = (state.markersUpdate.second as List<Marker<Event>>).map { it.content },
+                                             events = events,
                                              onItemClicked = {
                                                  navigator.navigate(
                                                      com.example.camperpro.android.destinations.EventDetailScreenDestination(
                                                          it
                                                      )
                                                  )
+                                             },
+                                             onScrollEnded = { event ->
+                                                 viewModel.selectMarker(
+                                                     markersState.indexOf(markersState.find { it.placeLinkedId == event.id })
+                                                 )
                                              })
-                    } else {
+                    }
+                } else {
+                    if (dealers.isNotEmpty()) {
                         HorizontalSpotsList(cameraPositionState = cameraPositionState,
-                                            spots = (state.markersUpdate.second as List<Marker<Dealer>>).map { it.content },
+                                            spots = dealers,
                                             onItemClicked = {
                                                 navigator.navigate(
                                                     DealerDetailsScreenDestination(
                                                         it
                                                     )
+                                                )
+                                            },
+                                            onScrollEnded = { dealer ->
+                                                viewModel.selectMarker(
+                                                    markersState.indexOf(markersState.find { it.placeLinkedId == dealer.id })
                                                 )
                                             })
                     }
@@ -233,10 +270,9 @@ fun MainMap(
             }
         }
 
-        // TODO: trouver un design pour eviter les force cast
         if (state.verticalListIsShowing) {
-            if (state.markersUpdate.first == UpdateSource.EVENTS) {
-                VerticalEventsList(spotsSortedFlow = viewModel.verticalListItems as StateFlow<List<Event>>,
+            if (updateSource == UpdateSource.EVENTS) {
+                VerticalEventsList(eventSortedFlow = viewModel.eventsSorted,
                                    { viewModel.onSortingOptionSelected(it) }) {
                     navigator.navigate(
                         com.example.camperpro.android.destinations.EventDetailScreenDestination(
@@ -245,7 +281,7 @@ fun MainMap(
                     )
                 }
             } else {
-                VerticalDealersList(spotsSortedFlow = viewModel.verticalListItems as StateFlow<List<Dealer>>,
+                VerticalDealersList(dealersSortedFlow = viewModel.dealersSorted,
                                     { viewModel.onSortingOptionSelected(it) }) {
                     navigator.navigate(
                         DealerDetailsScreenDestination(
@@ -256,25 +292,30 @@ fun MainMap(
             }
         }
 
+        // TODO: Remonter les params
+        TopButtons(isVerticalListOpen = state.verticalListIsShowing,
+                   onListButtonClick = {
+                       viewModel.swapVerticalList()
+                   },
+                   source = updateSource,
+                   onMapPropertiesUpdated = {
+                       properties = if (properties.mapType == MapType.NORMAL) {
+                           MapProperties(isMyLocationEnabled = true, mapType = MapType.SATELLITE)
+                       } else {
+                           MapProperties(isMyLocationEnabled = true, mapType = MapType.NORMAL)
+                       }
+                   })
 
-        TopButtons(
-            isVerticalListOpen = state.verticalListIsShowing,
-            onListButtonClick = { viewModel.swapVerticalList() },
-            source = state.markersUpdate.first
-        )
-
-        //        Box(
-        //            modifier = Modifier
-        //                .alpha(imageAlpha)
-        //                .fillMaxSize()
-        //                .background(Color.Transparent), contentAlignment = Alignment.Center
-        //        ) {
-        //            LoaderSpots()
-        //        }
+        if (currentlyLoading) {
+            LoadingModal(Modifier.align(Alignment.Center))
+        }
     }
 
+
     BackHandler {
-        navigator.popBackStack()
+        if (navController.currentDestination?.route.toString() != "main_map") {
+            navigator.popBackStack()
+        }
     }
 }
 
@@ -305,8 +346,7 @@ fun LocationSearchContainer(label: String) {
         Spacer(modifier = Modifier.weight(1f))
 
         Icon(
-            imageVector = Icons.Filled.Close,
-            contentDescription = ""
+            imageVector = Icons.Filled.Close, contentDescription = ""
         )
     }
 }
@@ -339,13 +379,13 @@ fun SearchHereButton(onClick: () -> Unit) {
 
 @Composable
 fun VerticalEventsList(
-    spotsSortedFlow: StateFlow<List<Event>>,
+    eventSortedFlow: StateFlow<List<Event>>,
     onSortOptionSelected: (SortOption) -> Unit,
     onItemClicked: (Event) -> Unit
 ) {
 
     val sorting = LocalDependencyContainer.current.appViewModel.verticalListSortingOption
-    val spotsSorted by spotsSortedFlow.collectAsState()
+    val eventSorted by eventSortedFlow.collectAsState()
 
     LaunchedEffect(sorting) {
         sorting.collect {
@@ -363,7 +403,7 @@ fun VerticalEventsList(
             .fillMaxSize()
             .padding(top = 100.dp),
     ) {
-        items(spotsSorted) { item ->
+        items(eventSorted) { item ->
             Row(modifier = Modifier
                 .padding(start = 15.dp, end = 15.dp, bottom = 20.dp)
                 .shadow(2.dp, RoundedCornerShape(8))
@@ -446,13 +486,13 @@ fun VerticalEventListItem(event: Event) {
 
 @Composable
 fun VerticalDealersList(
-    spotsSortedFlow: StateFlow<List<Dealer>>,
+    dealersSortedFlow: StateFlow<List<Dealer>>,
     onSortOptionSelected: (SortOption) -> Unit,
     onItemClicked: (Dealer) -> Unit
 ) {
 
     val sorting = LocalDependencyContainer.current.appViewModel.verticalListSortingOption
-    val spotsSorted by spotsSortedFlow.collectAsState()
+    val dealersSorted by dealersSortedFlow.collectAsState()
 
     LaunchedEffect(sorting) {
         sorting.collect {
@@ -470,7 +510,7 @@ fun VerticalDealersList(
             .fillMaxSize()
             .padding(top = 100.dp),
     ) {
-        items(spotsSorted) { item ->
+        items(dealersSorted) { item ->
             Row(modifier = Modifier
                 .padding(start = 15.dp, end = 15.dp, bottom = 20.dp)
                 .shadow(2.dp, RoundedCornerShape(8))
@@ -634,7 +674,8 @@ fun VerticalListItem(dealer: Dealer) {
 fun HorizontalEventsList(
     cameraPositionState: CameraPositionState,
     events: List<Event>,
-    onItemClicked: (Event) -> Unit
+    onItemClicked: (Event) -> Unit,
+    onScrollEnded: (Event) -> Unit
 ) {
     val listState = rememberLazyListState()
     val needToReposition by remember {
@@ -669,13 +710,14 @@ fun HorizontalEventsList(
                     if (needToReposition) {
                         listState.animateScrollToItem(listState.firstVisibleItemIndex)
                         cameraPositionState.animate(
-                            CameraUpdateFactory.newLatLng(
+                            CameraUpdateFactory.newLatLngZoom(
                                 LatLng(
                                     events[listState.firstVisibleItemIndex].latitude,
                                     events[listState.firstVisibleItemIndex].longitude
-                                )
+                                ), 15f
                             ), 1000
                         )
+                        onScrollEnded(events[listState.firstVisibleItemIndex])
                     }
                 }
             }
@@ -685,23 +727,25 @@ fun HorizontalEventsList(
                         if (listState.firstVisibleItemScrollOffset > 400) {
                             listState.animateScrollToItem(listState.lastVisibleItemIndex!!)
                             cameraPositionState.animate(
-                                CameraUpdateFactory.newLatLng(
+                                CameraUpdateFactory.newLatLngZoom(
                                     LatLng(
                                         events[listState.lastVisibleItemIndex!!].latitude,
                                         events[listState.lastVisibleItemIndex!!].longitude
-                                    )
+                                    ), 15f
                                 ), 1000
                             )
+                            onScrollEnded(events[listState.lastVisibleItemIndex!!])
                         } else {
                             listState.animateScrollToItem(listState.firstVisibleItemIndex)
                             cameraPositionState.animate(
-                                CameraUpdateFactory.newLatLng(
+                                CameraUpdateFactory.newLatLngZoom(
                                     LatLng(
                                         events[listState.firstVisibleItemIndex].latitude,
                                         events[listState.firstVisibleItemIndex].longitude
-                                    )
+                                    ), 15f
                                 ), 1000
                             )
+                            onScrollEnded(events[listState.firstVisibleItemIndex])
                         }
                     }
                 }
@@ -773,8 +817,10 @@ fun HorizontalEventListItem(event: Event) {
 fun HorizontalSpotsList(
     cameraPositionState: CameraPositionState,
     spots: List<Dealer>,
-    onItemClicked: (Dealer) -> Unit
+    onItemClicked: (Dealer) -> Unit,
+    onScrollEnded: (Dealer) -> Unit
 ) {
+
     val listState = rememberLazyListState()
     val needToReposition by remember {
         derivedStateOf {
@@ -788,7 +834,7 @@ fun HorizontalSpotsList(
                 .fillMaxWidth()
                 .height(130.dp), state = listState
         ) {
-            items(spots) { item ->
+            items(items = spots, key = { spot -> spot.id }) { item ->
                 Row(modifier = Modifier
                     .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
                     .shadow(2.dp, RoundedCornerShape(8))
@@ -808,13 +854,14 @@ fun HorizontalSpotsList(
                     if (needToReposition) {
                         listState.animateScrollToItem(listState.firstVisibleItemIndex)
                         cameraPositionState.animate(
-                            CameraUpdateFactory.newLatLng(
+                            CameraUpdateFactory.newLatLngZoom(
                                 LatLng(
                                     spots[listState.firstVisibleItemIndex].latitude,
                                     spots[listState.firstVisibleItemIndex].longitude
-                                )
+                                ), 15f
                             ), 1000
                         )
+                        onScrollEnded(spots[listState.firstVisibleItemIndex])
                     }
                 }
             }
@@ -824,23 +871,25 @@ fun HorizontalSpotsList(
                         if (listState.firstVisibleItemScrollOffset > 400) {
                             listState.animateScrollToItem(listState.lastVisibleItemIndex!!)
                             cameraPositionState.animate(
-                                CameraUpdateFactory.newLatLng(
+                                CameraUpdateFactory.newLatLngZoom(
                                     LatLng(
                                         spots[listState.lastVisibleItemIndex!!].latitude,
                                         spots[listState.lastVisibleItemIndex!!].longitude
-                                    )
+                                    ), 15f
                                 ), 1000
                             )
+                            onScrollEnded(spots[listState.lastVisibleItemIndex!!])
                         } else {
                             listState.animateScrollToItem(listState.firstVisibleItemIndex)
                             cameraPositionState.animate(
-                                CameraUpdateFactory.newLatLng(
+                                CameraUpdateFactory.newLatLngZoom(
                                     LatLng(
                                         spots[listState.firstVisibleItemIndex].latitude,
                                         spots[listState.firstVisibleItemIndex].longitude
-                                    )
+                                    ), 15f
                                 ), 1000
                             )
+                            onScrollEnded(spots[listState.firstVisibleItemIndex])
                         }
                     }
                 }
@@ -1013,7 +1062,10 @@ fun MainMapAdContainer(ad: List<Ad>) {
 
 @Composable
 fun TopButtons(
-    onListButtonClick: () -> Unit, isVerticalListOpen: Boolean, source: UpdateSource
+    onListButtonClick: () -> Unit,
+    isVerticalListOpen: Boolean,
+    source: UpdateSource,
+    onMapPropertiesUpdated: () -> Unit,
 ) {
     val appViewModel = LocalDependencyContainer.current.appViewModel
     val scope = rememberCoroutineScope()
@@ -1033,9 +1085,11 @@ fun TopButtons(
             onListButtonClick()
         }) {
             Image(
+                modifier = Modifier.padding(10.dp),
                 painter = if (isVerticalListOpen) painterResource(id = R.drawable.map) else painterResource(
                     id = R.drawable.list
-                ), contentDescription = stringResource(id = R.string.cd_button_vertical_list)
+                ),
+                contentDescription = stringResource(id = R.string.cd_button_vertical_list)
             )
         }
 
@@ -1045,29 +1099,32 @@ fun TopButtons(
             .padding(end = 10.dp)
             .shadow(2.dp, RoundedCornerShape(Dimensions.radiusRound))
             .zIndex(1f)
-            .background(Color.White, RoundedCornerShape(Dimensions.radiusRound)),
-                   onClick = {
-                       scope.launch {
-                           appViewModel.onBottomSheetContentChange(
-                               if (isVerticalListOpen) {
-                                   when (source) {
-                                       UpdateSource.AROUND_PLACE -> BottomSheetOption.SORT_AROUND_PLACE
-                                       UpdateSource.EVENTS -> BottomSheetOption.SORT_EVENTS
-                                       else -> {
-                                           BottomSheetOption.SORT
-                                       }
-                                   }
-                               } else {
-                                   BottomSheetOption.MAPLAYER
-                               }
-                           )
-                           appViewModel.bottomSheetIsShowing.show()
-                       }
-                   }) {
+            .background(Color.White, RoundedCornerShape(Dimensions.radiusRound)), onClick = {
+            appViewModel.withNetworkOnly {
+                if (isVerticalListOpen) {
+                    scope.launch {
+                        appViewModel.onBottomSheetContentChange(
+                            when (source) {
+                                UpdateSource.AROUND_PLACE -> BottomSheetOption.SORT_AROUND_PLACE
+                                UpdateSource.EVENTS -> BottomSheetOption.SORT_EVENTS
+                                else -> {
+                                    BottomSheetOption.SORT
+                                }
+                            }
+                        )
+                        appViewModel.bottomSheetIsShowing.show()
+                    }
+                } else {
+                    onMapPropertiesUpdated()
+                }
+            }
+        }) {
             Image(
+                modifier = Modifier.padding(10.dp),
                 painter = if (isVerticalListOpen) painterResource(id = R.drawable.sort) else painterResource(
                     id = R.drawable.map_layer
-                ), contentDescription = stringResource(
+                ),
+                contentDescription = stringResource(
                     id = R.string.cd_button_mapstyle
                 )
             )
@@ -1079,6 +1136,7 @@ fun TopButtons(
             .background(
                 Color.White, RoundedCornerShape(Dimensions.radiusRound)
             ), onClick = {
+
             scope.launch {
                 when (source) {
                     UpdateSource.EVENTS -> BottomSheetOption.FILTER_EVENT
@@ -1088,8 +1146,10 @@ fun TopButtons(
                 }
                 appViewModel.bottomSheetIsShowing.show()
             }
+
         }) {
             Image(
+                modifier = Modifier.padding(10.dp),
                 painter = painterResource(id = R.drawable.filter),
                 contentDescription = stringResource(id = R.string.cd_button_filter)
             )

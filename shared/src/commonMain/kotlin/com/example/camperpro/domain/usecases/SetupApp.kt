@@ -1,8 +1,8 @@
 package com.example.camperpro.domain.usecases
 
+import com.example.camperpro.data.ResultWrapper
 import com.example.camperpro.data.datasources.remote.Api
 import com.example.camperpro.utils.Globals
-import com.example.camperpro.data.ResultWrapper
 
 class SetupApp(
     private val camperProApi: Api

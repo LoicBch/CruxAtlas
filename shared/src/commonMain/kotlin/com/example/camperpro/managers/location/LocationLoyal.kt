@@ -10,4 +10,5 @@ internal expect class LocationLoyal() {
     fun removeAllListeners()
     fun removeListeners(target: Any)
     fun requestPermission()
+    fun isLocationEnabled(): Boolean
 }

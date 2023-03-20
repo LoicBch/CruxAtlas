@@ -4,6 +4,17 @@
     <string name="all">All</string>
     <string name="reset">Reset</string>
     <string name="step">Step</string>
+    <string name="slider_missing_network_title">Network connection lost</string>
+    <string name="slider_missing_network_text">Please check your internet settings</string>
+    <string name="slider_missing_gps_text">Please enable your GPS </string>
+    <string name="slider_missing_gps_title">GPS signal lost</string>
+    <string name="popup_missing_network_title">Network connection lost</string>
+    <string name="popup_missing_gps_title">GPS signal lost</string>
+    <string name="popup_missing_network_text">you can\'t access this function offline</string>
+    <string name="popup_missing_gps_text">you can\'t access this function without location
+        enabled</string>
+    <string name="loading">Processing</string>
+    <string name="get_offer">Get time-limited offer!</string>
 
 
     <!--  MainMap Screen  -->
@@ -105,6 +116,16 @@
     <string name="services_subtitle">This is additional information we can add.</string>
     <string name="dealers_subtitle">This place is an official dealer of the listed brands, but it might offer services for other brands as well. Contact place to find out.</string>
     <string name="accessories_subtitle">These brands are sold and/or serviced at this place.</string>
+
+    <!--  myLocation  -->
+    <string name="my_location">My current location</string>
+    <string name="my_parking">My parking location</string>
+    <string name="park_here">Park here</string>
+    <string name="delete">Delete</string>
+    <string name="delete_location_popup">Do you want to permanently delete this saved location? \n
+        The
+        action
+        cannot be undone.</string>
 
 
     <!--  Content description  -->

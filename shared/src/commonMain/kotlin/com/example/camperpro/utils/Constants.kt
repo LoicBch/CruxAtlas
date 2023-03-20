@@ -25,7 +25,7 @@ object Constants {
     }
 
     val DEFAULT_LOCATION = Location(45.87, 2.50)
-    const val RADIUS_AROUND_LIMIT = 1330
+    const val RADIUS_AROUND_LIMIT = 1000
     const val GPS_UPDATE_INTERVAL = 10000L
     const val SUGGESTION_START_LENGTH = 3
     const val WEBSERVICE_VERSION = "v4"

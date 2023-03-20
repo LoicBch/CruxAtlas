@@ -60,32 +60,41 @@ fun BottomBar(navController: NavHostController) {
                         modifier = Modifier.align(Alignment.CenterVertically),
                         selected = selected,
                         onClick = {
-                            if (destination.ordinal == 0) {
-                                navController.popBackStack(
-                                    MainMapDestination.route, false
-                                )
-                                appViewModel.onAroundMeClick()
-                            }
+                            appViewModel.withNetworkOnly {
 
-                            if (selected && destination.ordinal != 0) {
-                                // When we click again on a bottom bar item and it was already selected
-                                // we want to pop the back stack until the initial destination of this bottom bar item
-                                navController.popBackStack(
-                                    MainMapDestination.route, false
-                                )
-                                return@BottomNavigationItem
-                            }
+                                if (destination.ordinal == 0) {
 
+                                    Log.d("POSITION", "destination.ordinal == 0")
+                                    navController.popBackStack(
+                                        MainMapDestination.route, false
+                                    )
 
-                            navController.navigate(destination.direction) {
-
-                                if (destination.ordinal != 0) {
-                                    popUpTo(MainMapDestination.route) {
-                                        saveState = true
+                                    appViewModel.withGpsOnly {
+                                        appViewModel.onAroundMeClick()
                                     }
+                                    return@withNetworkOnly
                                 }
-                                launchSingleTop = true
-                                restoreState = true
+
+
+                                //                                if (selected && destination.ordinal != 0) {
+                                if (selected) {
+                                    // When we click again on a bottom bar item and it was already selected
+                                    // we want to pop the back stack until the initial destination of this bottom bar item
+                                    navController.popBackStack(
+                                        MainMapDestination.route, false
+                                    )
+                                    return@withNetworkOnly
+                                }
+                                navController.navigate(destination.direction) {
+
+                                    if (destination.ordinal != 0) {
+                                        popUpTo(MainMapDestination.route) {
+                                            saveState = true
+                                        }
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
                             }
                         },
 

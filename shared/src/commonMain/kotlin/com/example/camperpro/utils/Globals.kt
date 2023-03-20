@@ -11,8 +11,8 @@ object Globals {
 
     @ThreadLocal
     object geoLoc {
-        var lastKnownLocation: Location? = null
-        var lastSearchedLocation: Location? = null
+        var lastKnownLocation: Location = Constants.DEFAULT_LOCATION
+        var lastSearchedLocation: Location = Constants.DEFAULT_LOCATION
         var locationObserver: Job? = null
         lateinit var deviceCountry: String
         lateinit var deviceLanguage: String

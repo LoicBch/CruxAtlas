@@ -1,6 +1,5 @@
 package com.example.camperpro.android.onBoarding
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.camperpro.data.ResultWrapper
@@ -15,14 +14,16 @@ class SplashScreenViewModel(
     private val languageManager: LanguageManager
 ) : ViewModel() {
 
-    private val gpsLocationIsAsked = MutableStateFlow(false)
-    private val globalsVarsAreSet = MutableStateFlow(false)
+    var gpsLocationIsAsked = MutableStateFlow(false)
 
-    var setupIsComplete = combine(
-        gpsLocationIsAsked, globalsVarsAreSet
-    ) { gpsLocationIsObserved, globalVarsAreSet ->
-        gpsLocationIsObserved && globalVarsAreSet
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+    // TODO: reutiliser ce setup si besoi nde check plusieurs trucs
+    //    private val globalsVarsAreSet = MutableStateFlow(false)
+    //
+    //    var setupIsComplete = combine(
+    //        gpsLocationIsAsked, globalsVarsAreSet
+    //    ) { gpsLocationIsAsked, globalVarsAreSet ->
+    //        gpsLocationIsAsked && globalVarsAreSet
+    //    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
 
     fun initApp() {
@@ -33,7 +34,7 @@ class SplashScreenViewModel(
                 }
 
                 is ResultWrapper.Success -> {
-                    globalsVarsAreSet.update { true }
+//                    globalsVarsAreSet.update { true }
                 }
             }
         }

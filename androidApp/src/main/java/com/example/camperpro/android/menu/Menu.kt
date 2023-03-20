@@ -26,6 +26,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.camperpro.android.R
 import com.example.camperpro.android.composables.Dropdown
+import com.example.camperpro.android.destinations.CheckListsScreenDestination
+import com.example.camperpro.android.destinations.myLocationDestination
 import com.example.camperpro.android.ui.theme.AppColor
 import com.example.camperpro.android.ui.theme.Dimensions
 import com.example.camperpro.domain.model.MenuLink
@@ -57,15 +59,21 @@ fun MenuScreen(
             resultNavigator.navigateBack(result = true, true)
         }, R.drawable.events, R.string.cd_events, false), MenuItem(
             R.string.menu_travel_checklists,
-            {},
+            {
+                navigator.navigate(CheckListsScreenDestination)
+            },
             R.drawable.checklist,
             R.string.cd_travel_checklist,
             true
         ), //        MenuItem(R.string.menu_leveler, {}, R.drawable.events, R.string.cd_leveler, false),
         MenuItem(
-            R.string.menu_my_location, {}, R.drawable.my_location, R.string.cd_my_location, true
+            R.string.menu_my_location, {
+                navigator.navigate(myLocationDestination)
+            }, R.drawable.my_location, R.string.cd_my_location, true
         ), MenuItem(
-            R.string.menu_app_settings, {}, R.drawable.settings, R.string.cd_app_settings, false
+            R.string.menu_app_settings, {
+                navigator.navigate(myLocationDestination)
+            }, R.drawable.settings, R.string.cd_app_settings, false
         )
     )
 

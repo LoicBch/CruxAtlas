@@ -53,7 +53,7 @@ fun Header(event: Event, onClose: () -> Unit) {
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp, top = 16.dp)
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 30.dp)
         ) {
             IconButton(modifier = Modifier
                 .shadow(2.dp, RoundedCornerShape(Dimensions.radiusRound))
@@ -103,6 +103,14 @@ fun Infos(modifier: Modifier, event: Event) {
         text = event.name,
         fontSize = 22.sp,
         fontWeight = FontWeight.W700,
+        color = Color.Black
+    )
+
+    Text(
+        modifier = modifier.padding(bottom = 16.dp),
+        text = event.descriptionEn,
+        fontSize = 14.sp,
+        fontWeight = FontWeight(450),
         color = Color.Black
     )
 

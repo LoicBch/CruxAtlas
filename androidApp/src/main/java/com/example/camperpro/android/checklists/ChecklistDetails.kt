@@ -25,17 +25,18 @@ import com.example.camperpro.android.extensions.share
 import com.example.camperpro.android.spotSheet.Gallery
 import com.example.camperpro.android.ui.theme.AppColor
 import com.example.camperpro.android.ui.theme.Dimensions
+import com.example.camperpro.domain.model.CheckList
 import com.example.camperpro.domain.model.Dealer
+import com.ramcosta.composedestinations.annotation.Destination
 
+@Destination
 @Composable
-fun ChecklistDetails() {
+fun ChecklistDetails(checkList: CheckList) {
 
     Column {
-//        Header(partner = partner, onClose = { navigator.popBackStack() })
+        //        Header(partner = partner, onClose = { navigator.popBackStack() })
     }
-
 }
-
 
 
 @Composable

@@ -1,4 +1,5 @@
 package com.example.camperpro.data.model.dto
+
 import kotlinx.serialization.SerialName
 
 @kotlinx.serialization.Serializable
@@ -6,6 +7,7 @@ data class PartnerDto(
 
     var id: String = "",
     var name: String = "",
+    var description: String = "",
     var brands: String = "",
     var services: String = "",
 

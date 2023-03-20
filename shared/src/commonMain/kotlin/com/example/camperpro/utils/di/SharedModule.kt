@@ -52,7 +52,7 @@ val repositoriesDependencies = module {
 }
 
 val useCasesDependencies = module {
-    factoryOf(::FetchSpotAtLocationUseCase)
+    factoryOf(::FetchDealersAtLocationUseCase)
     factoryOf(::GetAllSearchForACategory)
     factoryOf(::FetchSuggestionsFromInput)
     factoryOf(::FetchAds)

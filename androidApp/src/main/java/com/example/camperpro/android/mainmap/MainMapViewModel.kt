@@ -1,5 +1,7 @@
 package com.example.camperpro.android.mainmap
 
+import android.util.Log
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,42 +15,68 @@ import com.example.camperpro.domain.model.composition.Marker
 import com.example.camperpro.domain.model.composition.UpdateSource
 import com.example.camperpro.domain.usecases.*
 import com.example.camperpro.utils.SortOption
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import toMarker
 
+// pour reduir la taille des bundles on peut garder les lieux query dans une list et utiliser des list d'id pour les autre list dont on a besoin comme la vertical list ou les autres
+
 class MainMapViewModel(
     private val savedStateHandle: SavedStateHandle,
-    private val fetchSpotAtLocationUseCase: FetchSpotAtLocationUseCase,
+    private val fetchDealersAtLocationUseCase: FetchDealersAtLocationUseCase,
     private val fetchEvents: FetchEvents,
     private val fetchAds: FetchAds,
     private val sortDealer: SortDealer,
     private val sortEvents: SortEvents
 ) : ViewModel() {
 
-    private val markersUpdate = savedStateHandle.getStateFlow(
-        "markersUpdate",
-        Pair<UpdateSource, List<Marker<Any>>>(UpdateSource.DEFAULT, emptyList())
-    )
+    private var previousSelectedMarkerIndex = 0
+
+    private var markers = mutableStateListOf<Marker>()
+    private val _markers = MutableStateFlow(markers)
+    val markersFlow: StateFlow<List<Marker>> get() = _markers
+
+    fun selectMarker(index: Int) {
+        markers[previousSelectedMarkerIndex] =
+            markers[previousSelectedMarkerIndex].copy(selected = false)
+        markers[index] = markers[index].copy(selected = true)
+        previousSelectedMarkerIndex = index
+    }
+
+    // We can insert a new item
+    //    fun addRecord(titleText: String, urgency: Boolean) {
+    //        markers.add(TodoItem(markers.size, titleText, urgency))
+    //    }
+
+    //    // We can retrieve an entire new list
+    //    fun updatelist() {
+    //        markers = mutableStateListOf(fetchFromRepository())
+    //        _markers.value = markers
+    //    }
+
 
     private val ads = savedStateHandle.getStateFlow("ads", emptyList<Ad>())
-    private val loading = savedStateHandle.getStateFlow("loading", false)
+    val loading = savedStateHandle.getStateFlow("loading", false)
     private val verticalListIsShowing =
         savedStateHandle.getStateFlow("verticalListIsShowing", false)
     private val cameraIsOutOfRadiusLimit =
         savedStateHandle.getStateFlow("cameraIsOutOfRadiusLimit", false)
 
-    val placeSearched = savedStateHandle.getStateFlow("placeSearched", "")
-    val verticalListItems = savedStateHandle.getStateFlow("verticalListItems", emptyList<Any>())
+    val updateSource = savedStateHandle.getStateFlow("updateSource", UpdateSource.DEFAULT)
 
-    //    flow can only take 5 element max? :(
+    val placeSearched = savedStateHandle.getStateFlow("placeSearched", "")
+
+    val events = savedStateHandle.getStateFlow("events", emptyList<Event>())
+    val dealers = savedStateHandle.getStateFlow("dealers", emptyList<Dealer>())
+
+    val eventsSorted = savedStateHandle.getStateFlow("eventsSorted", emptyList<Event>())
+    val dealersSorted = savedStateHandle.getStateFlow("dealersSorted", emptyList<Dealer>())
+
     val state = combine(
-        markersUpdate, ads, loading, verticalListIsShowing, cameraIsOutOfRadiusLimit
-    ) { markersUpdate, ads, isLoading, verticalListIsShowing, cameraIsOutOfRadiusLimit ->
+        updateSource, ads, loading, verticalListIsShowing, cameraIsOutOfRadiusLimit
+    ) { updateSource, ads, isLoading, verticalListIsShowing, cameraIsOutOfRadiusLimit ->
         MainMapState(
-            markersUpdate = markersUpdate,
+            updateSource = updateSource,
             ads = ads,
             isLoading,
             verticalListIsShowing,
@@ -56,8 +84,7 @@ class MainMapViewModel(
         )
     }.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), MainMapState(
-            markersUpdate = Pair(UpdateSource.DEFAULT, emptyList()),
-            emptyList(),
+            updateSource = UpdateSource.DEFAULT,
             isLoading = false,
             verticalListIsShowing = false,
             cameraIsOutOfRadiusLimit = false
@@ -69,20 +96,21 @@ class MainMapViewModel(
     }
 
     fun showSpots(location: Location) {
+        Log.d("LOCATION", "lat :${location.latitude} long :${location.longitude}")
         savedStateHandle["loading"] = true
         viewModelScope.launch {
-            when (val call = fetchSpotAtLocationUseCase(location)) {
+            when (val call = fetchDealersAtLocationUseCase(location)) {
 
                 is ResultWrapper.Failure -> {
                     savedStateHandle["loading"] = false
                 }
 
                 is ResultWrapper.Success -> {
-                    savedStateHandle["markersUpdate"] = Pair(
-                        UpdateSource.AROUND_ME,
-                        call.value!!.toMarker()
-                    )
-                    savedStateHandle["verticalListItems"] = call.value
+                    savedStateHandle["updateSource"] = UpdateSource.AROUND_ME
+                    markers.clear()
+                    markers.addAll(call.value!!.subList(0, 100).toMarker().toList())
+                    savedStateHandle["dealers"] = call.value!!.subList(0, 100).toList()
+                    savedStateHandle["dealersSorted"] = call.value!!.subList(0, 100).toList()
                     savedStateHandle["placeSearched"] = ""
                     savedStateHandle["loading"] = false
                 }
@@ -98,10 +126,12 @@ class MainMapViewModel(
                     savedStateHandle["loading"] = false
                 }
                 is ResultWrapper.Success -> {
-                    savedStateHandle["markersUpdate"] = Pair(
-                        UpdateSource.EVENTS,
-                        call.value!!.toMarker()
-                    )
+                    markers.clear()
+                    markers.addAll(call.value!!.toMarker())
+
+                    savedStateHandle["events"] = call.value
+                    savedStateHandle["eventsSorted"] = call.value
+                    savedStateHandle["updateSource"] = UpdateSource.EVENTS
                     savedStateHandle["verticalListItems"] = call.value
                     savedStateHandle["loading"] = false
                 }
@@ -112,14 +142,17 @@ class MainMapViewModel(
     fun showSpotsAroundPlace(place: Place) {
         savedStateHandle["loading"] = true
         viewModelScope.launch {
-            when (val call = fetchSpotAtLocationUseCase(place.location)) {
+            when (val call = fetchDealersAtLocationUseCase(place.location)) {
                 is ResultWrapper.Failure -> {
                     savedStateHandle["loading"] = false
                 }
                 is ResultWrapper.Success -> {
-                    //                    savedStateHandle["spots"] = call.value
-                    savedStateHandle["markersUpdate"] =
-                        Pair(UpdateSource.AROUND_PLACE, call.value!!.toMarker())
+                    markers.clear()
+                    markers.addAll(call.value!!.toMarker())
+
+                    savedStateHandle["dealers"] = call.value
+                    savedStateHandle["dealersSorted"] = call.value
+                    savedStateHandle["updateSource"] = UpdateSource.AROUND_PLACE
                     savedStateHandle["placeSearched"] = place.name
                     savedStateHandle["loading"] = false
                 }
@@ -128,33 +161,42 @@ class MainMapViewModel(
     }
 
     fun getAds() {
+        savedStateHandle["loading"] = true
         viewModelScope.launch {
             when (val call = fetchAds()) {
-                is ResultWrapper.Failure -> {}
-                is ResultWrapper.Success -> savedStateHandle["ads"] = call.value
+                is ResultWrapper.Failure -> {
+                    savedStateHandle["loading"] = false
+                }
+                is ResultWrapper.Success -> {
+                    savedStateHandle["loading"] = false
+                    savedStateHandle["ads"] = call.value
+                }
             }
         }
     }
 
     fun onSortingOptionSelected(sortOption: SortOption) {
         viewModelScope.launch {
-            // TODO: Faire une fonction d'extension / enum de map pour get le type de value actuellement afficher a partir de la source
-            if (markersUpdate.value.first == UpdateSource.EVENTS) {
-                when (val res =
-                    sortEvents(
-                        sortOption,
-                        markersUpdate.value.second.map { it.content } as List<Event>)) {
-                    is ResultWrapper.Failure -> {}
-                    is ResultWrapper.Success -> savedStateHandle["verticalListItems"] = res.value
+            if (updateSource.value == UpdateSource.EVENTS) {
+                when (val res = sortEvents(sortOption, events.value)) {
+                    is ResultWrapper.Failure -> {
+                        savedStateHandle["loading"] = false
+                    }
+                    is ResultWrapper.Success -> {
+                        savedStateHandle["eventsSorted"] = res.value
+                        savedStateHandle["loading"] = false
+                    }
                 }
             } else {
 
-                when (val res =
-                    sortDealer(
-                        sortOption,
-                        markersUpdate.value.second.map { it.content } as List<Dealer>)) {
-                    is ResultWrapper.Failure -> {}
-                    is ResultWrapper.Success -> savedStateHandle["verticalListItems"] = res.value
+                when (val res = sortDealer(sortOption, dealers.value)) {
+                    is ResultWrapper.Failure -> {
+                        savedStateHandle["loading"] = false
+                    }
+                    is ResultWrapper.Success -> {
+                        savedStateHandle["dealersSorted"] = res.value
+                        savedStateHandle["loading"] = false
+                    }
                 }
             }
         }

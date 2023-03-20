@@ -1,8 +1,10 @@
 package com.example.camperpro.android.myLocation
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
@@ -10,6 +12,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.ArrowBack
 import androidx.compose.material.icons.sharp.ThumbUp
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,12 +26,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.camperpro.android.R
+import com.example.camperpro.android.composables.AppButtonSmall
+import com.example.camperpro.android.composables.PopupParkingLocation
 import com.example.camperpro.android.extensions.hasLocationPermission
+import com.example.camperpro.android.extensions.navigateByGmaps
 import com.example.camperpro.android.ui.theme.AppColor
 import com.example.camperpro.domain.model.Ad
 import com.example.camperpro.domain.model.composition.Location
+import com.example.camperpro.domain.model.composition.Marker
 import com.example.camperpro.utils.Constants
 import com.example.camperpro.utils.Globals
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
@@ -34,22 +44,43 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
+import kotlinx.coroutines.flow.MutableStateFlow
+import org.koin.androidx.compose.getViewModel
 
 @Destination
 @Composable
-fun myLocation(navigator: DestinationsNavigator) {
+fun myLocation(navigator: DestinationsNavigator, viewModel: MyLocationViewModel = getViewModel()) {
 
-    Header(navigator = navigator)
-    MyLocationMap()
+    val popupIsActive by viewModel.popupIsActiveFlow.collectAsState()
 
+    Box {
+        Column {
+            Header(navigator = navigator)
+            MyLocationMap(viewModel.parkingLocationFlow,
+                          viewModel.currentLocationFlow,
+                          selectCurrentLocation = { viewModel.selectCurrentLocation() },
+                          selectParkingLocation = { viewModel.selectParkingLocation() },
+                          parkHere = { viewModel.setParkingLocation(it.latitude, it.longitude) },
+                          deleteParkingLoc = { viewModel.deleteParkingLocation() })
+        }
+        if (popupIsActive.value) PopupParkingLocation(
+            Modifier,
+            onExit = { popupIsActive.value = false },
+            onDelete = {
+                popupIsActive.value = false
+                viewModel.deleteParkingLocation()
+            })
+    }
 }
+
 
 @Composable
 fun Header(navigator: DestinationsNavigator) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 16.dp, horizontal = 20.dp)
+            .padding(vertical = 16.dp, horizontal = 20.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = { navigator.popBackStack() }) {
             Icon(imageVector = Icons.Sharp.ArrowBack, contentDescription = "")
@@ -64,22 +95,29 @@ fun Header(navigator: DestinationsNavigator) {
         )
 
         Spacer(modifier = Modifier.weight(0.5f))
-
     }
 }
 
 @Composable
-fun MyLocationMap() {
+fun MyLocationMap(
+    parkingLocationFlow: MutableStateFlow<MutableState<Marker>>,
+    currentLocationFlow: MutableStateFlow<MutableState<Marker>>,
+    selectCurrentLocation: () -> Unit,
+    selectParkingLocation: () -> Unit,
+    parkHere: (Location) -> Unit,
+    deleteParkingLoc: () -> Unit
+) {
+
+    val parkingLocation by parkingLocationFlow.collectAsState()
+    val currentLocation by currentLocationFlow.collectAsState()
 
     val context = LocalContext.current
-    val markers = listOf<Location>()
-    val markerSelected = 2
     val cameraPositionState = rememberCameraPositionState {
         position = if (context.hasLocationPermission) {
             CameraPosition.fromLatLngZoom(
                 LatLng(
-                    Globals.geoLoc.lastKnownLocation?.latitude!!,
-                    Globals.geoLoc.lastKnownLocation?.longitude!!
+                    Globals.geoLoc.lastKnownLocation.latitude,
+                    Globals.geoLoc.lastKnownLocation.longitude
                 ), 10f
             )
         } else {
@@ -100,36 +138,97 @@ fun MyLocationMap() {
             ),
             cameraPositionState = cameraPositionState
         ) {
-            markers.forEach { marker ->
-                Marker(
-                    state = MarkerState(position = LatLng(marker.latitude, marker.longitude)),
-                    onClick = {
-                        it.isFlat
-                    })
+            if (parkingLocation.value.latitude != 0.0) {
+                Marker(icon = if (parkingLocation.value.selected) {
+                    BitmapDescriptorFactory.fromResource(R.drawable.marker_selected)
+                } else {
+                    BitmapDescriptorFactory.fromResource(R.drawable.marker)
+                }, state = MarkerState(
+                    position = LatLng(
+                        parkingLocation.value.latitude, parkingLocation.value.longitude
+                    )
+                ), onClick = {
+                    selectParkingLocation()
+                    true
+                })
             }
 
-            if (markerSelected != null) {
-                LocationInfosBox(marker = markers.first())
+            if (currentLocation.value.latitude != 0.0) {
+                Marker(icon = if (currentLocation.value.selected) {
+                    BitmapDescriptorFactory.fromResource(R.drawable.marker_selected)
+                } else {
+                    BitmapDescriptorFactory.fromResource(R.drawable.marker)
+                }, state = MarkerState(
+                    position = LatLng(
+                        currentLocation.value.latitude, currentLocation.value.longitude
+                    )
+                ), onClick = {
+                    selectCurrentLocation()
+                    true
+                })
             }
-
-            //            AdContainer(pub = listOf<Ad>())
         }
+
+        if (currentLocation.value.selected) {
+            LocationInfosBox(
+                modifier = Modifier.align(Alignment.BottomCenter),
+                marker = currentLocation.value,
+                {}) {
+                parkHere(
+                    Location(
+                        currentLocation.value.latitude,
+                        currentLocation.value.longitude
+                    )
+                )
+            }
+        } else if (parkingLocation.value.selected) {
+            LocationInfosBox(
+                modifier = Modifier.align(Alignment.BottomCenter),
+                marker = parkingLocation.value,
+                {
+                    deleteParkingLoc()
+                }) {
+                context.navigateByGmaps(
+                    context,
+                    parkingLocation.value.latitude,
+                    parkingLocation.value.longitude
+                )
+            }
+        }
+
+        //            AdContainer(pub = listOf<Ad>())
     }
 }
 
 @Composable
-fun LocationInfosBox(marker: Location) {
-    Column {
+fun LocationInfosBox(
+    modifier: Modifier,
+    marker: Marker,
+    appButton: () -> Unit,
+    deleteParkingLoc: () -> Unit
+) {
+    Column(
+        modifier = modifier
+            .padding(25.dp)
+            .background(Color.White, RoundedCornerShape(8))
+            .padding(15.dp)
+    ) {
         Row(modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = "if",
+                text = if (marker.placeLinkedId == "parking") {
+                    stringResource(id = R.string.my_parking)
+                } else {
+                    stringResource(id = R.string.my_location)
+                },
                 fontWeight = FontWeight.W500,
                 fontSize = 16.sp,
                 color = AppColor.Tertiary
             )
             Spacer(modifier = Modifier.weight(1f))
-            if (1 == 1) {
-                IconButton(onClick = { }) {
+            if (marker.placeLinkedId == "parking") {
+                IconButton(onClick = {
+                    deleteParkingLoc()
+                }) {
                     Image(imageVector = Icons.Sharp.ThumbUp, contentDescription = "")
                 }
             }
@@ -137,7 +236,7 @@ fun LocationInfosBox(marker: Location) {
                 Image(imageVector = Icons.Sharp.ThumbUp, contentDescription = "")
             }
         }
-        if (1 == 1) {
+        if (marker.placeLinkedId == "parking") {
             Row {
                 Icon(imageVector = Icons.Sharp.ThumbUp, contentDescription = "")
                 Text(text = "distance")
@@ -146,13 +245,10 @@ fun LocationInfosBox(marker: Location) {
         Row {
             Icon(imageVector = Icons.Sharp.ThumbUp, contentDescription = "")
             Text(
-                text = "adresse",
-                fontSize = 12.sp,
-                fontWeight = FontWeight(450),
-                color = Color.Gray
+                text = "adresse", fontSize = 12.sp, fontWeight = FontWeight(450), color = Color.Gray
             )
         }
-        Row {
+        Row(Modifier.padding(top = 8.dp)) {
             Icon(
                 imageVector = Icons.Sharp.ThumbUp,
                 contentDescription = "",
@@ -165,7 +261,21 @@ fun LocationInfosBox(marker: Location) {
             )
         }
 
-        //        AppButton(isActive = true, onClick = { }, modifier = Modifier, textRes = "if")
+        AppButtonSmall(
+            onClick = { appButton() },
+            color = AppColor.Secondary,
+            modifier = Modifier.padding(top = 16.dp),
+            drawableRes = if (marker.placeLinkedId == "parking") {
+                R.drawable.park
+            } else {
+                R.drawable.here
+            },
+            textRes = if (marker.placeLinkedId == "parking") {
+                R.string.navigate
+            } else {
+                R.string.park_here
+            }
+        )
     }
 }
 
