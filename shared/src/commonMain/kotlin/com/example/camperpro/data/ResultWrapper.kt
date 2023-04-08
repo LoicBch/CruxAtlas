@@ -18,6 +18,8 @@ suspend fun <T> safeApiCall(apiCall: ApiCallBlock<T>): ResultWrapper<T> {
     return try {
         ResultWrapper.Success(apiCall.invoke())
     } catch (throwable: Throwable) {
+        println(throwable.message)
+        println(throwable.cause)
         when (throwable) {
             is IOException -> ResultWrapper.Failure(-1, throwable)
             is ClientRequestException -> {

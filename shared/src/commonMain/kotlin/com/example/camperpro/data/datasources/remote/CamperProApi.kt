@@ -2,14 +2,13 @@ package com.example.camperpro.data.datasources.remote
 
 import com.example.camperpro.data.ResultWrapper
 import com.example.camperpro.data.model.dto.AdDto
+import com.example.camperpro.data.model.dto.CheckListDto
 import com.example.camperpro.data.model.dto.EventDto
-import com.example.camperpro.data.model.responses.DealerResponse
-import com.example.camperpro.data.model.responses.PartnerResponse
-import com.example.camperpro.data.model.responses.StarterResponse
-import com.example.camperpro.data.model.responses.SuggestionResponse
+import com.example.camperpro.data.model.responses.*
 import com.example.camperpro.data.safeApiCall
 import com.example.camperpro.domain.model.*
 import com.example.camperpro.domain.model.composition.Location
+import com.example.camperpro.domain.model.composition.LocationInfos
 import com.example.camperpro.utils.Constants
 import com.example.camperpro.utils.Globals
 import io.ktor.client.*
@@ -35,12 +34,23 @@ class CamperProApi(private var client: HttpClient) : Api {
         }
     }
 
-    override suspend fun getSpotAtLocation(location: Location): ResultWrapper<List<Dealer>> {
+    override suspend fun getSpotAtLocation(
+        location: Location,
+        brandFilters: List<Int>?,
+        serviceFilters: List<Int>?
+    ): ResultWrapper<List<Dealer>> {
         return safeApiCall {
             client.get(Constants.API.DEALERS) {
                 url {
                     parameters.append("lat", location.latitude.toString())
                     parameters.append("lon", location.longitude.toString())
+
+                    if (!brandFilters.isNullOrEmpty()) {
+                        parameters.append("brand_filter", brandFilters.first().toString())
+                    }
+                    if (!serviceFilters.isNullOrEmpty()) {
+                        parameters.append("service_filter", serviceFilters.first().toString())
+                    }
                 }
             }.body<DealerResponse>().dealers.toVo()
         }
@@ -64,9 +74,33 @@ class CamperProApi(private var client: HttpClient) : Api {
         }
     }
 
-    override suspend fun getEvents(): ResultWrapper<List<Event>> {
+    override suspend fun getChecklists(): ResultWrapper<List<CheckList>> {
         return safeApiCall {
-            client.get(Constants.API.EVENTS).body<List<EventDto>>().toVo()
+            client.get(Constants.API.CHECKLISTS).body<List<CheckListDto>>().toVo()
+        }
+    }
+
+
+    override suspend fun getEvents(countriesFilters: String): ResultWrapper<List<Event>> {
+        return safeApiCall {
+            client.get(Constants.API.EVENTS) {
+                url {
+                    if (countriesFilters.isEmpty()) {
+                        parameters.append("country_filter", countriesFilters)
+                    }
+                }
+            }.body<List<EventDto>>().toVo()
+        }
+    }
+
+    override suspend fun locate(lat: String, long: String): ResultWrapper<LocationInfos> {
+        return safeApiCall {
+            client.get(Constants.API.LOCATE) {
+                url {
+                    parameters.append("lat", lat)
+                    parameters.append("long", long)
+                }
+            }.body<LocationInfoResponse>().toVo()
         }
     }
 

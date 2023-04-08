@@ -36,6 +36,10 @@ actual fun KMMContext.getBool(key: String, default: Boolean): Boolean {
 
 actual fun KMMContext.contains(key: String): Boolean = getSp().contains(key)
 
+actual fun KMMContext.remove(key: String) {
+    getSpEditor().remove(key)
+}
+
 private fun KMMContext.getSp() = getSharedPreferences(SP_NAME, 0)
 
 private fun KMMContext.getSpEditor() = getSp().edit()

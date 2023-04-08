@@ -1,0 +1,37 @@
+CREATE TABLE filterEntity (
+ id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    filterCategoryKey TEXT NOT NULL,
+    filterId TEXT NOT NULL,
+    isSelected INTEGER NOT NULL
+);
+
+insertFilter:
+INSERT OR REPLACE
+INTO filterEntity(
+filterCategoryKey,filterId, isSelected
+) VALUES ( ?, ?, ?);
+
+getAllFilterForCategory:
+SELECT *
+FROM filterEntity
+WHERE filterCategoryKey = ?;
+
+deleteFilter:
+DELETE  FROM filterEntity
+WHERE filterCategoryKey = ? AND filterId = ?;
+
+deleteAllFilter:
+DELETE FROM filterEntity;
+
+
+getSelectedFilter:
+SELECT * FROM filterEntity WHERE isSelected = 1 LIMIT 1;
+
+getAllFilters:
+SELECT * FROM filterEntity;
+
+resetSelectedEventFilters:
+UPDATE filterEntity SET isSelected = 0 WHERE filterCategoryKey = "COUNTRIES";
+
+resetSelectedDealerFilters:
+UPDATE filterEntity SET isSelected = 0 WHERE filterCategoryKey != "COUNTRIES";

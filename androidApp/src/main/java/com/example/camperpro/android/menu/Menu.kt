@@ -8,7 +8,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.ArrowForward
@@ -27,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import com.example.camperpro.android.R
 import com.example.camperpro.android.composables.Dropdown
 import com.example.camperpro.android.destinations.CheckListsScreenDestination
+import com.example.camperpro.android.destinations.SettingsMenuDestination
 import com.example.camperpro.android.destinations.myLocationDestination
 import com.example.camperpro.android.ui.theme.AppColor
 import com.example.camperpro.android.ui.theme.Dimensions
@@ -58,21 +58,16 @@ fun MenuScreen(
         MenuItem(R.string.menu_events, {
             resultNavigator.navigateBack(result = true, true)
         }, R.drawable.events, R.string.cd_events, false), MenuItem(
-            R.string.menu_travel_checklists,
-            {
+            R.string.menu_travel_checklists, {
                 navigator.navigate(CheckListsScreenDestination)
-            },
-            R.drawable.checklist,
-            R.string.cd_travel_checklist,
-            true
-        ), //        MenuItem(R.string.menu_leveler, {}, R.drawable.events, R.string.cd_leveler, false),
-        MenuItem(
+            }, R.drawable.checklist, R.string.cd_travel_checklist, true
+        ), MenuItem(
             R.string.menu_my_location, {
                 navigator.navigate(myLocationDestination)
             }, R.drawable.my_location, R.string.cd_my_location, true
         ), MenuItem(
             R.string.menu_app_settings, {
-                navigator.navigate(myLocationDestination)
+                navigator.navigate(SettingsMenuDestination)
             }, R.drawable.settings, R.string.cd_app_settings, false
         )
     )
@@ -107,7 +102,7 @@ fun MenuScreen(
         Divider(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 15.dp)
         )
 
         menuItems.filter { !it.isSubMenu }.forEach { menuItem ->
@@ -118,12 +113,12 @@ fun MenuScreen(
                 Divider(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
+                        .padding(horizontal = 15.dp)
                 )
 
                 Dropdown(
                     title = stringResource(id = R.string.menu_travel_tools),
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    modifier = Modifier.padding(horizontal = 15.dp)
                 ) {
                     Column {
                         MenuItem(menuItem = menuItems.find { it.labelRes == R.string.menu_travel_checklists }!!)
@@ -135,7 +130,7 @@ fun MenuScreen(
             Divider(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = 15.dp)
             )
         }
 
@@ -144,7 +139,7 @@ fun MenuScreen(
             Divider(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = 15.dp)
             )
         }
     }
@@ -166,12 +161,13 @@ fun MenuItem(
             )
             .clickable { menuItem.onclick() }, verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = menuItem.onclick) {
-            Icon(
-                painter = painterResource(id = menuItem.drawableRes),
-                contentDescription = stringResource(id = menuItem.contentDescriptionRes)
-            )
-        }
+
+        Icon(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            painter = painterResource(id = menuItem.drawableRes),
+            contentDescription = stringResource(id = menuItem.contentDescriptionRes)
+        )
+
         Text(
             modifier = Modifier.align(Alignment.CenterVertically),
             text = stringResource(id = menuItem.labelRes),
@@ -197,7 +193,7 @@ fun PubContainerMenu(pub: MenuLink) {
         Modifier
             .fillMaxWidth()
             .height(70.dp)
-            .padding(start = 16.dp)
+            .padding(start = 16.dp, end = 15.dp)
             .clickable {
                 uriHandler.openUri(pub.url)
                 uriHandler.openUri(pub.urlstat)
@@ -225,12 +221,12 @@ fun PubContainerMenu(pub: MenuLink) {
             )
         }
         Spacer(modifier = Modifier.weight(1f))
-        IconButton(onClick = { }) {
-            Icon(
-                imageVector = Icons.Sharp.ArrowForward,
-                contentDescription = "",
-                tint = AppColor.Secondary
-            )
-        }
+
+        Icon(
+            imageVector = Icons.Sharp.ArrowForward,
+            contentDescription = "",
+            tint = AppColor.Secondary
+        )
+
     }
 }

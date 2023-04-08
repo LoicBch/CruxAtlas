@@ -13,11 +13,10 @@ WHERE searchCategoryKey = ?;
 insertSearch:
 INSERT OR REPLACE
 INTO searchEntity(
-id,
 searchCategoryKey,
 searchLabel,
 timeStamp
-) VALUES (?,?,?, ?);
+) VALUES (?,?, ?);
 
 deleteSearchBySearchLabel:
 DELETE  FROM searchEntity

@@ -6,14 +6,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.camperpro.data.ResultWrapper
-import com.example.camperpro.domain.model.Ad
-import com.example.camperpro.domain.model.Dealer
-import com.example.camperpro.domain.model.Event
-import com.example.camperpro.domain.model.Place
+import com.example.camperpro.domain.model.*
 import com.example.camperpro.domain.model.composition.Location
 import com.example.camperpro.domain.model.composition.Marker
 import com.example.camperpro.domain.model.composition.UpdateSource
 import com.example.camperpro.domain.usecases.*
+import com.example.camperpro.utils.Globals
 import com.example.camperpro.utils.SortOption
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -96,21 +94,21 @@ class MainMapViewModel(
     }
 
     fun showSpots(location: Location) {
-        Log.d("LOCATION", "lat :${location.latitude} long :${location.longitude}")
         savedStateHandle["loading"] = true
         viewModelScope.launch {
             when (val call = fetchDealersAtLocationUseCase(location)) {
-
                 is ResultWrapper.Failure -> {
                     savedStateHandle["loading"] = false
                 }
-
                 is ResultWrapper.Success -> {
+
+                    val spots = call.value
+
                     savedStateHandle["updateSource"] = UpdateSource.AROUND_ME
                     markers.clear()
-                    markers.addAll(call.value!!.subList(0, 100).toMarker().toList())
-                    savedStateHandle["dealers"] = call.value!!.subList(0, 100).toList()
-                    savedStateHandle["dealersSorted"] = call.value!!.subList(0, 100).toList()
+                    markers.addAll(spots!!.toMarker().toList())
+                    savedStateHandle["dealers"] = spots.toList()
+                    savedStateHandle["dealersSorted"] = spots.toList()
                     savedStateHandle["placeSearched"] = ""
                     savedStateHandle["loading"] = false
                 }
@@ -126,13 +124,13 @@ class MainMapViewModel(
                     savedStateHandle["loading"] = false
                 }
                 is ResultWrapper.Success -> {
+
+                    savedStateHandle["updateSource"] = UpdateSource.EVENTS
                     markers.clear()
-                    markers.addAll(call.value!!.toMarker())
+                    markers.addAll(call.value!!.toMarker().toList())
 
                     savedStateHandle["events"] = call.value
                     savedStateHandle["eventsSorted"] = call.value
-                    savedStateHandle["updateSource"] = UpdateSource.EVENTS
-                    savedStateHandle["verticalListItems"] = call.value
                     savedStateHandle["loading"] = false
                 }
             }
@@ -188,7 +186,6 @@ class MainMapViewModel(
                     }
                 }
             } else {
-
                 when (val res = sortDealer(sortOption, dealers.value)) {
                     is ResultWrapper.Failure -> {
                         savedStateHandle["loading"] = false

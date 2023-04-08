@@ -70,7 +70,8 @@ fun Header(partner: Partner, onClose: () -> Unit) {
 
             Row(
                 modifier = Modifier
-                    .fillMaxWidth().padding(bottom = 30.dp)
+                    .fillMaxWidth()
+                    .padding(bottom = 30.dp)
             ) {
                 IconButton(modifier = Modifier
                     .shadow(2.dp, RoundedCornerShape(Dimensions.radiusRound))
@@ -87,21 +88,21 @@ fun Header(partner: Partner, onClose: () -> Unit) {
                     .shadow(2.dp, RoundedCornerShape(Dimensions.radiusRound))
                     .zIndex(1f)
                     .background(Color.White, RoundedCornerShape(Dimensions.radiusRound)),
-                           onClick = { /*TODO*/ }) {
-                    Icon(painter = painterResource(id = R.drawable.help), contentDescription = "")
+                           onClick = { context.share(context, "") }) {
+                    Icon(painter = painterResource(id = R.drawable.share), contentDescription = "")
                 }
 
                 IconButton(modifier = Modifier
                     .shadow(2.dp, RoundedCornerShape(Dimensions.radiusRound))
                     .zIndex(1f)
                     .background(Color.White, RoundedCornerShape(Dimensions.radiusRound)),
-                           onClick = { context.share(context, "") }) {
-                    Icon(painter = painterResource(id = R.drawable.share), contentDescription = "")
+                           onClick = { /*TODO*/ }) {
+                    Icon(painter = painterResource(id = R.drawable.help), contentDescription = "")
                 }
             }
 
             Row(
-                modifier = Modifier
+                modifier = Modifier.padding(bottom = 30.dp)
                     .fillMaxWidth()
             ) {
                 Row(
@@ -180,7 +181,6 @@ fun Tabs(partner: Partner) {
 
     val tabScreensTitle = listOf(
         stringResource(id = R.string.overview),
-//        stringResource(id = R.string.details),
         stringResource(id = R.string.contact_info)
     )
 
@@ -234,7 +234,6 @@ fun Tabs(partner: Partner) {
             when (page) {
                 0 -> OverviewTab(partner, pagerState)
                 1 -> ContactTab(partner)
-//                1 -> DetailsTab(partner)
             }
         }
     }
@@ -255,6 +254,13 @@ fun OverviewTab(partner: Partner, pagerState: PagerState) {
 
         RowContactPremium(partner = partner)
 
+        Text(modifier = Modifier.padding(top = 20.dp),
+            text = "Here is space for a brief description of the offer. It can be a short introduction to an insurance stating for whom it is, it could be an intro into the rental options, etc. To learn more visit website...",
+            fontSize = 14.sp,
+            fontWeight = FontWeight(450),
+            color = Color.Black
+        )
+
         Spacer(modifier = Modifier.weight(1f))
 
         AppButton(
@@ -267,82 +273,18 @@ fun OverviewTab(partner: Partner, pagerState: PagerState) {
 }
 
 @Composable
-fun DetailsTab(partner: Partner) {
-    Column(modifier = Modifier.fillMaxHeight()) {
-        Text(text = "Partner offer ?")
-    }
-}
-
-@Composable
-fun LocationInfos(partner: Partner) {
-    Row(
-        modifier = Modifier.padding(start = 5.dp, top = 20.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            modifier = Modifier.padding(end = 15.dp),
-            painter = painterResource(id = R.drawable.distance),
-            contentDescription = "",
-            tint = AppColor.Tertiary
-        )
-        Text(
-            text = "",
-            color = Color.Black,
-            fontWeight = FontWeight.W500,
-            fontSize = 12.sp
-        )
-    }
-
-    Row(
-        modifier = Modifier.padding(start = 5.dp, top = 15.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            modifier = Modifier.padding(end = 15.dp),
-            painter = painterResource(id = R.drawable.pin_here),
-            contentDescription = "",
-            tint = AppColor.Tertiary
-        )
-        Text(
-            text = "partner.fullLocation",
-            color = Color.Black,
-            fontWeight = FontWeight.W500,
-            fontSize = 12.sp
-        )
-    }
-
-    Row(
-        modifier = Modifier.padding(start = 5.dp, top = 15.dp, bottom = 40.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            modifier = Modifier.padding(end = 15.dp),
-            painter = painterResource(id = R.drawable.my_location),
-            contentDescription = "",
-            tint = AppColor.Tertiary
-        )
-        Text(
-            text = "partner.fullGeolocalisation",
-            color = Color.Black,
-            fontWeight = FontWeight.W500,
-            fontSize = 12.sp
-        )
-    }
-}
-
-
-@Composable
 fun RowContactPremium(partner: Partner) {
     Row(
-        horizontalArrangement = Arrangement.SpaceAround,
-        modifier = Modifier.padding(top = 20.dp).fillMaxWidth()
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier
+            .padding(top = 20.dp)
+            .fillMaxWidth()
     ) {
         if (partner.website.isNotEmpty()) {
             IconButton(modifier = Modifier
                 .background(
                     color = Color.White, RoundedCornerShape(Dimensions.radiusRound)
                 )
-                .padding(end = 12.dp)
                 .border(1.dp, AppColor.Secondary, RoundedCornerShape(Dimensions.radiusRound)),
                        onClick = { /*TODO*/ }) {
                 Icon(
@@ -358,7 +300,6 @@ fun RowContactPremium(partner: Partner) {
                 .background(
                     color = Color.White, RoundedCornerShape(Dimensions.radiusRound)
                 )
-                .padding(end = 12.dp)
                 .border(1.dp, AppColor.Secondary, RoundedCornerShape(Dimensions.radiusRound)),
                        onClick = { /*TODO*/ }) {
                 Icon(
@@ -374,7 +315,6 @@ fun RowContactPremium(partner: Partner) {
                 .background(
                     color = Color.White, RoundedCornerShape(Dimensions.radiusRound)
                 )
-                .padding(end = 12.dp)
                 .border(1.dp, AppColor.Secondary, RoundedCornerShape(Dimensions.radiusRound)),
                        onClick = { /*TODO*/ }) {
                 Icon(
@@ -390,7 +330,6 @@ fun RowContactPremium(partner: Partner) {
                 .background(
                     color = Color.White, RoundedCornerShape(Dimensions.radiusRound)
                 )
-                .padding(end = 12.dp)
                 .border(1.dp, AppColor.Secondary, RoundedCornerShape(Dimensions.radiusRound)),
                        onClick = { /*TODO*/ }) {
                 Icon(
@@ -406,7 +345,6 @@ fun RowContactPremium(partner: Partner) {
                 .background(
                     color = Color.White, RoundedCornerShape(Dimensions.radiusRound)
                 )
-                .padding(end = 12.dp)
                 .border(1.dp, AppColor.Secondary, RoundedCornerShape(Dimensions.radiusRound)),
                        onClick = { /*TODO*/ }) {
                 Icon(
@@ -422,7 +360,6 @@ fun RowContactPremium(partner: Partner) {
                 .background(
                     color = Color.White, RoundedCornerShape(Dimensions.radiusRound)
                 )
-                .padding(end = 12.dp)
                 .border(1.dp, AppColor.Secondary, RoundedCornerShape(Dimensions.radiusRound)),
                        onClick = { /*TODO*/ }) {
                 Icon(
@@ -443,33 +380,6 @@ fun ContactTab(partner: Partner) {
     val context = LocalContext.current
 
     Column(modifier = Modifier.fillMaxHeight()) {
-        //        Row(
-        //            modifier = Modifier.padding(vertical = 16.dp),
-        //            verticalAlignment = Alignment.CenterVertically
-        //        ) {
-        //            Image(painter = painterResource(id = R.drawable.pin_here), contentDescription = "")
-        //            Text(
-        //                modifier = Modifier.padding(start = 22.dp),
-        //                text = "partner.fullLocation",
-        //                fontSize = 12.sp,
-        //                fontWeight = FontWeight(450)
-        //            )
-        //        }
-        //        Divider()
-        //
-        //        Row(
-        //            modifier = Modifier.padding(vertical = 16.dp),
-        //            verticalAlignment = Alignment.CenterVertically
-        //        ) {
-        //            Image(painter = painterResource(id = R.drawable.my_location), contentDescription = "")
-        //            Text(
-        //                modifier = Modifier.padding(start = 22.dp),
-        //                text = "partner.fullGeolocalisation",
-        //                fontSize = 12.sp,
-        //                fontWeight = FontWeight(450)
-        //            )
-        //        }
-        //        Divider()
 
         if (partner.website.isNotEmpty()) {
             Row(
@@ -478,7 +388,11 @@ fun ContactTab(partner: Partner) {
                     .clickable { uriHandler.openUri(partner.website) },
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Image(painter = painterResource(id = R.drawable.website), contentDescription = "")
+                Image(
+                    modifier = Modifier.size(20.dp),
+                    painter = painterResource(id = R.drawable.website),
+                    contentDescription = ""
+                )
                 Text(
                     modifier = Modifier.padding(start = 22.dp),
                     text = partner.website,
@@ -496,7 +410,11 @@ fun ContactTab(partner: Partner) {
                     .clickable { context.sendMail(partner.email, "") },
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Image(painter = painterResource(id = R.drawable.mail), contentDescription = "")
+                Image(
+                    modifier = Modifier.size(20.dp),
+                    painter = painterResource(id = R.drawable.mail),
+                    contentDescription = ""
+                )
                 Text(
                     modifier = Modifier.padding(start = 22.dp),
                     text = partner.email,
@@ -515,7 +433,11 @@ fun ContactTab(partner: Partner) {
                     .clickable { context.dial(partner.phone) },
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Image(painter = painterResource(id = R.drawable.phone), contentDescription = "")
+                Image(
+                    modifier = Modifier.size(20.dp),
+                    painter = painterResource(id = R.drawable.phone),
+                    contentDescription = ""
+                )
                 Text(
                     modifier = Modifier.padding(start = 22.dp),
                     text = partner.phone,
@@ -535,7 +457,11 @@ fun ContactTab(partner: Partner) {
                     .clickable { uriHandler.openUri(partner.facebook) },
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Image(painter = painterResource(id = R.drawable.facebook), contentDescription = "")
+                Image(
+                    modifier = Modifier.size(20.dp),
+                    painter = painterResource(id = R.drawable.facebook),
+                    contentDescription = ""
+                )
                 Text(
                     modifier = Modifier.padding(start = 22.dp),
                     text = partner.facebook,
@@ -555,7 +481,11 @@ fun ContactTab(partner: Partner) {
                     .clickable { uriHandler.openUri(partner.twitter) },
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Image(painter = painterResource(id = R.drawable.twitter), contentDescription = "")
+                Image(
+                    modifier = Modifier.size(20.dp),
+                    painter = painterResource(id = R.drawable.twitter),
+                    contentDescription = ""
+                )
                 Text(
                     modifier = Modifier.padding(start = 22.dp),
                     text = partner.twitter,
@@ -574,7 +504,11 @@ fun ContactTab(partner: Partner) {
                     .clickable { uriHandler.openUri(partner.youtube) },
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Image(painter = painterResource(id = R.drawable.youtube), contentDescription = "")
+                Image(
+                    modifier = Modifier.size(20.dp),
+                    painter = painterResource(id = R.drawable.youtube),
+                    contentDescription = ""
+                )
                 Text(
                     modifier = Modifier.padding(start = 22.dp),
                     text = partner.youtube,

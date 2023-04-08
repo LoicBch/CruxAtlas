@@ -4,6 +4,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
@@ -16,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
@@ -27,12 +31,16 @@ import com.example.camperpro.android.R
 import com.example.camperpro.android.composables.AppButton
 import com.example.camperpro.android.extensions.navigateByGmaps
 import com.example.camperpro.android.extensions.share
+import com.example.camperpro.android.spotSheet.Gallery
 import com.example.camperpro.android.ui.theme.Dimensions
 import com.example.camperpro.domain.model.Event
+import com.example.camperpro.domain.model.Photo
 import com.example.camperpro.utils.fullGeolocalisation
 import com.example.camperpro.utils.fullLocation
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.glide.GlideImage
 
 @Destination
 @Composable
@@ -49,6 +57,11 @@ fun Header(event: Event, onClose: () -> Unit) {
     val context = LocalContext.current
 
     Box(Modifier.heightIn(min = 50.dp)) {
+
+        //        if (dealer.isPremium && dealer.photos.isNotEmpty()) {
+        Gallery(photos = listOf())
+        //        }
+
         Row(
             modifier = Modifier
                 .align(Alignment.TopStart)
@@ -70,17 +83,37 @@ fun Header(event: Event, onClose: () -> Unit) {
                 .shadow(2.dp, RoundedCornerShape(Dimensions.radiusRound))
                 .zIndex(1f)
                 .background(Color.White, RoundedCornerShape(Dimensions.radiusRound)),
-                       onClick = { /*TODO*/ }) {
-                Icon(painter = painterResource(id = R.drawable.help), contentDescription = "")
+                       onClick = { context.share(context, "") }) {
+                Icon(painter = painterResource(id = R.drawable.share), contentDescription = "")
             }
 
             IconButton(modifier = Modifier
                 .shadow(2.dp, RoundedCornerShape(Dimensions.radiusRound))
                 .zIndex(1f)
                 .background(Color.White, RoundedCornerShape(Dimensions.radiusRound)),
-                       onClick = { context.share(context, "") }) {
-                Icon(painter = painterResource(id = R.drawable.share), contentDescription = "")
+                       onClick = { /*TODO*/ }) {
+                Icon(painter = painterResource(id = R.drawable.help), contentDescription = "")
             }
+
+        }
+    }
+}
+
+@Composable
+fun GalleryEvent(photos: List<Photo>) {
+    val scrollState = rememberScrollState()
+
+    LazyRow {
+        itemsIndexed(photos) { index, photo ->
+            GlideImage(
+                modifier = Modifier
+                    .height(250.dp)
+                    .fillMaxWidth(),
+                imageModel = { photo.url },
+                imageOptions = ImageOptions(
+                    contentScale = ContentScale.Crop
+                )
+            )
         }
     }
 }
@@ -123,7 +156,11 @@ fun Infos(modifier: Modifier, event: Event) {
             modifier = Modifier.padding(vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(painter = painterResource(id = R.drawable.pin_here), contentDescription = "")
+            Image(
+                modifier = Modifier.size(20.dp),
+                painter = painterResource(id = R.drawable.pin_here),
+                contentDescription = ""
+            )
             Text(
                 modifier = Modifier.padding(start = 22.dp),
                 text = event.fullLocation,
@@ -137,7 +174,11 @@ fun Infos(modifier: Modifier, event: Event) {
             modifier = Modifier.padding(vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(painter = painterResource(id = R.drawable.my_location), contentDescription = "")
+            Image(
+                modifier = Modifier.size(20.dp),
+                painter = painterResource(id = R.drawable.my_location),
+                contentDescription = ""
+            )
             Text(
                 modifier = Modifier.padding(start = 22.dp),
                 text = event.fullGeolocalisation,
@@ -154,7 +195,11 @@ fun Infos(modifier: Modifier, event: Event) {
                     .clickable { uriHandler.openUri(event.website) },
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Image(painter = painterResource(id = R.drawable.website), contentDescription = "")
+                Image(
+                    modifier = Modifier.size(20.dp),
+                    painter = painterResource(id = R.drawable.website),
+                    contentDescription = ""
+                )
                 Text(
                     modifier = Modifier.padding(start = 22.dp),
                     text = event.website,

@@ -2,16 +2,14 @@
 
 package com.example.camperpro.android.mainmap
 
+import android.app.Application
 import android.util.Log
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -37,6 +35,7 @@ import com.example.camperpro.android.LocalDependencyContainer
 import com.example.camperpro.android.MyApplicationTheme
 import com.example.camperpro.android.R
 import com.example.camperpro.android.composables.LoadingModal
+import com.example.camperpro.android.composables.collectAsStateWithLifecycleImmutable
 import com.example.camperpro.android.destinations.AroundLocationScreenDestination
 import com.example.camperpro.android.destinations.DealerDetailsScreenDestination
 import com.example.camperpro.android.destinations.MenuScreenDestination
@@ -79,13 +78,13 @@ fun MainMap(
     val state by viewModel.state.collectAsState()
     val locationSearched by viewModel.placeSearched.collectAsState()
     val currentlyLoading by viewModel.loading.collectAsState()
-    val markersState by viewModel.markersFlow.collectAsState()
+    val markersState by viewModel.markersFlow.collectAsStateWithLifecycleImmutable()
     val updateSource by viewModel.updateSource.collectAsState()
 
-    val dealers by viewModel.dealers.collectAsState()
-    val events by viewModel.events.collectAsState()
+    val dealers by viewModel.dealers.collectAsStateWithLifecycleImmutable()
+    val events by viewModel.events.collectAsStateWithLifecycleImmutable()
 
-    var properties by remember {
+    var mapProperties by remember {
         mutableStateOf(MapProperties(isMyLocationEnabled = true, mapType = MapType.NORMAL))
     }
 
@@ -135,11 +134,19 @@ fun MainMap(
                         )
                     )
                 )
-                viewModel.showSpots(Constants.DEFAULT_LOCATION)
             }
         }
     }
 
+    LaunchedEffect(appViewModel.filtersApplied) {
+        appViewModel.filtersApplied.collect {
+            if (it != FilterType.COUNTRIES) {
+                viewModel.showSpots(cameraPositionState.locationVo)
+            } else {
+                viewModel.showEvents()
+            }
+        }
+    }
 
     LaunchedEffect(appViewModel.loadAroundMeIsPressed) {
         appViewModel.loadAroundMeIsPressed.collect {
@@ -187,11 +194,14 @@ fun MainMap(
 
     Box {
         GoogleMap(
-            modifier = Modifier.fillMaxSize(), properties = properties, uiSettings = MapUiSettings(
+            modifier = Modifier.fillMaxSize(),
+            properties = mapProperties,
+            uiSettings = MapUiSettings(
                 zoomControlsEnabled = false, myLocationButtonEnabled = false,
-            ), cameraPositionState = cameraPositionState
+            ),
+            cameraPositionState = cameraPositionState
         ) {
-            markersState.forEach { marker ->
+            markersState.value.forEach { marker ->
                 val markerState = MarkerState(position = LatLng(marker.latitude, marker.longitude))
                 Log.d("SELECTED", marker.selected.toString())
                 Marker(icon = if (marker.selected) {
@@ -204,7 +214,7 @@ fun MainMap(
                     } else {
                         navigator.navigate(
                             DealerDetailsScreenDestination(
-                                dealers.find { it.id == marker.placeLinkedId }!!
+                                dealers.value.find { it.id == marker.placeLinkedId }!!
                             )
                         )
                         true
@@ -223,18 +233,18 @@ fun MainMap(
 
                 if (locationSearched.isNotEmpty()) LocationSearchContainer(locationSearched)
                 if (updateSource == UpdateSource.EVENTS) {
-                    if (events.isNotEmpty()) {
+                    if (events.value.isNotEmpty()) {
 
                         cameraPositionState.move(
                             CameraUpdateFactory.newLatLngZoom(
                                 LatLng(
-                                    events.first().latitude,
-                                    events.first().longitude
+                                    events.value.first().latitude, events.value.first().longitude
                                 ), 15f
                             )
                         )
+
                         HorizontalEventsList(cameraPositionState = cameraPositionState,
-                                             events = events,
+                                             events = events.value,
                                              onItemClicked = {
                                                  navigator.navigate(
                                                      com.example.camperpro.android.destinations.EventDetailScreenDestination(
@@ -244,14 +254,14 @@ fun MainMap(
                                              },
                                              onScrollEnded = { event ->
                                                  viewModel.selectMarker(
-                                                     markersState.indexOf(markersState.find { it.placeLinkedId == event.id })
+                                                     markersState.value.indexOf(markersState.value.find { it.placeLinkedId == event.id })
                                                  )
                                              })
                     }
                 } else {
-                    if (dealers.isNotEmpty()) {
+                    if (dealers.value.isNotEmpty()) {
                         HorizontalSpotsList(cameraPositionState = cameraPositionState,
-                                            spots = dealers,
+                                            spots = dealers.value,
                                             onItemClicked = {
                                                 navigator.navigate(
                                                     DealerDetailsScreenDestination(
@@ -261,7 +271,7 @@ fun MainMap(
                                             },
                                             onScrollEnded = { dealer ->
                                                 viewModel.selectMarker(
-                                                    markersState.indexOf(markersState.find { it.placeLinkedId == dealer.id })
+                                                    markersState.value.indexOf(markersState.value.find { it.placeLinkedId == dealer.id })
                                                 )
                                             })
                     }
@@ -292,19 +302,16 @@ fun MainMap(
             }
         }
 
-        // TODO: Remonter les params
-        TopButtons(isVerticalListOpen = state.verticalListIsShowing,
-                   onListButtonClick = {
-                       viewModel.swapVerticalList()
-                   },
-                   source = updateSource,
-                   onMapPropertiesUpdated = {
-                       properties = if (properties.mapType == MapType.NORMAL) {
-                           MapProperties(isMyLocationEnabled = true, mapType = MapType.SATELLITE)
-                       } else {
-                           MapProperties(isMyLocationEnabled = true, mapType = MapType.NORMAL)
-                       }
-                   })
+
+        TopButtons(isVerticalListOpen = state.verticalListIsShowing, onListButtonClick = {
+            viewModel.swapVerticalList()
+        }, source = updateSource, onMapPropertiesUpdated = {
+            mapProperties = if (mapProperties.mapType == MapType.NORMAL) {
+                mapProperties.copy(mapType = MapType.SATELLITE)
+            } else {
+                mapProperties.copy(mapType = MapType.NORMAL)
+            }
+        })
 
         if (currentlyLoading) {
             LoadingModal(Modifier.align(Alignment.Center))
@@ -385,7 +392,7 @@ fun VerticalEventsList(
 ) {
 
     val sorting = LocalDependencyContainer.current.appViewModel.verticalListSortingOption
-    val eventSorted by eventSortedFlow.collectAsState()
+    val eventSorted by eventSortedFlow.collectAsStateWithLifecycleImmutable()
 
     LaunchedEffect(sorting) {
         sorting.collect {
@@ -403,9 +410,9 @@ fun VerticalEventsList(
             .fillMaxSize()
             .padding(top = 100.dp),
     ) {
-        items(eventSorted) { item ->
+        items(eventSorted.value) { item ->
             Row(modifier = Modifier
-                .padding(start = 15.dp, end = 15.dp, bottom = 20.dp)
+                .padding(start = 15.dp, end = 15.dp, bottom = 20.dp, top = 5.dp)
                 .shadow(2.dp, RoundedCornerShape(8))
                 .zIndex(1f)
                 .fillMaxWidth()
@@ -420,6 +427,8 @@ fun VerticalEventsList(
 
 @Composable
 fun VerticalEventListItem(event: Event) {
+
+    val application = LocalContext.current.applicationContext as Application
 
     Column(modifier = Modifier.padding(8.dp)) {
         Text(
@@ -473,7 +482,7 @@ fun VerticalEventListItem(event: Event) {
                 Text(
                     text = Location(
                         event.latitude, event.longitude
-                    ).distanceFromUserLocationText!!,
+                    ).distanceFromUserLocationText(KMMPreference(application)),
                     color = AppColor.Primary,
                     fontWeight = FontWeight.W500,
                     fontSize = 12.sp
@@ -492,7 +501,7 @@ fun VerticalDealersList(
 ) {
 
     val sorting = LocalDependencyContainer.current.appViewModel.verticalListSortingOption
-    val dealersSorted by dealersSortedFlow.collectAsState()
+    val dealersSorted by dealersSortedFlow.collectAsStateWithLifecycleImmutable()
 
     LaunchedEffect(sorting) {
         sorting.collect {
@@ -510,9 +519,9 @@ fun VerticalDealersList(
             .fillMaxSize()
             .padding(top = 100.dp),
     ) {
-        items(dealersSorted) { item ->
+        items(dealersSorted.value) { item ->
             Row(modifier = Modifier
-                .padding(start = 15.dp, end = 15.dp, bottom = 20.dp)
+                .padding(start = 15.dp, end = 15.dp, bottom = 20.dp, top = 5.dp)
                 .shadow(2.dp, RoundedCornerShape(8))
                 .zIndex(1f)
                 .fillMaxWidth()
@@ -527,6 +536,8 @@ fun VerticalDealersList(
 
 @Composable
 fun VerticalListItem(dealer: Dealer) {
+
+    val application = LocalContext.current.applicationContext as Application
 
     if (dealer.isPremium && dealer.photos.isNotEmpty()) {
         Box {
@@ -632,7 +643,7 @@ fun VerticalListItem(dealer: Dealer) {
                     Text(
                         text = Location(
                             dealer.latitude, dealer.longitude
-                        ).distanceFromUserLocationText!!,
+                        ).distanceFromUserLocationText(KMMPreference(application)),
                         color = AppColor.neutralText,
                         fontWeight = FontWeight.W500,
                         fontSize = 12.sp
@@ -658,7 +669,7 @@ fun VerticalListItem(dealer: Dealer) {
                 Text(
                     text = Location(
                         dealer.latitude, dealer.longitude
-                    ).distanceFromUserLocationText!!,
+                    ).distanceFromUserLocationText(KMMPreference(application)),
                     color = AppColor.neutralText,
                     fontWeight = FontWeight.W500,
                     fontSize = 12.sp
@@ -757,6 +768,8 @@ fun HorizontalEventsList(
 @Composable
 fun HorizontalEventListItem(event: Event) {
 
+    val application = LocalContext.current.applicationContext as Application
+
     Column(modifier = Modifier.padding(8.dp)) {
         Text(
             modifier = Modifier.padding(bottom = 5.dp),
@@ -802,7 +815,7 @@ fun HorizontalEventListItem(event: Event) {
                 Text(
                     text = Location(
                         event.latitude, event.longitude
-                    ).distanceFromUserLocationText!!,
+                    ).distanceFromUserLocationText(KMMPreference(application)),
                     color = AppColor.neutralText,
                     fontWeight = FontWeight.W500,
                     fontSize = 12.sp
@@ -900,6 +913,8 @@ fun HorizontalSpotsList(
 
 @Composable
 fun HorizontalListItem(dealer: Dealer) {
+
+    val application = LocalContext.current.applicationContext as Application
 
     if (dealer.isPremium && dealer.photos.isNotEmpty()) {
         Box {
@@ -1008,7 +1023,7 @@ fun HorizontalListItem(dealer: Dealer) {
                     Text(
                         text = Location(
                             dealer.latitude, dealer.longitude
-                        ).distanceFromUserLocationText!!,
+                        ).distanceFromUserLocationText(KMMPreference(application)),
                         color = AppColor.neutralText,
                         fontWeight = FontWeight.W500,
                         fontSize = 12.sp
@@ -1033,7 +1048,7 @@ fun HorizontalListItem(dealer: Dealer) {
                 Text(
                     text = Location(
                         dealer.latitude, dealer.longitude
-                    ).distanceFromUserLocationText!!,
+                    ).distanceFromUserLocationText(KMMPreference(application)),
                     color = AppColor.neutralText,
                     fontWeight = FontWeight.W500,
                     fontSize = 12.sp
@@ -1060,6 +1075,7 @@ fun MainMapAdContainer(ad: List<Ad>) {
     )
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TopButtons(
     onListButtonClick: () -> Unit,
@@ -1115,7 +1131,7 @@ fun TopButtons(
                         appViewModel.bottomSheetIsShowing.show()
                     }
                 } else {
-                    onMapPropertiesUpdated()
+                        onMapPropertiesUpdated.invoke()
                 }
             }
         }) {
@@ -1130,30 +1146,81 @@ fun TopButtons(
             )
         }
 
-        IconButton(modifier = Modifier
-            .shadow(2.dp, RoundedCornerShape(Dimensions.radiusRound))
-            .zIndex(1f)
-            .background(
-                Color.White, RoundedCornerShape(Dimensions.radiusRound)
-            ), onClick = {
+        if (!appViewModel.isFiltersActive(updateSource = source)) {
+            IconButton(modifier = Modifier
+                .shadow(2.dp, RoundedCornerShape(Dimensions.radiusRound))
+                .zIndex(1f)
+                .background(
+                    Color.White, RoundedCornerShape(Dimensions.radiusRound)
+                ), onClick = {
 
-            scope.launch {
-                when (source) {
-                    UpdateSource.EVENTS -> BottomSheetOption.FILTER_EVENT
-                    else -> {
-                        BottomSheetOption.FILTER
+                scope.launch {
+                    when (source) {
+                        UpdateSource.EVENTS -> BottomSheetOption.FILTER_EVENT
+                        else -> {
+                            BottomSheetOption.FILTER
+                        }
                     }
+                    appViewModel.bottomSheetIsShowing.show()
                 }
-                appViewModel.bottomSheetIsShowing.show()
-            }
 
-        }) {
-            Image(
-                modifier = Modifier.padding(10.dp),
-                painter = painterResource(id = R.drawable.filter),
-                contentDescription = stringResource(id = R.string.cd_button_filter)
-            )
+            }) {
+                Image(
+                    modifier = Modifier.padding(10.dp),
+                    painter = painterResource(id = R.drawable.filter),
+                    contentDescription = stringResource(id = R.string.cd_button_filter)
+                )
+            }
+        } else {
+            Box {
+
+                IconButton(modifier = Modifier
+                    .shadow(2.dp, RoundedCornerShape(Dimensions.radiusRound))
+                    .zIndex(1f)
+                    .background(
+                        Color.White, RoundedCornerShape(Dimensions.radiusRound)
+                    )
+                    .border(
+                        width = 2.dp,
+                        shape = RoundedCornerShape(Dimensions.radiusRound),
+                        color = AppColor.Primary
+                    ), onClick = {
+                    scope.launch {
+                        when (source) {
+                            UpdateSource.EVENTS -> BottomSheetOption.FILTER_EVENT
+                            else -> {
+                                BottomSheetOption.FILTER
+                            }
+                        }
+                        appViewModel.bottomSheetIsShowing.show()
+                    }
+
+                }) {
+                    Image(
+                        modifier = Modifier.padding(10.dp),
+                        painter = painterResource(id = R.drawable.filter),
+                        contentDescription = stringResource(id = R.string.cd_button_filter)
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .size(20.dp)
+                        .clip(RoundedCornerShape(Dimensions.radiusRound))
+                        .background(AppColor.Primary)
+                        .align(Alignment.BottomEnd)
+                        .zIndex(1f)
+                ) {
+                    Image(
+                        modifier = Modifier.align(Alignment.Center),
+                        painter = painterResource(id = R.drawable.check),
+                        contentDescription = ""
+                    )
+                }
+            }
         }
+
+
     }
 }
 

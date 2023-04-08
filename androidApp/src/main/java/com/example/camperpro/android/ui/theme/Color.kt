@@ -12,8 +12,11 @@ object AppColor {
     val SplashScreenBackground = Color(0xFF4457A7)
     val ClearGrey = Color(0x6649454F)
     val Red = Color(0xFFDC362E)
+    val greyTags = Color(0xFFF4F6F9)
+
 
     val SelectedItem = Color(0xFF165DD7)
+    val ClearBlue = Color(0xFFeef0fa)
     val BlueCamperPro = Color(0xFF165DD7)
     val unSelectedFilter = Color(0xFF8A8FAB)
     val unFocusedTextField = Color(0xFFF4F4F4)

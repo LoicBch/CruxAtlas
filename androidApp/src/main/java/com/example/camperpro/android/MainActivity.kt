@@ -79,12 +79,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        startKoin {
-            androidLogger(level = Level.DEBUG)
-            androidContext(this@MainActivity)
-            modules(sharedModule() + platformModule())
-        }
-
         setContent {
             MyApplicationTheme {
                 val appViewModel: AppViewModel = getViewModel()

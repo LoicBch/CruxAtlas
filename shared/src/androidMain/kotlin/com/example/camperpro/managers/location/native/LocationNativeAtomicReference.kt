@@ -2,7 +2,7 @@ package com.example.camperpro.managers.location.native
 
 import java.util.concurrent.atomic.AtomicReference
 
-internal actual class NativeAtomicReference<T> actual constructor(value: T) {
+internal actual class LocationNativeAtomicReference<T> actual constructor(value: T) {
 
     private val atomic = AtomicReference(value)
 

@@ -106,6 +106,7 @@ android {
         targetSdk = 33
     }
 }
+
 dependencies {
     implementation("com.google.android.gms:play-services-location:21.0.1")
     implementation("androidx.startup:startup-runtime:1.1.1")

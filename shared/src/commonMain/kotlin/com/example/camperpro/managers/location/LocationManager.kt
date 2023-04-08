@@ -2,7 +2,7 @@ package com.example.camperpro.managers.location
 
 import com.example.camperpro.managers.location.extension.appending
 import com.example.camperpro.managers.location.extension.removed
-import com.example.camperpro.managers.location.native.NativeAtomicReference
+import com.example.camperpro.managers.location.native.LocationNativeAtomicReference
 import kotlin.native.concurrent.ThreadLocal
 
 class LocationManager {
@@ -103,12 +103,12 @@ class LocationManager {
         }
 
         private val onLocationUpdatedBlocks =
-            NativeAtomicReference(listOf<OnLocationUpdatedBlock>())
+            LocationNativeAtomicReference(listOf<OnLocationUpdatedBlock>())
         private val onLocationUpdatedBlockMap =
-            NativeAtomicReference(mapOf<Any, OnLocationUpdatedBlock>())
+            LocationNativeAtomicReference(mapOf<Any, OnLocationUpdatedBlock>())
         private val onLocationUnavailableBlockMap =
-            NativeAtomicReference(mapOf<Any, OnLocationUnavailableBlock>())
+            LocationNativeAtomicReference(mapOf<Any, OnLocationUnavailableBlock>())
         private val onPermissionUpdatedBlockMap =
-            NativeAtomicReference(mapOf<Any, OnPermissionUpdatedBlock>())
+            LocationNativeAtomicReference(mapOf<Any, OnPermissionUpdatedBlock>())
     }
 }

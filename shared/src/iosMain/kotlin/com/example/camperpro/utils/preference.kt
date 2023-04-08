@@ -37,6 +37,10 @@ actual fun KMMContext.getBool(key: String, default: Boolean): Boolean {
 }
 
 // TODO: implement for ios
+
+actual fun KMMContext.remove(key: String) {
+}
+
 actual fun KMMContext.contains(key: String): Boolean {
     return true
 }

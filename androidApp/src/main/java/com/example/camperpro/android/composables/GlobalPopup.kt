@@ -36,30 +36,45 @@ fun GlobalPopup(modifier: Modifier, state: GlobalPopupState, onExit: () -> Unit)
                 .background(
                     color = Color.White, shape = RoundedCornerShape(15)
                 )
-                .padding(vertical = 24.dp, horizontal = 16.dp)
+                .padding(top = 10.dp, start = 16.dp, end = 16.dp)
                 .align(Alignment.Center) //            .width(IntrinsicSize.Min)
         ) {
 
-            Text(
-                text = when (state) {
-                    GlobalPopupState.NETWORK_MISSING -> stringResource(id = R.string.popup_missing_network_title)
-                    GlobalPopupState.GPS_MISSING -> stringResource(id = R.string.popup_missing_gps_title)
-                    GlobalPopupState.HID -> ""
-                }, fontWeight = FontWeight.W700, fontSize = 22.sp, color = Color.Black, maxLines = 1
-            )
-            Text(
-                text = when (state) {
-                    GlobalPopupState.NETWORK_MISSING -> stringResource(id = R.string.popup_missing_network_text)
-                    GlobalPopupState.GPS_MISSING -> stringResource(id = R.string.popup_missing_gps_text)
-                    GlobalPopupState.HID -> ""
-                }, fontWeight = FontWeight(450), fontSize = 16.sp, color = Color.Black, maxLines = 1
-            )
-            Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
+            Row(
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = when (state) {
+                        GlobalPopupState.NETWORK_MISSING -> stringResource(id = R.string.popup_missing_network_title)
+                        GlobalPopupState.GPS_MISSING -> stringResource(id = R.string.popup_missing_gps_title)
+                        GlobalPopupState.HID -> ""
+                    },
+                    fontWeight = FontWeight.W700,
+                    fontSize = 22.sp,
+                    color = Color.Black,
+                    maxLines = 1
+                )
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(onClick = { onExit() }) {
                     Icon(imageVector = Icons.Sharp.Close, contentDescription = "")
                 }
             }
+
+
+            Text(
+                text = when (state) {
+                    GlobalPopupState.NETWORK_MISSING -> stringResource(id = R.string.popup_missing_network_text)
+                    GlobalPopupState.GPS_MISSING -> stringResource(id = R.string.popup_missing_gps_text)
+                    GlobalPopupState.HID -> ""
+                },
+                modifier = Modifier.padding(top = 5.dp, bottom = 20.dp),
+                fontWeight = FontWeight(450),
+                fontSize = 16.sp,
+                color = Color.Black,
+                maxLines = 1
+            )
         }
 
     }

@@ -29,14 +29,14 @@ struct MainMapScreen: View {
             
             if(viewModel.verticalListIsShowing){
                 ZStack(alignment: .top){
-                    VerticalSpotsList(spots : viewModel.spots)
+                    VerticalSpotsList(spots : viewModel.dealers)
                     TopButtons(showVerticalList: { viewModel.permuteVerticalList() }, ShowSheetView: { bottomSheetViewModel.openSheet(option: BottomSheetOption.FILTER)})
                 }
             }else{
                 VStack(){
                     TopButtons(showVerticalList: { viewModel.permuteVerticalList() }, ShowSheetView: { bottomSheetViewModel.openSheet(option: BottomSheetOption.FILTER)})
                     Spacer()
-                    HorizontalSpotsList(spots: viewModel.spots)
+                    HorizontalDealersList(dealers: viewModel.dealers)
                     if (!viewModel.ads.isEmpty){
                         MainMapAdContainer()
                     }
@@ -48,7 +48,7 @@ struct MainMapScreen: View {
 
 struct VerticalSpotsList: View {
     
-    var spots: [Spot]
+    var spots: [Dealer]
     @State private var scrollViewContentSize: CGSize = .zero
     
     var body: some View{
@@ -76,7 +76,7 @@ struct VerticalSpotsList: View {
     
     struct VerticalListItem: View {
         
-        var spot: Spot
+        var spot:Dealer
         
         var body: some View{
             
@@ -123,8 +123,8 @@ struct VerticalSpotsList: View {
         }
     }
 
-struct HorizontalSpotsList: View {
-    var spots: [Spot]
+struct HorizontalDealersList: View {
+    var dealers: [Dealer]
     
     @State private var scrollViewContentSize: CGSize = .zero
     @GestureState private var dragOffset: CGFloat = 0
@@ -133,8 +133,8 @@ struct HorizontalSpotsList: View {
     var body: some View {
         ScrollView(.horizontal){
             LazyHStack(alignment: .center, spacing: 20){
-                ForEach(spots , id: \.self) { spot in
-                        HorizontalListItem(spot: spot)
+                ForEach(dealers , id: \.self) { dealer in
+                        HorizontalListDealerItem(dealer: dealer)
                         .frame(width: scrollViewContentSize.width, height: 130)
                         .background(RoundedRectangle(cornerRadius: 25)
                         .fill(Color.white))
@@ -166,14 +166,14 @@ struct HorizontalSpotsList: View {
 }
 
 
-struct HorizontalListItem: View {
+struct HorizontalListDealerItem: View {
     
-    var spot: Spot
+    var dealer: Dealer
 
     var body: some View{
         
         HStack(){
-            if (spot.isPremium && !spot.photos.isEmpty) {
+            if (dealer.isPremium && !dealer.photos.isEmpty) {
                 ZStack(){
                     Image("").frame(width: 130, height: 130)
                     Image("")
@@ -181,32 +181,32 @@ struct HorizontalListItem: View {
             }
     
             VStack(){
-                Text("test")
+                Text("test").frame(alignment: )
                 Text("test")
                 Spacer()
                 HStack(){
-                    if (!spot.services.isEmpty){
+                    if (!dealer.services.isEmpty){
                         Image("")
                     }
     
-                    if (!spot.services.isEmpty){
+                    if (!dealer.services.isEmpty){
                         Image("")
                     }
     
-                    if (!spot.services.isEmpty){
+                    if (!dealer.services.isEmpty){
                         Image("")
                     }
     
                     Spacer()
     
-                    if (spot.photos.isEmpty) {
+                    if (dealer.photos.isEmpty) {
                         HStack(){
                             Image("")
                             Text("test")
                         }
                     }
     
-                    if (spot.isPremium && !spot.photos.isEmpty) {
+                    if (dealer.isPremium && !dealer.photos.isEmpty) {
                         HStack(){
                             Image("")
                             Text("test")
@@ -217,6 +217,8 @@ struct HorizontalListItem: View {
         }
     }
 }
+
+
 
 struct MainMapAdContainer: View{
     var body: some View{

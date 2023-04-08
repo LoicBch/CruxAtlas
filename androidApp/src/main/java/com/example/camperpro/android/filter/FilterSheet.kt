@@ -1,71 +1,71 @@
 package com.example.camperpro.android.filter
 
-import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.*
 import com.example.camperpro.android.LocalDependencyContainer
 import com.example.camperpro.android.R
-import com.example.camperpro.domain.model.Search
+import com.example.camperpro.utils.FilterType
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun FilterSheet() {
 
-    var categorySelected by remember {
-        mutableStateOf(FilterCategory.UNSELECTED)
-    }
+    val appViewmodel = LocalDependencyContainer.current.appViewModel
+    val coroutine = rememberCoroutineScope()
+    val sheetState = appViewmodel.bottomSheetIsShowing
+    val filterSelected by appViewmodel.filterDealerSelected.collectAsState()
 
     var isSelectingOption by remember {
         mutableStateOf(false)
     }
 
-    Log.d("COMPOSE", "FilterSheet: ")
-
     LaunchedEffect(Unit) {
+        appViewmodel.getFilter()
         isSelectingOption = false
-        Log.d("COMPOSE", "FilterSheet: launcheffect")
     }
-
-    val appViewmodel = LocalDependencyContainer.current.appViewModel
 
     if (!appViewmodel.bottomSheetIsShowing.isVisible) isSelectingOption = false
 
     if (isSelectingOption) {
         FilterOptions(
             onItemClick = {
-                categorySelected.optionSelected = it
                 isSelectingOption = false
-                appViewmodel.addSearch(
-                    Search(
-                        0, categorySelected.name.lowercase(), it, System.currentTimeMillis()
-                    )
-                )
+                appViewmodel.onFilterOptionSelected(it)
             },
             onSelectingOptionCancel = { isSelectingOption = false },
-            categorySelected = categorySelected
+            categorySelected = filterSelected.category
         )
     } else {
-        FilterCategorySelection(categorySelected = categorySelected,
+        FilterCategorySelection(filterSelected = filterSelected,
                                 onSelectButtonClick = { isSelectingOption = true },
                                 onCategorySelected = {
-                                    categorySelected = it
-                                })
+                                    appViewmodel.onFilterCategorySelected(it)
+                                },
+                                onApplyFilter = {
+                                    appViewmodel.applyFilterToDealers()
+                                    coroutine.launch { sheetState.hide() }
+                                },
+                                onHistoricFilterSelection = { appViewmodel.onFilterOptionSelected(it) })
     }
 }
 
-enum class FilterCategory(
-    @StringRes val title: Int, @DrawableRes val icon: Int, var optionSelected: String?
+enum class RadioButtonsFilter(
+    @StringRes val title: Int, @DrawableRes val icon: Int, val filterType: FilterType
 ) {
     GARAGE(
-        R.string.filter_step1_option1, R.drawable.repair, null
+        R.string.filter_step1_option1, R.drawable.repair, FilterType.SERVICE
     ),
     DEALERS(
-        R.string.filter_step1_option2, R.drawable.dealers, null
+        R.string.filter_step1_option2, R.drawable.dealers, FilterType.BRAND
     ),
-    ACCESSORIES(
-        R.string.filter_step1_option3, R.drawable.accessories, null
-    ),
-    UNSELECTED(R.string.filters_title, R.drawable.facebook, null)
+    UNSELECTED(R.string.filters_title, R.drawable.facebook, FilterType.UNSELECTED_DEALER)
+}
+
+fun RadioButtonsFilter.toDomainEnum() = when (this) {
+    RadioButtonsFilter.GARAGE -> FilterType.SERVICE
+    RadioButtonsFilter.DEALERS -> FilterType.BRAND
+    RadioButtonsFilter.UNSELECTED -> RadioButtonsFilter.UNSELECTED
 }

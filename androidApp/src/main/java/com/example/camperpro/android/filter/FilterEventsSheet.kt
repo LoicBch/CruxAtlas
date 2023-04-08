@@ -19,6 +19,7 @@ import androidx.compose.material.icons.sharp.Close
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -32,8 +33,10 @@ import com.example.camperpro.android.LocalDependencyContainer
 import com.example.camperpro.android.R
 import com.example.camperpro.android.composables.AppButton
 import com.example.camperpro.android.composables.SearchField
+import com.example.camperpro.android.composables.collectAsStateWithLifecycleImmutable
 import com.example.camperpro.android.ui.theme.AppColor
 import com.example.camperpro.android.ui.theme.Dimensions
+import com.example.camperpro.domain.model.composition.filterName
 import com.example.camperpro.utils.Globals
 import kotlinx.coroutines.launch
 
@@ -41,10 +44,12 @@ import kotlinx.coroutines.launch
 @Composable
 fun FilterEventsSheet() {
 
+    val appViewmodel = LocalDependencyContainer.current.appViewModel
     var countriesSelected by remember { mutableStateOf("") }
     var isSelectingCountry by remember { mutableStateOf(false) }
+    val coroutine = rememberCoroutineScope()
+    val sheetState = appViewmodel.bottomSheetIsShowing
 
-    val appViewmodel = LocalDependencyContainer.current.appViewModel
 
     if (!appViewmodel.bottomSheetIsShowing.isVisible) isSelectingCountry = false
 
@@ -54,9 +59,15 @@ fun FilterEventsSheet() {
             isSelectingCountry = false
         }, onSelectingCountryCancel = { isSelectingCountry = false })
     } else {
-        BaseLayout(countrySelected = countriesSelected,
-                   onButtonClick = { isSelectingCountry = true },
-                   onLastSearchSelect = { countriesSelected = it })
+        BaseLayout(
+            countrySelected = countriesSelected,
+            onButtonClick = { isSelectingCountry = true },
+            onLastSearchSelect = { countriesSelected = it },
+            onApplyFilter = {
+                appViewmodel.applyFilterToEvents(countriesSelected)
+                coroutine.launch { sheetState.hide() }
+            }
+        )
     }
 }
 
@@ -71,7 +82,10 @@ fun SelectCountryLayout(
     }
 
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-        Row(modifier = Modifier.padding(top = 12.dp)) {
+        Row(
+            modifier = Modifier.padding(top = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
 
             IconButton(onClick = { onSelectingCountryCancel(false) }) {
                 Icon(
@@ -89,6 +103,13 @@ fun SelectCountryLayout(
                 color = Color.Black
             )
             Spacer(modifier = Modifier.weight(0.5f))
+            IconButton(modifier = Modifier.alpha(0f), onClick = { }) {
+                Icon(
+                    imageVector = Icons.Filled.Close,
+                    contentDescription = "",
+                    tint = AppColor.Tertiary
+                )
+            }
         }
 
         SearchField(modifier = Modifier.padding(top = 22.dp),
@@ -116,6 +137,7 @@ fun SelectCountryLayout(
                     countriesSelected.add(it)
                 }
             }, stringResource(id = R.string.choose_country), items)
+
         } else {
             CountriesResultsList(countriesSelected, {
                 if (countriesSelected.contains(it)) {
@@ -125,8 +147,6 @@ fun SelectCountryLayout(
                 }
             }, stringResource(id = R.string.search_result), items)
         }
-
-        Spacer(modifier = Modifier.weight(1f))
 
         AppButton(
             isActive = countriesSelected.isNotEmpty(),
@@ -142,7 +162,7 @@ fun SelectCountryLayout(
 }
 
 @Composable
-fun CountriesResultsList(
+fun ColumnScope.CountriesResultsList(
     countriesSelected: List<String>,
     onItemClick: (String) -> Unit,
     subTitleLabel: String,
@@ -165,6 +185,7 @@ fun CountriesResultsList(
 
     LazyColumn(
         modifier = Modifier
+            .weight(1f)
             .padding(top = 22.dp)
             .scrollable(
                 state = scrollState, orientation = Orientation.Vertical
@@ -202,10 +223,15 @@ fun CountryOptionItem(onButtonClick: (String) -> Unit, option: String, selected:
             fontWeight = FontWeight(450)
         )
 
-        Checkbox(checked = checkedState, enabled = true, onCheckedChange = {
-            onButtonClick(option)
-            checkedState = !checkedState
-        })
+        Spacer(modifier = Modifier.weight(1f))
+
+        Checkbox(checked = checkedState,
+                 enabled = true,
+                 colors = CheckboxDefaults.colors(checkedColor = AppColor.Primary),
+                 onCheckedChange = {
+                     onButtonClick(option)
+                     checkedState = !checkedState
+                 })
     }
 }
 
@@ -213,7 +239,9 @@ fun CountryOptionItem(onButtonClick: (String) -> Unit, option: String, selected:
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun BaseLayout(
-    countrySelected: String, onButtonClick: () -> Unit, onLastSearchSelect: (String) -> Unit
+    countrySelected: String, onButtonClick: () -> Unit,
+    onLastSearchSelect: (String) -> Unit,
+    onApplyFilter: (String) -> Unit
 ) {
 
     val sheetState = LocalDependencyContainer.current.appViewModel.bottomSheetIsShowing
@@ -243,6 +271,13 @@ fun BaseLayout(
                 )
             )
             Spacer(modifier = Modifier.weight(0.5f))
+            IconButton(modifier = Modifier.alpha(0f), onClick = { }) {
+                Icon(
+                    imageVector = Icons.Sharp.Close,
+                    contentDescription = "",
+                    tint = AppColor.Tertiary
+                )
+            }
 
         }
 
@@ -272,7 +307,8 @@ fun BaseLayout(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        AppButton(isActive = countrySelected.isNotEmpty(), onClick = { // TODO: filter elements
+        AppButton(isActive = true, onClick = {
+            onApplyFilter(countrySelected)
         }, modifier = Modifier.padding(bottom = 16.dp), textRes = R.string.apply_filters)
     }
 }
@@ -378,10 +414,8 @@ fun MaterialTextField(
 fun HistoricSearchList(onSelectFilter: (String) -> Unit) {
 
     val appViewmodel = LocalDependencyContainer.current.appViewModel
-    val searches by appViewmodel.historicSearches.collectAsState()
+    val searches by appViewmodel.filtersEventUsed.collectAsStateWithLifecycleImmutable()
     val scrollState = rememberScrollState()
-
-    appViewmodel.getSearchesOfCategory("events")
 
     Text(
         modifier = Modifier.padding(top = 20.dp),
@@ -398,13 +432,12 @@ fun HistoricSearchList(onSelectFilter: (String) -> Unit) {
                 state = scrollState, orientation = Orientation.Vertical
             )
     ) {
-        items(searches) { search ->
+        items(searches.value) { filter ->
             LastSearchItem(onSearchDelete = {
-                searches.remove(search)
-                appViewmodel.deleteSearch(search)
+                appViewmodel.removeFilter(filter)
             }, onSelectSearch = {
                 onSelectFilter(it)
-            }, search = search.searchLabel)
+            }, search = filter.filterName)
         }
     }
 }

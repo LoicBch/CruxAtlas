@@ -9,18 +9,18 @@ import com.example.camperpro.utils.CommonParcelize
 
 @CommonParcelize
 class Partner(
-    var id: String,
-    var name: String,
-    var description: String,
-    var brands: List<String>,
-    var services: List<String>,
-    var phone: String,
-    var email: String,
-    var website: String,
-    var facebook: String,
-    var youtube: String,
-    var instagram: String,
-    var twitter: String,
-    var isPremium: Boolean,
-    var photos: List<Photo> = listOf()
+    val id: String,
+    val name: String,
+    val description: String,
+    val brands: List<String>,
+    val services: List<String>,
+    val phone: String,
+    val email: String,
+    val website: String,
+    val facebook: String,
+    val youtube: String,
+    val instagram: String,
+    val twitter: String,
+    val isPremium: Boolean,
+    val photos: List<Photo> = listOf()
 ) : CommonParcelable

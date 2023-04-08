@@ -1,6 +1,6 @@
 package com.example.camperpro.managers.network
 
-import com.example.camperpro.managers.network.native.NativeAtomicReference
+import com.example.camperpro.managers.network.native.NetworkNativeAtomicReference
 import kotlin.native.concurrent.ThreadLocal
 
 class NetworkManager {
@@ -44,13 +44,13 @@ class NetworkManager {
         private lateinit var networkSource: NetworkSource
 
         private val onNetworkStateChangesBlocks =
-            NativeAtomicReference(listOf<OnNetworkStateChangesBlock>())
+            NetworkNativeAtomicReference(listOf<OnNetworkStateChangesBlock>())
         private val onNetworkSourcesChangesBlocks =
-            NativeAtomicReference(listOf<OnNetworkSourceChangesBlock>())
+            NetworkNativeAtomicReference(listOf<OnNetworkSourceChangesBlock>())
         private val onNetworkAvailableBlocks =
-            NativeAtomicReference(listOf<OnNetworkStateChangesBlock>())
+            NetworkNativeAtomicReference(listOf<OnNetworkStateChangesBlock>())
         private val onNetworkUnavailableBlocks =
-            NativeAtomicReference(listOf<OnNetworkStateChangesBlock>())
+            NetworkNativeAtomicReference(listOf<OnNetworkStateChangesBlock>())
 
     }
 }

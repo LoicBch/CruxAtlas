@@ -11,10 +11,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.camperpro.android.R
 import com.example.camperpro.android.composables.SearchField
+import com.example.camperpro.android.composables.collectAsStateWithLifecycleImmutable
 import com.example.camperpro.android.filter.LastSearchItem
 import com.example.camperpro.android.ui.theme.AppColor
 import com.example.camperpro.domain.model.Place
@@ -41,8 +39,20 @@ fun AroundLocationScreen(
     resultNavigator: ResultBackNavigator<Place>,
     viewModel: AroundLocationViewModel = getViewModel()
 ) {
-    val suggestionsList by viewModel.suggestionList.collectAsState()
+    val suggestionsList by viewModel.suggestionList.collectAsStateWithLifecycleImmutable()
     val placesHistoric = viewModel.placesHistoric
+
+    val onUserSearch: (value: String) -> Unit = remember {
+        return@remember viewModel::onUserSearch
+    }
+
+    val onSelectPlace: (value: Search) -> Unit = remember {
+        return@remember viewModel::onSelectPlace
+    }
+
+    val onDeleteSearch: (value: Search) -> Unit = remember {
+        return@remember viewModel::onDeleteSearch
+    }
 
     LaunchedEffect(true) {
         viewModel.loadPlacesHistoric()
@@ -94,11 +104,11 @@ fun AroundLocationScreen(
         SearchField(
             Modifier.padding(top = 12.dp), placeHolder = R.string
                 .around_location_placeholder, onUserSearch = {
-                viewModel.onUserSearch(it.text)
+                onUserSearch(it.text)
             }
         )
 
-        if (suggestionsList.isEmpty()) {
+        if (suggestionsList.value.isEmpty()) {
 
             Text(
                 modifier = Modifier.padding(top = 54.dp),
@@ -110,20 +120,19 @@ fun AroundLocationScreen(
 
             LastSearchedLocationList(
                 placesHistoric,
-                { viewModel.onDeleteSearch(it) },
-                { viewModel.onSelectPlace(it) })
+                { onDeleteSearch(it) },
+                { onSelectPlace(it) })
 
         } else {
-            SuggestionsList(list = suggestionsList) {
+            SuggestionsList(list = suggestionsList.value) {
                 val search = Search(
-                    0,
                     Constants.Persistence.SEARCH_CATEGORY_LOCATION,
                     it.name,
                     System.currentTimeMillis(),
                     it.location.latitude,
                     it.location.longitude
                 )
-                viewModel.onSelectPlace(search)
+                onSelectPlace(search)
             }
         }
     }

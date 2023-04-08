@@ -47,6 +47,7 @@ val repositoriesDependencies = module {
     singleOf(::Dealers) { bind<DealerRepository>() }
     singleOf(::CheckLists) { bind<CheckListRepository>() }
     singleOf(::Searches) { bind<SearchesRepository>() }
+    singleOf(::Filters) { bind<FilterRepository>() }
     singleOf(::Events) { bind<EventRepository>() }
     singleOf(::Partners) { bind<PartnerRepository>() }
 }
@@ -61,10 +62,15 @@ val useCasesDependencies = module {
     factoryOf(::SetupApp)
     factoryOf(::AddSearch)
     factoryOf(::DeleteSearch)
+    factoryOf(::DeleteFilter)
+    factoryOf(::ApplyPlacesFilters)
+    factoryOf(::FetchFilters)
+    factoryOf(::GetFiltersSaved)
     factoryOf(::SortDealer)
     factoryOf(::SortEvents)
     factoryOf(::FetchPartners)
     factoryOf(::FetchEvents)
+    factoryOf(::GetLocationInfos)
     factory { (context: Any?) -> LanguageManager(context) }
 }
 

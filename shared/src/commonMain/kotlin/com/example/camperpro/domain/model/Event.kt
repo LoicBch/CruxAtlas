@@ -5,21 +5,21 @@ import com.example.camperpro.utils.CommonParcelize
 
 @CommonParcelize
 class Event(
-    var id: String,
-    var name: String,
-    var descriptionFr: String,
-    var descriptionEn: String,
-    var descriptionEs: String,
-    var descriptionDe: String,
-    var descriptionNl: String,
-    var dateBegin: String,
-    var dateEnd: String,
-    var latitude: Double,
-    var longitude: Double,
-    var address: String,
-    var postalCode: String,
-    var city: String,
-    var country: String,
-    var countryIso: String,
-    var website: String
+    val id: String,
+    val name: String,
+    val descriptionFr: String,
+    val descriptionEn: String,
+    val descriptionEs: String,
+    val descriptionDe: String,
+    val descriptionNl: String,
+    val dateBegin: String,
+    val dateEnd: String,
+    val latitude: Double,
+    val longitude: Double,
+    val address: String,
+    val postalCode: String,
+    val city: String,
+    val country: String,
+    val countryIso: String,
+    val website: String
 ) : CommonParcelable

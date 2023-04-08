@@ -7,6 +7,10 @@ import com.example.camperpro.domain.model.composition.Location
 import com.example.camperpro.domain.repositories.DealerRepository
 
 class Dealers(private var camperProApi: Api) : DealerRepository {
-    override suspend fun atLocation(location: Location): ResultWrapper<List<Dealer>> =
-        camperProApi.getSpotAtLocation(location)
+    override suspend fun atLocation(
+        location: Location,
+        brandFilters: List<Int>?,
+        serviceFilters: List<Int>?
+    ): ResultWrapper<List<Dealer>> =
+        camperProApi.getSpotAtLocation(location, brandFilters, serviceFilters)
 }

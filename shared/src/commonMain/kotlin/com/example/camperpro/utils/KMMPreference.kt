@@ -23,6 +23,8 @@ class KMMPreference(private val context: KMMContext) {
     fun getBool(key: String, default: Boolean): Boolean =
         context.getBool(key, default)
 
-    fun contains(key: String) : Boolean = context.contains(key)
+    fun contains(key: String): Boolean = context.contains(key)
+
+    fun remove(key: String) = context.remove(key)
 
 }

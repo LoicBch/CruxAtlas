@@ -19,7 +19,9 @@ import androidx.compose.material.icons.sharp.Close
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -34,29 +36,33 @@ import com.example.camperpro.android.composables.AppButton
 import com.example.camperpro.android.composables.HistoricSearchList
 import com.example.camperpro.android.ui.theme.AppColor
 import com.example.camperpro.android.ui.theme.Dimensions
+import com.example.camperpro.domain.model.composition.Filter
+import com.example.camperpro.domain.model.composition.filterName
+import com.example.camperpro.utils.FilterType
 import kotlinx.coroutines.launch
 
 @Composable
 fun FilterCategorySelection(
-    categorySelected: FilterCategory,
-    onSelectButtonClick: (FilterCategory) -> Unit,
-    onCategorySelected: (FilterCategory) -> Unit
+    filterSelected: Filter,
+    onSelectButtonClick: (FilterType) -> Unit,
+    onCategorySelected: (FilterType) -> Unit,
+    onApplyFilter: () -> Unit,
+    onHistoricFilterSelection: (String) -> Unit
 ) {
     Column(modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp)) {
 
-        FilterStepOne(
-            categorySelected,
-            onFilterCategorySelected = { onCategorySelected(it) })
-
-        if (categorySelected != FilterCategory.UNSELECTED) {
-            FilterStepTwo(onSelectButtonClick, categorySelected)
+        FilterStepOne(selectedRadioButton = filterSelected.category,
+                      onRadioButtonSelected = { onCategorySelected(it) })
+        if (filterSelected.category != FilterType.UNSELECTED_DEALER) {
+            FilterStepTwo(onSelectButtonClick, filterSelected, onHistoricFilterSelection)
         }
-
         Spacer(modifier = Modifier.weight(1f))
 
         AppButton(
-            isActive = categorySelected.optionSelected != null,
-            onClick = { /*TODO*/ },
+            isActive = true,
+            onClick = {
+                onApplyFilter()
+            },
             modifier = Modifier,
             textRes = R.string.apply_filters
         )
@@ -66,8 +72,9 @@ fun FilterCategorySelection(
 
 @Composable
 fun FilterStepTwo(
-    onSelectButtonClick: (FilterCategory) -> Unit,
-    categorySelected: FilterCategory
+    onSelectButtonClick: (FilterType) -> Unit,
+    filterSelected: Filter,
+    onHistoricFilterSelection: (String) -> Unit
 ) {
 
     val scrollState = rememberScrollState()
@@ -75,16 +82,11 @@ fun FilterStepTwo(
         mutableStateOf("")
     }
 
-    buttonLabel = if (categorySelected.optionSelected != null) {
-        categorySelected.optionSelected!!
-    } else {
-        when (categorySelected) {
-            FilterCategory.GARAGE -> stringResource(id = R.string.choose_services_type)
-            FilterCategory.DEALERS -> stringResource(id = R.string.choose_motorhome_brand)
-            FilterCategory.ACCESSORIES -> stringResource(id = R.string.choose_accessories_brand)
-            else -> {
-                ""
-            }
+    buttonLabel = when (filterSelected.category) {
+        FilterType.SERVICE -> stringResource(id = R.string.choose_services_type)
+        FilterType.BRAND -> stringResource(id = R.string.choose_motorhome_brand)
+        else -> {
+            ""
         }
     }
 
@@ -112,39 +114,35 @@ fun FilterStepTwo(
 
         Divider(modifier = Modifier.padding(vertical = 12.dp))
 
-        if (categorySelected.optionSelected != null) {
-            MaterialTextField(
-                onSelectButtonClick = onSelectButtonClick,
-                categorySelected = categorySelected
-            )
-        } else {
+        if (filterSelected.filterId == "") {
             FilterOptionsButton(
                 onSelectButtonClick = onSelectButtonClick,
-                categorySelected = categorySelected,
+                categorySelected = filterSelected.category,
                 buttonLabel = buttonLabel
             )
+        } else {
+            MaterialTextField(
+                onSelectButtonClick = onSelectButtonClick, filterSelected = filterSelected
+            )
+
         }
 
-        HistoricSearchList(categorySelected, onSelectFilter = {
-            categorySelected.optionSelected = it
-            buttonLabel = it
+        HistoricSearchList(filterSelected.category, onSelectFilter = {
+            onHistoricFilterSelection(it)
         })
     }
 }
 
 @Composable
 fun FilterOptionsButton(
-    onSelectButtonClick: (FilterCategory) -> Unit,
-    categorySelected: FilterCategory,
-    buttonLabel: String
+    onSelectButtonClick: (FilterType) -> Unit, categorySelected: FilterType, buttonLabel: String
 ) {
 
-    Button(
-        modifier = Modifier.height(Dimensions.buttonHeight),
-        colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
-        shape = RoundedCornerShape(Dimensions.radiusTextField),
-        border = BorderStroke(2.dp, AppColor.Tertiary),
-        onClick = { onSelectButtonClick(categorySelected) }) {
+    Button(modifier = Modifier.height(Dimensions.buttonHeight),
+           colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+           shape = RoundedCornerShape(4.dp),
+           border = BorderStroke(1.dp, AppColor.Tertiary),
+           onClick = { onSelectButtonClick(categorySelected) }) {
         Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
             Text(
                 modifier = Modifier.padding(start = 12.dp),
@@ -166,70 +164,74 @@ fun FilterOptionsButton(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MaterialTextField(
-    onSelectButtonClick: (FilterCategory) -> Unit,
-    categorySelected: FilterCategory
+    onSelectButtonClick: (FilterType) -> Unit, filterSelected: Filter
 ) {
 
-    BasicTextField(
-        value = categorySelected.optionSelected!!,
-        modifier = Modifier
-            .height(Dimensions.buttonHeight)
-            .fillMaxWidth()
-            .clickable { onSelectButtonClick(categorySelected) },
-        onValueChange = { },
-        enabled = false,
-        readOnly = true,
-        textStyle = TextStyle(
-            color = AppColor.Primary,
-            fontWeight = FontWeight.W500,
-            fontSize = 16.sp
-        ),
-        singleLine = true,
-        decorationBox = @Composable { innerTextField ->
-            TextFieldDefaults.OutlinedTextFieldDecorationBox(
-                value = categorySelected.optionSelected!!,
-                visualTransformation = VisualTransformation.None,
-                innerTextField = innerTextField,
-                placeholder = null,
-                interactionSource = remember { MutableInteractionSource() },
-                label = {
-                    Text(
-                        text = categorySelected.name.lowercase(),
-                        fontWeight = FontWeight.W500,
-                        fontSize = 11.sp,
-                        color = AppColor.Primary
-                    )
-                },
-                trailingIcon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.unfold),
-                        contentDescription = "", tint = AppColor.Primary
-                    )
-                },
-                singleLine = true,
-                enabled = false,
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    textColor = AppColor.Primary,
-                    focusedBorderColor = AppColor.Primary,
-                    unfocusedBorderColor = AppColor.Primary
-                ),
-                border = {
-                    TextFieldDefaults.BorderBox(
-                        false,
-                        isError = false,
-                        interactionSource = remember { MutableInteractionSource() },
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            textColor = AppColor.Primary,
-                            focusedBorderColor = AppColor.Primary,
-                            unfocusedBorderColor = AppColor.Primary
-                        ),
-                        focusedBorderThickness = 2.dp,
-                        unfocusedBorderThickness = 2.dp
-                    )
-                }
-            )
-        }
-    )
+    BasicTextField(value = filterSelected.filterName,
+                   modifier = Modifier
+                       .height(Dimensions.buttonHeight)
+                       .fillMaxWidth()
+                       .clickable { onSelectButtonClick(filterSelected.category) },
+                   onValueChange = { },
+                   enabled = false,
+                   readOnly = true,
+                   textStyle = TextStyle(
+                       color = AppColor.Primary, fontWeight = FontWeight.W500, fontSize = 16.sp
+                   ),
+                   singleLine = true,
+                   decorationBox = @Composable { innerTextField ->
+                       TextFieldDefaults.OutlinedTextFieldDecorationBox(value = filterSelected.category.name,
+                                                                        visualTransformation = VisualTransformation.None,
+                                                                        innerTextField = innerTextField,
+                                                                        placeholder = null,
+                                                                        interactionSource = remember { MutableInteractionSource() },
+                                                                        label = {
+                                                                            Text(
+                                                                                text = stringResource(
+                                                                                    id = when (filterSelected.category) {
+                                                                                        FilterType.BRAND -> R.string.motorhome_brands
+                                                                                        FilterType.SERVICE -> R.string.motorhome_services
+                                                                                        FilterType.COUNTRIES -> R.string.filter_step1_option1
+                                                                                        FilterType.UNSELECTED_DEALER -> R.string.filter_step1_option1
+                                                                                        FilterType.UNSELECTED_EVENT -> TODO()
+                                                                                    }
+                                                                                ),
+                                                                                fontWeight = FontWeight.W500,
+                                                                                fontSize = 11.sp,
+                                                                                color = AppColor.Primary
+                                                                            )
+                                                                        },
+                                                                        trailingIcon = {
+                                                                            Icon(
+                                                                                painter = painterResource(
+                                                                                    id = R.drawable.unfold
+                                                                                ),
+                                                                                contentDescription = "",
+                                                                                tint = AppColor.Primary
+                                                                            )
+                                                                        },
+                                                                        singleLine = true,
+                                                                        enabled = false,
+                                                                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                                                                            textColor = AppColor.Primary,
+                                                                            focusedBorderColor = AppColor.Primary,
+                                                                            unfocusedBorderColor = AppColor.Primary
+                                                                        ),
+                                                                        border = {
+                                                                            TextFieldDefaults.BorderBox(
+                                                                                false,
+                                                                                isError = false,
+                                                                                interactionSource = remember { MutableInteractionSource() },
+                                                                                colors = TextFieldDefaults.outlinedTextFieldColors(
+                                                                                    textColor = AppColor.Primary,
+                                                                                    focusedBorderColor = AppColor.Primary,
+                                                                                    unfocusedBorderColor = AppColor.Primary
+                                                                                ),
+                                                                                focusedBorderThickness = 2.dp,
+                                                                                unfocusedBorderThickness = 2.dp
+                                                                            )
+                                                                        })
+                   })
 }
 
 
@@ -243,7 +245,8 @@ fun LastSearchItem(search: String, onSearchDelete: () -> Unit, onSelectSearch: (
     ) {
         Icon(
             painter = painterResource(id = R.drawable.historic),
-            contentDescription = "", tint = AppColor.Primary
+            contentDescription = "",
+            tint = AppColor.Primary
         )
 
         Text(
@@ -271,13 +274,12 @@ fun LastSearchItem(search: String, onSearchDelete: () -> Unit, onSelectSearch: (
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun FilterStepOne(
-    selectedItem: FilterCategory,
-    onFilterCategorySelected: (FilterCategory) -> Unit
+    selectedRadioButton: FilterType, onRadioButtonSelected: (FilterType) -> Unit
 ) {
 
     Row(
         modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.CenterVertically
     ) {
 
         val sheetState = LocalDependencyContainer.current.appViewModel.bottomSheetIsShowing
@@ -289,22 +291,27 @@ fun FilterStepOne(
         Spacer(modifier = Modifier.weight(0.5f))
 
         Text(
-            fontSize = 16.sp,
-            fontWeight = FontWeight.W500,
-            text = stringResource(
+            fontSize = 16.sp, fontWeight = FontWeight.W500, text = stringResource(
                 id = R.string.filters_title
             )
         )
         Spacer(modifier = Modifier.weight(0.5f))
 
-        if (selectedItem != FilterCategory.UNSELECTED) {
-            IconButton(onClick = { onFilterCategorySelected(FilterCategory.UNSELECTED) }) {
-                Icon(
-                    imageVector = Icons.Filled.Refresh,
-                    contentDescription = "",
-                    tint = AppColor.Secondary
-                )
+        IconButton(modifier = Modifier.alpha(
+            if (selectedRadioButton != FilterType.UNSELECTED_DEALER) {
+                100f
+            } else {
+                0f
             }
+        ), onClick = { onRadioButtonSelected(FilterType.UNSELECTED_DEALER) }) {
+            Icon(
+                modifier = Modifier.graphicsLayer {
+                    rotationY = 180f
+                },
+                imageVector = Icons.Filled.Refresh,
+                contentDescription = "",
+                tint = AppColor.Secondary
+            )
         }
     }
 
@@ -337,21 +344,20 @@ fun FilterStepOne(
             .padding(top = 20.dp)
     ) {
 
-        FilterCategory.values().dropLast(2).forEach { option ->
+        RadioButtonsFilter.values().dropLast(1).forEach { option ->
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 20.dp)
                     .selectable(
-                        selected = (selectedItem == option),
-                        onClick = { onFilterCategorySelected(option) },
+                        selected = (selectedRadioButton == option.filterType),
+                        onClick = { onRadioButtonSelected(option.filterType) },
                         role = Role.RadioButton
-                    ),
-                verticalAlignment = Alignment.CenterVertically
+                    ), verticalAlignment = Alignment.CenterVertically
             ) {
                 RadioGroupItem(
-                    selectedItem = selectedItem,
-                    filterCategory = option
+                    selectedItem = selectedRadioButton, radioButton = option
                 )
             }
         }
@@ -360,27 +366,26 @@ fun FilterStepOne(
 
 @Composable
 fun RowScope.RadioGroupItem(
-    selectedItem: FilterCategory,
-    filterCategory: FilterCategory
+    selectedItem: FilterType, radioButton: RadioButtonsFilter
 ) {
 
     Icon(
-        painter = painterResource(id = filterCategory.icon),
+        painter = painterResource(id = radioButton.icon),
         contentDescription = "",
-        tint = if (selectedItem == filterCategory) AppColor.Primary else AppColor.Tertiary
+        tint = if (selectedItem == radioButton.filterType) AppColor.Primary else AppColor.Tertiary
     )
     Text(
         modifier = Modifier.padding(start = 10.dp),
-        text = stringResource(filterCategory.title),
+        text = stringResource(radioButton.title),
         fontSize = 14.sp,
         fontWeight = FontWeight.W500,
-        color = if (selectedItem == filterCategory) AppColor.Primary else AppColor.Tertiary
+        color = if (selectedItem == radioButton.filterType) AppColor.Primary else AppColor.Tertiary
     )
     Spacer(modifier = Modifier.weight(0.5f))
     RadioButton(
         modifier = Modifier.padding(end = 16.dp),
-        selected = (selectedItem == filterCategory),
+        selected = (selectedItem == radioButton.filterType),
         onClick = null,
-        colors = RadioButtonDefaults.colors(selectedColor = if (selectedItem == filterCategory) AppColor.Primary else AppColor.Tertiary)
+        colors = RadioButtonDefaults.colors(selectedColor = if (selectedItem == radioButton.filterType) AppColor.Primary else AppColor.Tertiary)
     )
 }

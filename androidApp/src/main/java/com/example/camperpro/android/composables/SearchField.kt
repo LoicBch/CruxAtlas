@@ -1,6 +1,5 @@
 package com.example.camperpro.android.composables
 
-import androidx.annotation.Nullable
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
@@ -22,14 +21,79 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.camperpro.android.ui.theme.AppColor
 import com.example.camperpro.android.ui.theme.Dimensions
 
 
 @Composable
-fun SearchField(modifier: Modifier, @StringRes placeHolder: Int, onUserSearch: ((TextFieldValue) -> Unit) = {} ) {
+fun SearchField(
+    modifier: Modifier,
+    @StringRes placeHolder: Int,
+    onUserSearch: ((TextFieldValue) -> Unit) = {}
+) {
+
+    val textState = remember { mutableStateOf(TextFieldValue()) }
+    val boxIsFocused = remember {
+        mutableStateOf(false)
+    }
+
+    TextField(modifier = modifier
+        .border(
+            if (boxIsFocused.value) BorderStroke(1.dp, AppColor.BlueCamperPro)
+            else BorderStroke(0.dp, Color.Transparent), shape = RoundedCornerShape(
+                4.dp
+            )
+        )
+        .onFocusChanged {
+            boxIsFocused.value = it.isFocused
+        }
+        .fillMaxWidth(),
+              maxLines = 1,
+              leadingIcon = {
+                  Icon(
+                      imageVector = if (boxIsFocused.value) Icons.Filled.ArrowBack else Icons.Filled.Search,
+                      contentDescription = "",
+                      tint = if (boxIsFocused.value) AppColor.BlueCamperPro else Color.Unspecified
+                  )
+              },
+              trailingIcon = {
+                  if (textState.value.text.isNotEmpty()) {
+                      Icon(
+                          modifier = Modifier.clickable { textState.value = TextFieldValue("") },
+                          imageVector = Icons.Outlined.Close,
+                          contentDescription = "",
+                          tint = AppColor.Secondary
+                      )
+                  }
+              },
+              placeholder = { Text(text = stringResource(placeHolder)) },
+              value = textState.value,
+              onValueChange = { textFieldValue ->
+                  textState.value = textFieldValue
+                  onUserSearch(textFieldValue)
+              },
+              colors = TextFieldDefaults.textFieldColors(
+                  backgroundColor = if (boxIsFocused.value) Color.White else AppColor.unFocusedTextField,
+                  focusedIndicatorColor = Color.Transparent,
+                  unfocusedIndicatorColor = Color.Transparent,
+                  disabledIndicatorColor = Color.Transparent,
+                  placeholderColor = Color.Black
+
+              )
+    )
+
+}
+
+@Composable
+fun FilterSearchField(
+    modifier: Modifier,
+    @StringRes placeHolder: Int,
+    onUserSearch: ((TextFieldValue) -> Unit) = {}
+) {
 
     val textState = remember { mutableStateOf(TextFieldValue()) }
     val boxIsFocused = remember {
@@ -65,14 +129,19 @@ fun SearchField(modifier: Modifier, @StringRes placeHolder: Int, onUserSearch: (
                       )
                   }
               },
-              placeholder = { Text(text = stringResource(placeHolder)) },
+              placeholder = {
+                  Text(
+                      text = stringResource(placeHolder),
+                      fontWeight = FontWeight.W500
+                  )
+              },
               value = textState.value,
               onValueChange = { textFieldValue ->
                   textState.value = textFieldValue
-                  onUserSearch?.let { it(textFieldValue) }
-                              },
+                  onUserSearch(textFieldValue)
+              },
               colors = TextFieldDefaults.textFieldColors(
-                  backgroundColor = if (boxIsFocused.value) Color.White else AppColor.unFocusedTextField,
+                  backgroundColor = if (boxIsFocused.value) Color.White else AppColor.ClearBlue,
                   focusedIndicatorColor = Color.Transparent,
                   unfocusedIndicatorColor = Color.Transparent,
                   disabledIndicatorColor = Color.Transparent,

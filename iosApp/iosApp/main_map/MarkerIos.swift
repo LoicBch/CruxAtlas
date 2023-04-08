@@ -11,11 +11,10 @@ import shared
 
 struct MarkerIos: Identifiable, Equatable {
     var id: UUID
-    var name: String
-    var description: String
+    var placeLinkedId: String
+    var selected: Bool
     let latitude: Double
     let longitude: Double
-    var spot : Spot
 
     var coordinate: CLLocationCoordinate2D {
         CLLocationCoordinate2D(latitude: latitude, longitude: longitude)

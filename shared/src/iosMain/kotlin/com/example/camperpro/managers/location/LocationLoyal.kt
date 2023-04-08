@@ -3,8 +3,9 @@ package com.example.camperpro.managers.location
 import com.example.camperpro.managers.location.extension.OnAlwaysAllowsPermissionRequiredBlock
 import com.example.camperpro.managers.location.extension.appending
 import com.example.camperpro.managers.location.extension.removed
-import com.example.camperpro.managers.network.native.NativeAtomicReference
+import com.example.camperpro.managers.location.native.LocationNativeAtomicReference
 import com.example.camperpro.managers.location.utils.Version
+import com.example.camperpro.managers.network.native.NetworkNativeAtomicReference
 import platform.CoreLocation.CLLocationManager
 import platform.CoreLocation.kCLLocationAccuracyBestForNavigation
 import platform.UIKit.UIDevice
@@ -66,8 +67,8 @@ internal actual class LocationLoyal {
         else -> requestPermission()
     }
 
-    val requiredPermission = NativeAtomicReference(LocationAuthorizationStatus.AuthorizedAlways)
-    val previousAuthorizationStatus = NativeAtomicReference(LocationAuthorizationStatus.NotSet)
+    val requiredPermission = LocationNativeAtomicReference(LocationAuthorizationStatus.AuthorizedAlways)
+    val previousAuthorizationStatus = LocationNativeAtomicReference(LocationAuthorizationStatus.NotSet)
 
     fun onAlwaysAllowsPermissionRequired(
         target: Any,
@@ -104,7 +105,7 @@ internal actual class LocationLoyal {
         CLLocationManagerDelegate()
     }
 
-    private val onAlwaysAllowsPermissionRequiredBlockMap = NativeAtomicReference(mapOf<Any, OnAlwaysAllowsPermissionRequiredBlock>())
+    private val onAlwaysAllowsPermissionRequiredBlockMap = NetworkNativeAtomicReference(mapOf<Any, OnAlwaysAllowsPermissionRequiredBlock>())
 
     private fun notifyOnAlwaysAllowsPermissionRequired() {
         onAlwaysAllowsPermissionRequiredBlockMap.value.forEach { it.value() }

@@ -11,33 +11,50 @@ import com.example.camperpro.android.composables.GlobalPopupState
 import com.example.camperpro.android.composables.GlobalSliderState
 import com.example.camperpro.data.ResultWrapper
 import com.example.camperpro.domain.model.Search
-import com.example.camperpro.domain.usecases.AddSearch
-import com.example.camperpro.domain.usecases.DeleteSearch
-import com.example.camperpro.domain.usecases.GetAllSearchForACategory
+import com.example.camperpro.domain.model.composition.Filter
+import com.example.camperpro.domain.model.composition.UpdateSource
+import com.example.camperpro.domain.model.composition.filterName
+import com.example.camperpro.domain.model.composition.getIdFromFilterName
+import com.example.camperpro.domain.usecases.*
 import com.example.camperpro.managers.location.LocationManager
-import com.example.camperpro.utils.BottomSheetOption
-import com.example.camperpro.utils.ConnectivityObserver
-import com.example.camperpro.utils.Globals
-import com.example.camperpro.utils.SortOption
+import com.example.camperpro.utils.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 // TODO: make a viewmodel specific to bottomSheetScreen and keep this viewModel for commons data
+// todo same for filters and search
 @OptIn(ExperimentalMaterialApi::class)
 class AppViewModel(
     private val addSearchUsecase: AddSearch,
     private val deleteSearchUsecase: DeleteSearch,
-    private val getAllSearchForACategory: GetAllSearchForACategory
+    private val getAllSearchForACategory: GetAllSearchForACategory,
+    private val applyPlacesFilters: ApplyPlacesFilters,
+    private val deleteFilter: DeleteFilter,
+    private val getFiltersSaved: GetFiltersSaved,
 ) : ViewModel() {
 
     val bottomSheetIsShowing = ModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden,
-        isSkipHalfExpanded = true
+        initialValue = ModalBottomSheetValue.Hidden, isSkipHalfExpanded = true
     )
     val historicSearches = MutableStateFlow<MutableList<Search>>(mutableListOf())
     private val loadAroundMeIsPressedChannel = Channel<Boolean>()
     val loadAroundMeIsPressed = loadAroundMeIsPressedChannel.receiveAsFlow()
+
+    private val filtersAppliedChannel = Channel<FilterType>()
+    val filtersApplied = filtersAppliedChannel.receiveAsFlow()
+
+    private val _filterDealerSelected = MutableStateFlow(Filter())
+    val filterDealerSelected = _filterDealerSelected.asStateFlow()
+
+    private val _filtersDealerUsed = MutableStateFlow(listOf<Filter>())
+    val filtersDealerUsed = _filtersDealerUsed.asStateFlow()
+
+    private val _filterEventSelected = MutableStateFlow(Filter())
+    val filterEventSelected = _filterEventSelected.asStateFlow()
+
+    private val _filtersEventUsed = MutableStateFlow(listOf<Filter>())
+    val filtersEventUsed = _filtersEventUsed.asStateFlow()
 
     private val _locationIsObserved = MutableStateFlow(false)
     val locationIsObserved = _locationIsObserved.asStateFlow()
@@ -50,6 +67,9 @@ class AppViewModel(
 
     private val _verticalListSortingOption = MutableStateFlow(SortOption.NONE)
     val verticalListSortingOption = _verticalListSortingOption.asStateFlow()
+
+    private val _filtersUpdated = MutableStateFlow(false)
+    val filtersUpdated = _filtersUpdated.asStateFlow()
 
     private val _globalPopup = MutableStateFlow(GlobalPopupState.HID)
     val globalPopup = _globalPopup.asStateFlow()
@@ -92,6 +112,112 @@ class AppViewModel(
 
     fun onSortingOptionSelected(sortOption: SortOption) {
         _verticalListSortingOption.update { sortOption }
+    }
+
+    fun removeFilter(filter: Filter) {
+
+        when (filter.category) {
+            FilterType.COUNTRIES -> {
+                _filtersEventUsed.update {
+                    _filtersEventUsed.value.toMutableList().apply { remove(filter) }
+                }
+            }
+            FilterType.UNSELECTED_DEALER -> {}
+            FilterType.UNSELECTED_EVENT -> {}
+            else -> {
+                _filtersDealerUsed.update {
+                    _filtersDealerUsed.value.toMutableList().apply { remove(filter) }
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            deleteFilter(filter)
+        }
+    }
+
+    fun applyFilterToDealers() {
+
+        if (filterDealerSelected.value.category != FilterType.UNSELECTED_DEALER) {
+            _filtersDealerUsed.update {
+                _filtersDealerUsed.value.toMutableList().apply { add(_filterDealerSelected.value) }
+            }
+        }
+
+        viewModelScope.launch {
+            applyPlacesFilters(
+                Filter(
+                    _filterDealerSelected.value.category, _filterDealerSelected.value.filterId, true
+                )
+            )
+            filtersAppliedChannel.send(_filterEventSelected.value.category)
+        }
+    }
+
+    fun applyFilterToEvents(countrySelected: String) {
+
+        _filterEventSelected.update {
+            Filter(
+                _filterEventSelected.value.category,
+                countrySelected,
+                true
+            )
+        }
+
+        if (filterEventSelected.value.filterId != "") {
+            _filtersEventUsed.update {
+                _filtersEventUsed.value.toMutableList().apply { add(_filterEventSelected.value) }
+            }
+        }
+
+        viewModelScope.launch {
+            applyPlacesFilters(
+                Filter(
+                    _filterEventSelected.value.category, _filterEventSelected.value.filterId, true
+                )
+            )
+            filtersAppliedChannel.send(FilterType.COUNTRIES)
+        }
+    }
+
+    fun getFilter() {
+        viewModelScope.launch {
+            when (val result = getFiltersSaved()) {
+                is ResultWrapper.Failure -> {
+
+                }
+                is ResultWrapper.Success -> {
+                    val dealerFilters =
+                        result.value!!.filter { it.category != FilterType.COUNTRIES }
+                    val eventFilters = result.value!!.filter { it.category == FilterType.COUNTRIES }
+
+                    if (dealerFilters.any { it.isSelected }) {
+                        _filterDealerSelected.update { result.value!!.first { it.isSelected } }
+                    }
+
+                    if (eventFilters.any { it.isSelected }) {
+                        _filterEventSelected.update { result.value!!.first { it.isSelected } }
+                    }
+
+                    _filtersDealerUsed.update { dealerFilters.filter { !it.isSelected } }
+                    _filtersEventUsed.update { eventFilters.filter { !it.isSelected } }
+                }
+            }
+        }
+    }
+
+    fun isFiltersActive(updateSource: UpdateSource): Boolean {
+        return when (updateSource) {
+            UpdateSource.AROUND_ME -> {
+                _filterDealerSelected.value.filterName != ""
+            }
+            UpdateSource.EVENTS -> {
+                _filterEventSelected.value.filterName != ""
+            }
+            else -> {
+                _filterDealerSelected.value.filterName != ""
+            }
+        }
     }
 
     fun addSearch(search: Search) {
@@ -142,7 +268,6 @@ class AppViewModel(
 
     fun withNetworkOnly(networkAvailableBlock: () -> Unit) {
         if (Globals.network.status == ConnectivityObserver.NetworkStatus.Available) {
-            Log.d("NETWORK", networkAvailableBlock.invoke().toString())
             networkAvailableBlock.invoke()
         } else {
             _globalPopup.update { GlobalPopupState.NETWORK_MISSING }
@@ -154,6 +279,21 @@ class AppViewModel(
             gpsAvailableBlock()
         } else {
             _globalPopup.update { GlobalPopupState.GPS_MISSING }
+        }
+    }
+
+    fun onFilterCategorySelected(category: FilterType) {
+        _filterDealerSelected.update {
+            Filter(category, "")
+        }
+    }
+
+    fun onFilterOptionSelected(filterName: String) {
+        _filterDealerSelected.update {
+            Filter(
+                _filterDealerSelected.value.category,
+                _filterDealerSelected.value.getIdFromFilterName(filterName)
+            )
         }
     }
 

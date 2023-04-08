@@ -26,8 +26,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 @Composable
 fun SplashScreen(navController: NavController, viewModel: SplashScreenViewModel) {
 
-    //    val setupIsComplete = viewModel.setupIsComplete.collectAsState()
-    val setupIsComplete = viewModel.gpsLocationIsAsked.collectAsState()
+    val setupIsComplete = viewModel.setupIsComplete.collectAsState()
     val context = LocalContext.current
 
     val locationPermission =

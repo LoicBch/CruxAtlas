@@ -10,7 +10,7 @@ class SearchDaoDelight(db: CamperproDatabase) : SearchDao {
     private val queries = db.searchEntityQueries
 
     override suspend fun insertSearch(search: SearchDto) {
-        queries.insertSearch(0, search.categoryKey, search.searchLabel, search.timeStamp)
+        queries.insertSearch(search.categoryKey, search.searchLabel, search.timeStamp)
     }
 
     override suspend fun getAllSearchsOfCategory(categoryKey: String): List<SearchDto> {

@@ -17,10 +17,12 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -29,6 +31,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.camperpro.android.R
+import com.example.camperpro.android.composables.collectAsStateWithLifecycleImmutable
+import com.example.camperpro.android.destinations.ChecklistDetailsDestination
 import com.example.camperpro.android.ui.theme.AppColor
 import com.example.camperpro.domain.model.CheckList
 import com.ramcosta.composedestinations.annotation.Destination
@@ -41,10 +45,17 @@ import org.koin.androidx.compose.getViewModel
 fun CheckListsScreen(
     navigator: DestinationsNavigator, viewModel: CheckListsViewModel = getViewModel()
 ) {
-    CheckListHeader(navigator = navigator)
-    Tags(viewModel.tagsFlow) { viewModel.selectTag(it) }
-    CheckLists(viewModel.checklists) {
-        //        navigator.navigate(ChecklistDetailsDestination(it))
+
+    LaunchedEffect(true) {
+        viewModel.getChecklists()
+    }
+
+    Column {
+        CheckListHeader(navigator = navigator)
+        Tags(viewModel.tagsFlow) { viewModel.selectTag(it) }
+        CheckLists(viewModel.checklistsShowed) {
+            navigator.navigate(ChecklistDetailsDestination(it))
+        }
     }
 }
 
@@ -53,7 +64,7 @@ fun CheckListHeader(navigator: DestinationsNavigator) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 16.dp, horizontal = 20.dp),
+            .padding(vertical = 5.dp, horizontal = 20.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = { navigator.popBackStack() }) {
@@ -62,7 +73,7 @@ fun CheckListHeader(navigator: DestinationsNavigator) {
         Spacer(modifier = Modifier.weight(0.5f))
 
         Text(
-            text = stringResource(id = R.string.menu_my_location),
+            text = stringResource(id = R.string.travel_checklists),
             fontSize = 16.sp,
             fontWeight = FontWeight.W500,
             color = Color.Black
@@ -70,6 +81,9 @@ fun CheckListHeader(navigator: DestinationsNavigator) {
 
         Spacer(modifier = Modifier.weight(0.5f))
 
+        IconButton(modifier = Modifier.alpha(0f), onClick = {}) {
+            Icon(imageVector = Icons.Sharp.ArrowBack, contentDescription = "")
+        }
     }
 }
 
@@ -80,9 +94,11 @@ fun Tags(tagsFlow: StateFlow<List<Pair<String, Boolean>>>, onSelectTag: (String)
     val scrollState = rememberScrollState()
 
     LazyRow(
-        modifier = Modifier.scrollable(
-            state = scrollState, orientation = Orientation.Vertical
-        )
+        modifier = Modifier
+            .padding(start = 15.dp)
+            .scrollable(
+                state = scrollState, orientation = Orientation.Vertical
+            )
     ) {
         items(tags) { tag ->
             TagItem(tag) { onSelectTag(it) }
@@ -93,18 +109,19 @@ fun Tags(tagsFlow: StateFlow<List<Pair<String, Boolean>>>, onSelectTag: (String)
 @Composable
 fun TagItem(tag: Pair<String, Boolean>, selectTag: (String) -> Unit) {
     Row(modifier = Modifier
-        .padding(5.dp)
+        .padding(start = 16.dp)
         .shadow(2.dp, RoundedCornerShape(8))
         .background(
             if (tag.second) {
                 AppColor.Primary
             } else {
-                AppColor.Tertiary
+                AppColor.greyTags
             }, RoundedCornerShape(8)
-        )
-        .clickable { selectTag(tag.first) }) {
+        ).padding(vertical = 8.dp, horizontal = 12.dp)
+        .clickable { selectTag(tag.first) }, verticalAlignment = Alignment.CenterVertically) {
+
         Text(
-            text = "#", fontSize = 18.sp, fontWeight = FontWeight.W700, color = if (tag.second) {
+            text = "#", fontSize = 22.sp, fontWeight = FontWeight.W700, color = if (tag.second) {
                 Color.White
             } else {
                 AppColor.Tertiary
@@ -112,7 +129,7 @@ fun TagItem(tag: Pair<String, Boolean>, selectTag: (String) -> Unit) {
         )
         Text(
             text = tag.first,
-            Modifier.padding(start = 15.dp),
+            Modifier.padding(start = 5.dp),
             fontSize = 14.sp,
             fontWeight = FontWeight.W500,
             color = if (tag.second) {
@@ -127,7 +144,7 @@ fun TagItem(tag: Pair<String, Boolean>, selectTag: (String) -> Unit) {
 @Composable
 fun CheckLists(checklistsFlow: StateFlow<List<CheckList>>, openChecklist: (CheckList) -> Unit) {
 
-    val checkLists by checklistsFlow.collectAsState()
+    val checkLists by checklistsFlow.collectAsStateWithLifecycleImmutable()
     val scrollState = rememberScrollState()
 
     LazyColumn(
@@ -137,7 +154,7 @@ fun CheckLists(checklistsFlow: StateFlow<List<CheckList>>, openChecklist: (Check
                 state = scrollState, orientation = Orientation.Vertical
             )
     ) {
-        items(checkLists) { checklist ->
+        items(checkLists.value) { checklist ->
             ChecklistItem(checklist) { openChecklist(checklist) }
         }
     }
@@ -146,18 +163,25 @@ fun CheckLists(checklistsFlow: StateFlow<List<CheckList>>, openChecklist: (Check
 @Composable
 fun ChecklistItem(checklist: CheckList, openChecklist: () -> Unit) {
     Row(modifier = Modifier
-        .padding(5.dp)
+        .fillMaxWidth()
+        .padding(vertical = 8.dp, horizontal = 16.dp)
         .shadow(2.dp, RoundedCornerShape(8))
         .background(
-            AppColor.Tertiary, RoundedCornerShape(8)
+            Color.White, RoundedCornerShape(8)
         )
         .clickable { openChecklist() }) {
 
-        Image(painter = painterResource(id = R.drawable.checklist), contentDescription = "")
+        Image(
+            modifier = Modifier
+                .size(130.dp)
+                .padding(end = 16.dp),
+            painter = painterResource(id = R.drawable.twitter),
+            contentDescription = ""
+        )
 
-        Column() {
+        Column {
             Text(
-                text = "Name",
+                text = checklist.name,
                 Modifier.padding(top = 16.dp),
                 fontSize = 12.sp,
                 fontWeight = FontWeight.W500,
@@ -165,7 +189,7 @@ fun ChecklistItem(checklist: CheckList, openChecklist: () -> Unit) {
             )
 
             Text(
-                text = "tags",
+                text = checklist.tags.joinToString(separator = " ") { "#$it" },
                 Modifier.padding(top = 8.dp),
                 fontSize = 11.sp,
                 fontWeight = FontWeight.W500,

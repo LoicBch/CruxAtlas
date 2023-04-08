@@ -12,11 +12,11 @@ import SwiftUI
 
 struct SpotSheetScreen: View {
 
-    var spot : Spot
+//    var spot : Dealer
     
     var body: some View {
         VStack {
-            Text(spot.name)
+//            Text(spot.name)
         }
     }
 }

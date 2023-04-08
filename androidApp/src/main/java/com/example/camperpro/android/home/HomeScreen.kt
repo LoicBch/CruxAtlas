@@ -8,10 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -52,10 +49,6 @@ fun HomeScreen(navController: NavHostController = rememberNavController()) {
             val long = it.coordinates.longitude
             Log.d("location", "$lat, $long")
             Globals.geoLoc.lastKnownLocation = Location(lat, long)
-
-            if (Globals.geoLoc.lastSearchedLocation != Constants.DEFAULT_LOCATION) {
-                Globals.geoLoc.lastSearchedLocation = Location(lat, long)
-            }
 
             if (!appViewModel.locationIsObserved.value) {
                 appViewModel.onLocationObserveStarted()

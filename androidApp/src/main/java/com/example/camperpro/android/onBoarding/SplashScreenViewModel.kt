@@ -15,15 +15,13 @@ class SplashScreenViewModel(
 ) : ViewModel() {
 
     var gpsLocationIsAsked = MutableStateFlow(false)
+    private val globalsVarsAreSet = MutableStateFlow(false)
 
-    // TODO: reutiliser ce setup si besoi nde check plusieurs trucs
-    //    private val globalsVarsAreSet = MutableStateFlow(false)
-    //
-    //    var setupIsComplete = combine(
-    //        gpsLocationIsAsked, globalsVarsAreSet
-    //    ) { gpsLocationIsAsked, globalVarsAreSet ->
-    //        gpsLocationIsAsked && globalVarsAreSet
-    //    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+    var setupIsComplete = combine(
+        gpsLocationIsAsked, globalsVarsAreSet
+    ) { gpsLocationIsAsked, globalVarsAreSet ->
+        gpsLocationIsAsked && globalVarsAreSet
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
 
     fun initApp() {
@@ -34,7 +32,7 @@ class SplashScreenViewModel(
                 }
 
                 is ResultWrapper.Success -> {
-//                    globalsVarsAreSet.update { true }
+                    globalsVarsAreSet.update { true }
                 }
             }
         }

@@ -41,7 +41,7 @@ fun AppButtonSmall(
             backgroundColor = color
         )
     ) {
-        Row {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(painterResource(drawableRes), contentDescription = "", tint = Color.White)
             Text(
                 modifier = Modifier

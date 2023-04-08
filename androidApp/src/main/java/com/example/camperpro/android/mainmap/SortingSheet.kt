@@ -11,6 +11,7 @@ import androidx.compose.material.icons.sharp.Close
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -59,13 +60,20 @@ fun SortingSheet(spotsSource: BottomSheetOption) {
             }
             Spacer(modifier = Modifier.weight(0.5f))
             Text(
-                fontSize = 16.sp,
-                fontWeight = FontWeight.W500,
-                text = stringResource(
+                fontSize = 16.sp, fontWeight = FontWeight.W500, text = stringResource(
                     id = R.string.sorting
                 ), color = Color.Black
             )
             Spacer(modifier = Modifier.weight(0.5f))
+
+            IconButton(modifier = Modifier.alpha(0f), onClick = { }) {
+                Icon(
+                    imageVector = Icons.Filled.Refresh,
+                    contentDescription = "",
+                    tint = AppColor.Secondary
+                )
+            }
+
             if (categorySelected != SortCategory.NONE) {
                 IconButton(onClick = { categorySelected = SortCategory.NONE }) {
                     Icon(
@@ -97,12 +105,10 @@ fun SortingSheet(spotsSource: BottomSheetOption) {
                         selected = (categorySelected == category),
                         onClick = { categorySelected = category },
                         role = Role.RadioButton
-                    ),
-                verticalAlignment = Alignment.CenterVertically
+                    ), verticalAlignment = Alignment.CenterVertically
             ) {
                 SortRadioGroupItem(
-                    sortCategory = category,
-                    sortCategorySelected = categorySelected
+                    sortCategory = category, sortCategorySelected = categorySelected
                 )
             }
         }
@@ -123,6 +129,7 @@ fun SortingSheet(spotsSource: BottomSheetOption) {
 @Composable
 fun RowScope.SortRadioGroupItem(sortCategory: SortCategory, sortCategorySelected: SortCategory) {
     Icon(
+        modifier = Modifier.size(20.dp),
         painter = painterResource(id = sortCategory.icon),
         contentDescription = "",
         tint = if (sortCategorySelected == sortCategory) AppColor.Primary else AppColor.Tertiary
@@ -143,16 +150,13 @@ fun RowScope.SortRadioGroupItem(sortCategory: SortCategory, sortCategorySelected
 }
 
 enum class SortCategory(
-    @StringRes val title: Int,
-    @DrawableRes val icon: Int
+    @StringRes val title: Int, @DrawableRes val icon: Int
 ) {
     NONE(
-        R.string.none,
-        R.drawable.circle_cross
+        R.string.none, R.drawable.circle_cross
     ),
     DIST_FROM_YOU(
-        R.string.by_distance_from_you,
-        R.drawable.distance
+        R.string.by_distance_from_you, R.drawable.distance
     ),
     DIST_FROM_SEARCHED(
         R.string.distance_from_searched_location, R.drawable.distance
@@ -176,14 +180,10 @@ fun Array<SortCategory>.availableSorting(spotsSource: BottomSheetOption): List<S
     return when (spotsSource) {
         BottomSheetOption.SORT -> listOf(SortCategory.NONE, SortCategory.DIST_FROM_YOU)
         BottomSheetOption.SORT_AROUND_PLACE -> listOf(
-            SortCategory.NONE,
-            SortCategory.DIST_FROM_YOU,
-            SortCategory.DIST_FROM_SEARCHED
+            SortCategory.NONE, SortCategory.DIST_FROM_YOU, SortCategory.DIST_FROM_SEARCHED
         )
         BottomSheetOption.SORT_EVENTS -> listOf(
-            SortCategory.NONE,
-            SortCategory.DIST_FROM_YOU,
-            SortCategory.BY_DATE
+            SortCategory.NONE, SortCategory.DIST_FROM_YOU, SortCategory.BY_DATE
         )
         else -> {
             this.toList()

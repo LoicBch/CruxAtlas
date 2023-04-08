@@ -32,17 +32,20 @@ fun Dropdown(modifier: Modifier, title: String, content: @Composable () -> Unit)
     Column {
         Row(
             Modifier
-                .height(70.dp),
+                .height(70.dp)
+                .clickable { isExpanded = !isExpanded },
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                modifier = Modifier.padding(start = 16.dp),
+                modifier = Modifier
+                    .padding(start = 16.dp),
                 painter = painterResource(id = R.drawable.tools),
                 contentDescription = stringResource(
                     id = R.string.cd_travel_tools
                 ),
-                tint = if (isExpanded) AppColor.Primary else AppColor.Tertiary
+                tint = if (isExpanded) AppColor.Primary else AppColor.Black
             )
+
             Text(
                 modifier = Modifier.padding(start = 16.dp),
                 text = title,

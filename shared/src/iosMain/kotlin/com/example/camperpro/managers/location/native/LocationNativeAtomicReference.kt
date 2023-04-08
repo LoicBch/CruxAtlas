@@ -3,7 +3,7 @@ package com.example.camperpro.managers.location.native
 import kotlinx.atomicfu.atomic
 import kotlin.native.concurrent.freeze
 
-internal actual class NativeAtomicReference<T> actual constructor(value: T) {
+internal actual class LocationNativeAtomicReference<T> actual constructor(value: T) {
 
     private val atomic = atomic(value)
 

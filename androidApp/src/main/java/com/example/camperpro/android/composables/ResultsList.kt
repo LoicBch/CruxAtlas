@@ -10,8 +10,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -23,10 +21,6 @@ import com.example.camperpro.android.ui.theme.AppColor
 fun ResultsList(onItemClick: (String) -> Unit, subTitleLabel: String, results: List<String>) {
 
     val scrollState = rememberScrollState()
-
-    val items = remember {
-        mutableStateOf(results)
-    }
 
     Text(
         modifier = Modifier.padding(top = 20.dp),
@@ -44,7 +38,7 @@ fun ResultsList(onItemClick: (String) -> Unit, subTitleLabel: String, results: L
                 state = scrollState, orientation = Orientation.Vertical
             )
     ) {
-        items(items.value) {
+        items(items = results) {
             OptionItem(Modifier.clickable { onItemClick(it) }, it)
         }
     }

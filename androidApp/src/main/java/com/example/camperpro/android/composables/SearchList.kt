@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -17,18 +16,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.camperpro.android.LocalDependencyContainer
 import com.example.camperpro.android.R
-import com.example.camperpro.android.filter.FilterCategory
 import com.example.camperpro.android.filter.LastSearchItem
 import com.example.camperpro.android.ui.theme.AppColor
+import com.example.camperpro.domain.model.composition.filterName
+import com.example.camperpro.utils.FilterType
 
 @Composable
-fun HistoricSearchList(categorySelected: FilterCategory, onSelectFilter: (String) -> Unit) {
+fun HistoricSearchList(categorySelected: FilterType, onSelectFilter: (String) -> Unit) {
 
     val appViewmodel = LocalDependencyContainer.current.appViewModel
-    val searches by appViewmodel.historicSearches.collectAsState()
+    val filters by appViewmodel.filtersDealerUsed.collectAsStateWithLifecycleImmutable()
     val scrollState = rememberScrollState()
-
-    appViewmodel.getSearchesOfCategory(categorySelected.name)
 
     Text(
         modifier = Modifier.padding(top = 20.dp),
@@ -45,13 +43,12 @@ fun HistoricSearchList(categorySelected: FilterCategory, onSelectFilter: (String
                 state = scrollState, orientation = Orientation.Vertical
             )
     ) {
-        items(searches) { search ->
+        items(filters.value.filter { it.category == categorySelected }.take(2)) { filter ->
             LastSearchItem(onSearchDelete = {
-                searches.remove(search)
-                appViewmodel.deleteSearch(search)
+                appViewmodel.removeFilter(filter)
             }, onSelectSearch = {
                 onSelectFilter(it)
-            }, search = search.searchLabel)
+            }, search = filter.filterName)
         }
     }
 }

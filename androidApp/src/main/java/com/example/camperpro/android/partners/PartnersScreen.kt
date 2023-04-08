@@ -13,7 +13,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.example.camperpro.android.R
+import com.example.camperpro.android.composables.collectAsStateWithLifecycleImmutable
 import com.example.camperpro.android.destinations.PartnerDetailsScreenDestination
 import com.example.camperpro.domain.model.Partner
 import com.ramcosta.composedestinations.annotation.Destination
@@ -41,7 +41,7 @@ fun PartnersScreen(
     navigator: DestinationsNavigator, viewModel: PartnersViewModel = getViewModel()
 ) {
 
-    val partners by viewModel.partners.collectAsState()
+    val partners by viewModel.partners.collectAsStateWithLifecycleImmutable()
     val scrollState = rememberScrollState()
 
     LaunchedEffect(Unit) {
@@ -55,11 +55,11 @@ fun PartnersScreen(
             )
             .background(Color.White)
             .fillMaxSize()
-            .padding(top = 100.dp),
+            .padding(top = 30.dp),
     ) {
-        items(partners) { item ->
+        items(partners.value) { item ->
             Row(modifier = Modifier
-                .padding(start = 15.dp, end = 15.dp, bottom = 20.dp)
+                .padding(start = 15.dp, end = 15.dp, bottom = 20.dp, top = 5.dp)
                 .shadow(2.dp, RoundedCornerShape(8))
                 .zIndex(1f)
                 .fillMaxWidth()
@@ -98,15 +98,14 @@ fun VerticalListItem(partner: Partner) {
 
     Column(modifier = Modifier.padding(8.dp)) {
         Text(
-            modifier = Modifier.padding(bottom = 5.dp),
-            fontWeight = FontWeight.W500,
+            modifier = Modifier.padding(bottom = 10.dp),
+            fontWeight = FontWeight.Bold,
             maxLines = 1,
             fontSize = 14.sp,
             text = partner.name
         )
 
         Text(
-            modifier = Modifier.padding(5.dp),
             fontWeight = FontWeight(450),
             maxLines = 2,
             fontSize = 10.sp,
@@ -120,6 +119,7 @@ fun VerticalListItem(partner: Partner) {
                 painter = painterResource(id = R.drawable.shield),
                 contentDescription = "",
                 modifier = Modifier
+                    .padding(end = 5.dp)
                     .shadow(2.dp, RoundedCornerShape(15))
                     .zIndex(1f)
                     .background(Color.White, RoundedCornerShape(15))

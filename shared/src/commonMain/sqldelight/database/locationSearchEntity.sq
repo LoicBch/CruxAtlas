@@ -13,12 +13,11 @@ FROM locationSearchEntity;
 insertSearch:
 INSERT OR REPLACE
 INTO locationSearchEntity(
-id,
 label,
 timeStamp,
 lat,
 long
-) VALUES (?,?,?, ?, ?);
+) VALUES (?,?, ?, ?);
 
 deleteSearchBySearchLabel:
 DELETE  FROM locationSearchEntity

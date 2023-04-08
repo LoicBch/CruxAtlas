@@ -8,6 +8,7 @@ import com.example.camperpro.android.filter.FilterEventsSheet
 import com.example.camperpro.android.filter.FilterSheet
 import com.example.camperpro.android.mainmap.SortingSheet
 import com.example.camperpro.utils.BottomSheetOption
+import com.example.camperpro.utils.Globals
 
 @Composable
 fun BottomSheetLayoutScreen() {

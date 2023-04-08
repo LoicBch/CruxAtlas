@@ -10,7 +10,7 @@ class LocationSearchDaoDelight(db: CamperproDatabase) : LocationSearchDao {
     private val queries = db.locationSearchEntityQueries
 
     override suspend fun insertSearch(search: LocationSearchDto) {
-        queries.insertSearch(0, search.label, search.timeStamp, search.lat, search.lon)
+        queries.insertSearch(search.label, search.timeStamp, search.lat, search.lon)
     }
 
     override suspend fun getAllSearchs(): List<LocationSearchDto> {

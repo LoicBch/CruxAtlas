@@ -43,7 +43,7 @@
     <string name="all_services_type">all services type</string>
     <string name="all_accessories_brand">all accessories brand</string>
     <string name="apply_filters">Apply filters</string>
-    <string name="search_placeholder">Type to search</string>
+    <string name="search_placeholder">Tap to start typing</string>
     <string name="last_searched">Last searched</string>
     <string name="search_result">Search results</string>
     <string name="filter_step1_title">How can we help you today ?</string>
@@ -53,6 +53,8 @@
     <string name="filter_step1_option3">Search motorhome accessories</string>
     <string name="choose_country">Choose country</string>
     <string name="confirm_selection">Confirm selection</string>
+    <string name="motorhome_brands">Motorhome brands</string>
+    <string name="motorhome_services">Motorhome services</string>
     <string name="where_do_you_want_to_go">Where do you want to go</string>
 
 
@@ -103,7 +105,7 @@
     <string name="verified">Verified</string>
     <string name="overview">Overview</string>
     <string name="details">Details</string>
-    <string name="contact_info">Contacts</string>
+    <string name="contact_info">Contacts info</string>
     <string name="phone">Phone</string>
     <string name="website">Website</string>
     <string name="from_you">from you</string>
@@ -126,6 +128,29 @@
         The
         action
         cannot be undone.</string>
+
+    <!--  checkLists  -->
+    <string name="travel_checklists">Travel checklists</string>
+    <string name="clear_all">Clear all</string>
+
+
+    <!--  Settings  -->
+    <string name="measuring_system">Measuring system</string>
+    <string name="language">Language</string>
+    <string name="help">Help</string>u
+    <string name="term_of_use">Terms of use</string>
+    <string name="privacy_policy">Privacy policy</string>
+    <string name="build">Build</string>
+    <string name="version">App version</string>
+    <string name="technical_infos">Technical infos</string>
+    <string name="app_settings">App settings</string>
+    <string name="french">French</string>
+    <string name="english">English</string>
+    <string name="italian">Italian</string>
+    <string name="spanish">Spanish</string>
+    <string name="german">German</string>
+    <string name="meter">meter</string>
+    <string name="miles">miles</string>
 
 
     <!--  Content description  -->

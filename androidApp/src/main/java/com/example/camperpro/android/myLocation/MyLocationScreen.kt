@@ -1,5 +1,6 @@
 package com.example.camperpro.android.myLocation
 
+import android.app.Application
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,17 +11,15 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.ArrowBack
-import androidx.compose.material.icons.sharp.ThumbUp
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -33,9 +32,12 @@ import com.example.camperpro.android.extensions.navigateByGmaps
 import com.example.camperpro.android.ui.theme.AppColor
 import com.example.camperpro.domain.model.Ad
 import com.example.camperpro.domain.model.composition.Location
+import com.example.camperpro.domain.model.composition.LocationInfos
 import com.example.camperpro.domain.model.composition.Marker
+import com.example.camperpro.domain.model.composition.distanceFromUserLocationText
 import com.example.camperpro.utils.Constants
 import com.example.camperpro.utils.Globals
+import com.example.camperpro.utils.KMMPreference
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -52,23 +54,38 @@ import org.koin.androidx.compose.getViewModel
 fun myLocation(navigator: DestinationsNavigator, viewModel: MyLocationViewModel = getViewModel()) {
 
     val popupIsActive by viewModel.popupIsActiveFlow.collectAsState()
+    val activeLocation by viewModel.activeLocation.collectAsState()
+    val application = LocalContext.current.applicationContext
+
+    LaunchedEffect(key1 = true) {
+        viewModel.init(application as Application)
+    }
 
     Box {
         Column {
             Header(navigator = navigator)
-            MyLocationMap(viewModel.parkingLocationFlow,
-                          viewModel.currentLocationFlow,
-                          selectCurrentLocation = { viewModel.selectCurrentLocation() },
-                          selectParkingLocation = { viewModel.selectParkingLocation() },
-                          parkHere = { viewModel.setParkingLocation(it.latitude, it.longitude) },
-                          deleteParkingLoc = { viewModel.deleteParkingLocation() })
+            MyLocationMap(
+                viewModel.parkingLocationFlow,
+                viewModel.currentLocationFlow,
+                selectCurrentLocation = { viewModel.selectCurrentLocation() },
+                selectParkingLocation = { viewModel.selectParkingLocation(Location(0.0, 0.0)) },
+                parkHere = {
+                    viewModel.saveParkingLocation(
+                        application as Application,
+                        it.latitude,
+                        it.longitude
+                    )
+                },
+                deleteParkingLoc = { popupIsActive.value = true },
+                activeLocation = activeLocation,
+            )
         }
         if (popupIsActive.value) PopupParkingLocation(
             Modifier,
             onExit = { popupIsActive.value = false },
             onDelete = {
                 popupIsActive.value = false
-                viewModel.deleteParkingLocation()
+                viewModel.deleteParkingLocation(application as Application)
             })
     }
 }
@@ -95,6 +112,10 @@ fun Header(navigator: DestinationsNavigator) {
         )
 
         Spacer(modifier = Modifier.weight(0.5f))
+
+        IconButton(modifier = Modifier.alpha(0f), onClick = { }) {
+            Icon(imageVector = Icons.Sharp.ArrowBack, contentDescription = "")
+        }
     }
 }
 
@@ -105,6 +126,7 @@ fun MyLocationMap(
     selectCurrentLocation: () -> Unit,
     selectParkingLocation: () -> Unit,
     parkHere: (Location) -> Unit,
+    activeLocation: LocationInfos,
     deleteParkingLoc: () -> Unit
 ) {
 
@@ -173,30 +195,32 @@ fun MyLocationMap(
             LocationInfosBox(
                 modifier = Modifier.align(Alignment.BottomCenter),
                 marker = currentLocation.value,
-                {}) {
-                parkHere(
-                    Location(
-                        currentLocation.value.latitude,
-                        currentLocation.value.longitude
+                appButton = {
+                    parkHere(
+                        Location(
+                            currentLocation.value.latitude,
+                            currentLocation.value.longitude
+                        )
                     )
-                )
-            }
+                }, activeLocation = activeLocation,
+                deleteParkingLoc = {}
+            )
         } else if (parkingLocation.value.selected) {
             LocationInfosBox(
                 modifier = Modifier.align(Alignment.BottomCenter),
                 marker = parkingLocation.value,
-                {
-                    deleteParkingLoc()
-                }) {
-                context.navigateByGmaps(
-                    context,
-                    parkingLocation.value.latitude,
-                    parkingLocation.value.longitude
-                )
-            }
-        }
+                appButton = {
+                    context.navigateByGmaps(
+                        context,
+                        parkingLocation.value.latitude,
+                        parkingLocation.value.longitude
+                    )
 
-        //            AdContainer(pub = listOf<Ad>())
+                },
+                activeLocation = activeLocation,
+                deleteParkingLoc = { deleteParkingLoc() }
+            )
+        }
     }
 }
 
@@ -205,15 +229,19 @@ fun LocationInfosBox(
     modifier: Modifier,
     marker: Marker,
     appButton: () -> Unit,
+    activeLocation: LocationInfos,
     deleteParkingLoc: () -> Unit
 ) {
+
+    val application = LocalContext.current.applicationContext as Application
+
     Column(
         modifier = modifier
             .padding(25.dp)
             .background(Color.White, RoundedCornerShape(8))
-            .padding(15.dp)
+            .padding(start = 15.dp, end = 15.dp, bottom = 15.dp, top = 5.dp)
     ) {
-        Row(modifier = Modifier.fillMaxWidth()) {
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = if (marker.placeLinkedId == "parking") {
                     stringResource(id = R.string.my_parking)
@@ -229,32 +257,63 @@ fun LocationInfosBox(
                 IconButton(onClick = {
                     deleteParkingLoc()
                 }) {
-                    Image(imageVector = Icons.Sharp.ThumbUp, contentDescription = "")
+                    Icon(
+                        painter = painterResource(id = R.drawable.trash),
+                        contentDescription = "",
+                        tint = AppColor.Tertiary
+                    )
                 }
             }
             IconButton(onClick = { }) {
-                Image(imageVector = Icons.Sharp.ThumbUp, contentDescription = "")
+                Image(painter = painterResource(id = R.drawable.share), contentDescription = "")
             }
         }
         if (marker.placeLinkedId == "parking") {
-            Row {
-                Icon(imageVector = Icons.Sharp.ThumbUp, contentDescription = "")
-                Text(text = "distance")
+            Row(modifier = Modifier.padding(bottom = 8.dp)) {
+                Icon(
+                    modifier = Modifier
+                        .padding(end = 15.dp)
+                        .size(20.dp),
+                    painter = painterResource(id = R.drawable.distance),
+                    tint = AppColor.Tertiary,
+                    contentDescription = ""
+                )
+                Text(
+                    text = Location(
+                        marker.latitude,
+                        marker.longitude
+                    ).distanceFromUserLocationText(KMMPreference(application)),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight(450),
+                    color = Color.Gray
+                )
             }
         }
-        Row {
-            Icon(imageVector = Icons.Sharp.ThumbUp, contentDescription = "")
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                modifier = Modifier
+                    .padding(end = 15.dp)
+                    .size(20.dp),
+                painter = painterResource(id = R.drawable.pin_here),
+                contentDescription = "", tint = AppColor.Tertiary
+            )
             Text(
-                text = "adresse", fontSize = 12.sp, fontWeight = FontWeight(450), color = Color.Gray
+                text = activeLocation.address,
+                fontSize = 12.sp,
+                fontWeight = FontWeight(450),
+                color = Color.Gray
             )
         }
-        Row(Modifier.padding(top = 8.dp)) {
+        Row(Modifier.padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(
-                imageVector = Icons.Sharp.ThumbUp,
+                modifier = Modifier
+                    .padding(end = 15.dp)
+                    .size(20.dp),
+                painter = painterResource(id = R.drawable.location_arrow),
                 contentDescription = "",
             )
             Text(
-                text = "location",
+                text = "${activeLocation.gpsDeciTxt} (lat, lng) \n ${activeLocation.gpsDmsTxt} (lat, lng)",
                 fontSize = 12.sp,
                 fontWeight = FontWeight(450),
                 color = Color.Gray
