@@ -37,7 +37,7 @@ fun GlobalPopup(modifier: Modifier, state: GlobalPopupState, onExit: () -> Unit)
                     color = Color.White, shape = RoundedCornerShape(15)
                 )
                 .padding(top = 10.dp, start = 16.dp, end = 16.dp)
-                .align(Alignment.Center) //            .width(IntrinsicSize.Min)
+                .align(Alignment.Center)
         ) {
 
             Row(
@@ -76,7 +76,6 @@ fun GlobalPopup(modifier: Modifier, state: GlobalPopupState, onExit: () -> Unit)
                 maxLines = 1
             )
         }
-
     }
 }
 

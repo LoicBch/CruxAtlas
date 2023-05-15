@@ -1,0 +1,137 @@
+
+//Around location
+"around_location_placeholder" = "Toca para empezar a escribir";
+"around_location_subtitle" = " country";
+"cd_magnifying_glass_icon" = "icono de lupa";
+
+//Filter
+"filters_title" = "Filtro";
+"search_details_subtitle" = "Detalles de la búsqueda";
+"choose_motorhome_brand" = "Elegir marca de autocaravana";
+"choose_services_type" = "Elegir tipo de servicio";
+"choose_accessories_brand" = "Elegir marca de accesorios";
+"all_motorhome_brand" = "todas las marcas de autocaravanas";
+"all_services_type" = "todos los tipos de servicios";
+"all_accessories_brand" = "todas las marcas de accesorios";
+"apply_filters" = "Aplicar filtros";
+"search_placeholder" = "Toca para empezar a escribir";
+"last_searched" = "Última búsqueda";
+"search_result" = "Resultados de la búsqueda";
+"filter_step1_title" = "¿Cómo podemos ayudarte hoy?";
+"filter_step2_title" = "Seleccionar detalles";
+"filter_step1_option1" = " mettre à niveau ou acheter un camping-car";
+"filter_step1_option2" = "Encontrar concesionarios oficiales de autocaravanas";
+"filter_step1_option3" = "Buscar accesorios para autocaravanas";
+"choose_country" = "Elegir país";
+"confirm_selection" = "Confirmar selección";
+"motorhome_brands" = "Marcas de autocaravanas";
+"motorhome_services" = "Servicios de autocaravanas";
+"where_do_you_want_to_go" = "¿Dónde quieres ir?";
+"cd_filter_icon" = "icono de filtro";
+"cd_filter_option" = "abrir y elegir %1$s";
+
+//Global
+"all" = "Todo";
+"reset" = "Reiniciar";
+"step" = "Paso";
+"slider_missing_network_title" = "Se perdió la conexión de red";
+"slider_missing_network_text" = "Por favor";
+"slider_missing_gps_text" = "Por favor";
+"slider_missing_gps_title" = "Se perdió la señal GPS";
+"popup_missing_network_title" = "Se perdió la conexión de red";
+"popup_missing_gps_title" = "Se perdió la señal GPS";
+"popup_missing_network_text" = "No puedes acceder a esta función sin conexión";
+"popup_missing_gps_text" = "you can\'t access this function without location";
+"loading" = "enabled";
+"get_offer" = "¡Obtén una oferta por tiempo limitado!";
+
+//MainMap Screen
+"appbar_around_me" = "Alrededor de mí";
+"appbar_around_location" = "Alrededor de un lugar";
+"appbar_partners" = "Socios";
+"appbar_menu" = "Más";
+"search_this_area" = "Buscar en esta área";
+"cd_button_vertical_list" = "cambiar a modo de lista";
+"cd_button_filter" = "cambiar a modo de lista";
+"cd_button_mapstyle" = "Cambiar capa de mapa";
+"cd_around_me" = "mostrar lugares alrededor de mí";
+"cd_around_location" = " um in der Nähe eines Ortes zu suchen";
+"cd_partners" = "abrir pantalla de socios";
+"cd_menu" = "abrir menú";
+"cd_search_here" = "buscar en esta ubicación";
+
+//More
+"menu_travel_tools" = "Herramientas de viaje";
+"menu_events" = "Eventos";
+"menu_leveler" = "Nivelador";
+"menu_my_location" = "Mi ubicación";
+"menu_app_settings" = "Configuración de la aplicación";
+"menu_travel_checklists" = "Listas de verificación de viaje";
+"cd_travel_tools" = "icono de herramientas de viaje";
+"cd_travel_checklist" = "icono de lista de verificación de viaje";
+"cd_leveler" = "icono de nivelador";
+"cd_events" = "abrir mapa de eventos";
+"cd_my_location" = "icono de mi ubicación";
+"cd_app_settings" = "icono de configuración de la aplicación";
+
+//Partner
+"navigate_to_event" = "Ir al evento";
+"cd_arrow_back" = "volver";
+
+//Settings
+"measuring_system" = "Sistema de medición";
+"language" = "Idioma";
+"help" = "Ayuda";
+"term_of_use" = "Términos de uso";
+"privacy_policy" = "Política de privacidad";
+"build" = "Construir";
+"version" = "Versión de la aplicación";
+"technical_infos" = "Información técnica";
+"app_settings" = "Configuración de la aplicación";
+"french" = "Francés";
+"english" = "Inglés";
+"italian" = "Italiano";
+"spanish" = "Español";
+"german" = "Alemán";
+"meter" = "metro";
+"miles" = "millas";
+"serv" = "volver";
+
+//Sorting
+"sorting" = "Ordenar";
+"sort_places" = "Ordenar lugares";
+"none" = "Ninguno";
+"by_distance_from_you" = "Por distancia desde ti";
+"distance_from_searched_location" = "Por distancia desde la ubicación buscada";
+"by_date" = "Por fecha (más pronto primero)";
+"apply_sorting" = "Aplicar ordenamiento";
+"z" = "icono de lupa";
+
+//Spot Sheet
+"verified" = "Verificado";
+"overview" = "Descripción general";
+"details" = "Detalles";
+"contact_info" = "Información de contacto";
+"phone" = "Teléfono";
+"website" = "Sitio web";
+"from_you" = "desde ti";
+"view_all_services" = "Ver todos los servicios en este lugar";
+"view_all_brands" = "Ver todas las marcas en este lugar";
+"navigate" = "Navegar";
+"services" = "Servicios";
+"official_dealers" = "Concesionarios oficiales";
+"accessories" = "Accesorios";
+"services_subtitle" = " die wir hinzufügen können.";
+"dealers_subtitle" = " mais il peut également offrir des services pour d\'autres marques. Contactez l\'endroit pour savoir.";
+"accessories_subtitle" = "Estas marcas se venden y/o se prestan servicios en este lugar.";
+
+//checkLists
+"travel_checklists" = "Listas de verificación de viaje";
+"clear_all" = "Borrar todo";
+
+//myLocation
+"my_location" = "Mi ubicación actual";
+"my_parking" = "Mi ubicación de estacionamiento";
+"park_here" = "Aparcar aquí";
+"delete" = "Eliminar";
+"delete_location_popup" = "Do you want to permanently delete this saved location? The action cannot be undone.";

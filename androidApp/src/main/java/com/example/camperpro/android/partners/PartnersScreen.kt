@@ -40,7 +40,6 @@ import org.koin.androidx.compose.getViewModel
 fun PartnersScreen(
     navigator: DestinationsNavigator, viewModel: PartnersViewModel = getViewModel()
 ) {
-
     val partners by viewModel.partners.collectAsStateWithLifecycleImmutable()
     val scrollState = rememberScrollState()
 

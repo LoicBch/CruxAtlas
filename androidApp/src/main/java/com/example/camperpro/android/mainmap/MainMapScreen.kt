@@ -42,6 +42,7 @@ import com.example.camperpro.android.destinations.MenuScreenDestination
 import com.example.camperpro.android.extensions.hasLocationPermission
 import com.example.camperpro.android.extensions.isScrollingUp
 import com.example.camperpro.android.extensions.lastVisibleItemIndex
+import com.example.camperpro.android.partners.VerticalListItem
 import com.example.camperpro.android.ui.theme.AppColor
 import com.example.camperpro.android.ui.theme.Dimensions
 import com.example.camperpro.domain.model.*
@@ -229,7 +230,7 @@ fun MainMap(
                     SearchHereButton(onClick = {
                         viewModel.showSpots(cameraPositionState.locationVo)
                     })
-                }
+
 
                 if (locationSearched.isNotEmpty()) LocationSearchContainer(locationSearched)
                 if (updateSource == UpdateSource.EVENTS) {

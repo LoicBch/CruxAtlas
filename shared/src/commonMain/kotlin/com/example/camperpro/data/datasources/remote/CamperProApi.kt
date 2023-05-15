@@ -1,6 +1,7 @@
 package com.example.camperpro.data.datasources.remote
 
 import com.example.camperpro.data.ResultWrapper
+import com.example.camperpro.data.flattenIos
 import com.example.camperpro.data.model.dto.AdDto
 import com.example.camperpro.data.model.dto.CheckListDto
 import com.example.camperpro.data.model.dto.EventDto
@@ -81,11 +82,11 @@ class CamperProApi(private var client: HttpClient) : Api {
     }
 
 
-    override suspend fun getEvents(countriesFilters: String): ResultWrapper<List<Event>> {
+    override suspend fun getEvents(countriesFilters: String?): ResultWrapper<List<Event>> {
         return safeApiCall {
             client.get(Constants.API.EVENTS) {
                 url {
-                    if (countriesFilters.isEmpty()) {
+                    if (!countriesFilters.isNullOrEmpty()) {
                         parameters.append("country_filter", countriesFilters)
                     }
                 }
@@ -94,6 +95,16 @@ class CamperProApi(private var client: HttpClient) : Api {
     }
 
     override suspend fun locate(lat: String, long: String): ResultWrapper<LocationInfos> {
+
+        val res = safeApiCall {
+            client.get(Constants.API.LOCATE) {
+                url {
+                    parameters.append("lat", lat)
+                    parameters.append("long", long)
+                }
+            }.body<LocationInfoResponse>().toVo()
+        }
+        print(res.flattenIos()?.address)
         return safeApiCall {
             client.get(Constants.API.LOCATE) {
                 url {

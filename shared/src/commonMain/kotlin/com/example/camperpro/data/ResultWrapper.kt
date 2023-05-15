@@ -4,14 +4,22 @@ import io.ktor.client.call.*
 import io.ktor.client.plugins.*
 import io.ktor.utils.io.errors.*
 
+// TODO: Should find a way to implement this for ios directly without using the flattenIos method. Because for now Sealed Class and generic of generic in interface are not 
+//  handle in kmm  
+
 typealias ApiCallBlock<T> = suspend () -> T
 
-//covar != Swift
 sealed class ResultWrapper<out T> {
     data class Success<T>(val value: T?) : ResultWrapper<T>()
     data class Failure(val code: Int, val throwable: Throwable) : ResultWrapper<Nothing>()
 }
 
+fun <T> ResultWrapper<T>.flattenIos(): T? {
+    return when (this) {
+        is ResultWrapper.Failure -> null
+        is ResultWrapper.Success -> this.value
+    }
+}
 
 @Throws(IllegalStateException::class)
 suspend fun <T> safeApiCall(apiCall: ApiCallBlock<T>): ResultWrapper<T> {
@@ -30,4 +38,6 @@ suspend fun <T> safeApiCall(apiCall: ApiCallBlock<T>): ResultWrapper<T> {
         }
     }
 }
+
+
 

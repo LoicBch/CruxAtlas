@@ -1,0 +1,137 @@
+
+//Around location
+"around_location_placeholder" = "Tik om te beginnen met typen";
+"around_location_subtitle" = " city";
+"cd_magnifying_glass_icon" = "vergrootglaspictogram";
+
+//Filter
+"filters_title" = "Filter";
+"search_details_subtitle" = "Zoekdetails";
+"choose_motorhome_brand" = "Kies motorhome-merk";
+"choose_services_type" = "Kies type diensten";
+"choose_accessories_brand" = "Kies accessoiresmerk";
+"all_motorhome_brand" = "alle motorhome-merken";
+"all_services_type" = "alle type diensten";
+"all_accessories_brand" = "alle accessoiresmerken";
+"apply_filters" = "Filters toepassen";
+"search_placeholder" = "Tik om te beginnen met typen";
+"last_searched" = "Laatst gezocht";
+"search_result" = "Zoekresultaten";
+"filter_step1_title" = "Hoe kunnen we u vandaag helpen?";
+"filter_step2_title" = "Details selecteren";
+"filter_step1_option1" = " aufrüsten oder kaufen";
+"filter_step1_option2" = "Vind officiële motorhome-dealers";
+"filter_step1_option3" = "Zoek motorhome-accessoires";
+"choose_country" = "Kies land";
+"confirm_selection" = "Selectie bevestigen";
+"motorhome_brands" = "Motorhome-merken";
+"motorhome_services" = "Motorhome-diensten";
+"where_do_you_want_to_go" = "Waar wil je naartoe?";
+"cd_filter_icon" = "filterpictogram";
+"cd_filter_option" = "openen en %1$s kiezen";
+
+//Global
+"all" = "Alle";
+"reset" = "Herstellen";
+"step" = "Stap";
+"slider_missing_network_title" = "Netwerkverbinding verbroken";
+"slider_missing_network_text" = "Controlla le impostazioni internet";
+"slider_missing_gps_text" = "Attiva il GPS";
+"slider_missing_gps_title" = "GPS-signaal verloren";
+"popup_missing_network_title" = "Netwerkverbinding verbroken";
+"popup_missing_gps_title" = "GPS-signaal verloren";
+"popup_missing_network_text" = "U kunt deze functie niet offline gebruiken";
+"popup_missing_gps_text" = "you can\'t access this function without location";
+"loading" = "enabled";
+"get_offer" = "Ontvang aanbieding met beperkte tijd!";
+
+//MainMap Screen
+"appbar_around_me" = "Om mij heen";
+"appbar_around_location" = "Rond een plek";
+"appbar_partners" = "Partners";
+"appbar_menu" = "Meer";
+"search_this_area" = "Doorzoek dit gebied";
+"cd_button_vertical_list" = "schakelen naar lijstmodus";
+"cd_button_filter" = "schakelen naar lijstmodus";
+"cd_button_mapstyle" = "Verander kaartlaag";
+"cd_around_me" = "plaatsen weergeven om mij heen";
+"cd_around_location" = "Apri la schermata per cercare intorno a una posizione";
+"cd_partners" = "partnerscherm openen";
+"cd_menu" = "menu openen";
+"cd_search_here" = "zoeken op deze locatie";
+
+//More
+"menu_travel_tools" = "Reisgereedschap";
+"menu_events" = "Evenementen";
+"menu_leveler" = "Waterpas";
+"menu_my_location" = "Mijn locatie";
+"menu_app_settings" = "App-instellingen";
+"menu_travel_checklists" = "Reiscontrolelijsten";
+"cd_travel_tools" = "reisgereedschapspictogram";
+"cd_travel_checklist" = "reiscontrolelijstpictogram";
+"cd_leveler" = "waterpaspictogram";
+"cd_events" = "open kaart met evenementen";
+"cd_my_location" = "mijn locatiepictogram";
+"cd_app_settings" = "app-instellingenpictogram";
+
+//Partner
+"navigate_to_event" = "Navigeer naar het evenement";
+"cd_arrow_back" = "terug gaan";
+
+//Settings
+"measuring_system" = "Meet systeem";
+"language" = "Taal";
+"help" = "Help";
+"term_of_use" = "Gebruiksvoorwaarden";
+"privacy_policy" = "Privacybeleid";
+"build" = "Build";
+"version" = "App-versie";
+"technical_infos" = "Technische informatie";
+"app_settings" = "App-instellingen";
+"french" = "Frans";
+"english" = "Engels";
+"italian" = "Italiaans";
+"spanish" = "Spaans";
+"german" = "Duits";
+"meter" = "meter";
+"miles" = "mijlen";
+"serv" = "terug gaan";
+
+//Sorting
+"sorting" = "Sorteren";
+"sort_places" = "Plaatsen sorteren";
+"none" = "Geen";
+"by_distance_from_you" = "Op afstand van u";
+"distance_from_searched_location" = "Op afstand van gezochte locatie";
+"by_date" = "Op datum (eerstvolgende)";
+"apply_sorting" = "Sorteren toepassen";
+"z" = "vergrootglaspictogram";
+
+//Spot Sheet
+"verified" = "Geverifieerd";
+"overview" = "Overzicht";
+"details" = "Details";
+"contact_info" = "Contactgegevens";
+"phone" = "Telefoon";
+"website" = "Website";
+"from_you" = "van u";
+"view_all_services" = "Bekijk alle diensten op deze plek";
+"view_all_brands" = "Bekijk alle merken op deze plek";
+"navigate" = "Navigeren";
+"services" = "Diensten";
+"official_dealers" = "Officiële dealers";
+"accessories" = "Accessoires";
+"services_subtitle" = "Queste informazioni aggiuntive possono essere aggiunte.";
+"dealers_subtitle" = " bietet aber möglicherweise auch Dienstleistungen für andere Marken an. Kontaktieren Sie den Ort";
+"accessories_subtitle" = "Deze merken worden verkocht en/of onderhouden op deze plek.";
+
+//checkLists
+"travel_checklists" = "Reiscontrolelijsten";
+"clear_all" = "Alles wissen";
+
+//myLocation
+"my_location" = "Mijn huidige locatie";
+"my_parking" = "Mijn parkeerlocatie";
+"park_here" = "Hier parkeren";
+"delete" = "Verwijderen";
+"delete_location_popup" = "Do you want to permanently delete this saved location? The action cannot be undone.";

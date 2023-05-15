@@ -1,0 +1,137 @@
+
+//Around location
+"around_location_placeholder" = "Tippen Sie zum Starten der Eingabe";
+"around_location_subtitle" = " region";
+"cd_magnifying_glass_icon" = "Lupe-Symbol";
+
+//Filter
+"filters_title" = "Filter";
+"search_details_subtitle" = "Details suchen";
+"choose_motorhome_brand" = "Wählen Sie die Marke des Wohnmobils";
+"choose_services_type" = "Wählen Sie den Dienstleistungstyp";
+"choose_accessories_brand" = "Wählen Sie die Zubehörmarke";
+"all_motorhome_brand" = "alle Wohnmobilmarken";
+"all_services_type" = "alle Dienstleistungstypen";
+"all_accessories_brand" = "alle Zubehörmarken";
+"apply_filters" = "Filter anwenden";
+"search_placeholder" = "Tippen Sie zum Starten der Eingabe";
+"last_searched" = "Zuletzt gesucht";
+"search_result" = "Suchergebnisse";
+"filter_step1_title" = "Wie können wir Ihnen heute helfen?";
+"filter_step2_title" = "Details auswählen";
+"filter_step1_option1" = "Réparer";
+"filter_step1_option2" = "Offizielle Wohnmobilhändler finden";
+"filter_step1_option3" = "Wohnmobilzubehör suchen";
+"choose_country" = "Land auswählen";
+"confirm_selection" = "Auswahl bestätigen";
+"motorhome_brands" = "Wohnmobilmarken";
+"motorhome_services" = "Wohnmobil-Dienstleistungen";
+"where_do_you_want_to_go" = "Wohin möchten Sie gehen?";
+"cd_filter_icon" = "Filter-Symbol";
+"cd_filter_option" = "Öffnen und %1$s auswählen";
+
+//Global
+"all" = "Alle";
+"reset" = "Zurücksetzen";
+"step" = "Schritt";
+"slider_missing_network_title" = "Netzwerkverbindung unterbrochen";
+"slider_missing_network_text" = "Bitte überprüfen Sie Ihre Internet-Einstellungen";
+"slider_missing_gps_text" = "Bitte aktivieren Sie Ihr GPS";
+"slider_missing_gps_title" = "GPS-Signal verloren";
+"popup_missing_network_title" = "Netzwerkverbindung unterbrochen";
+"popup_missing_gps_title" = "GPS-Signal verloren";
+"popup_missing_network_text" = "Sie können nicht offline auf diese Funktion zugreifen";
+"popup_missing_gps_text" = "you can\'t access this function without location";
+"loading" = "enabled";
+"get_offer" = "Begrenztes Zeitangebot erhalten!";
+
+//MainMap Screen
+"appbar_around_me" = "In meiner Nähe";
+"appbar_around_location" = "In der Nähe eines Ortes";
+"appbar_partners" = "Partner";
+"appbar_menu" = "Mehr";
+"search_this_area" = "Diesen Bereich durchsuchen";
+"cd_button_vertical_list" = "Zum Listenmodus wechseln";
+"cd_button_filter" = "Zum Listenmodus wechseln";
+"cd_button_mapstyle" = "Kartenlayer ändern";
+"cd_around_me" = "Orte in meiner Nähe anzeigen";
+"cd_around_location" = "Bildschirm öffnen";
+"cd_partners" = "Partnerbildschirm öffnen";
+"cd_menu" = "Menü öffnen";
+"cd_search_here" = "An diesem Ort suchen";
+
+//More
+"menu_travel_tools" = "Reise-Tools";
+"menu_events" = "Veranstaltungen";
+"menu_leveler" = "Wasserwaage";
+"menu_my_location" = "Mein Standort";
+"menu_app_settings" = "App-Einstellungen";
+"menu_travel_checklists" = "Reise-Checklisten";
+"cd_travel_tools" = "Reise-Tools-Symbol";
+"cd_travel_checklist" = "Reise-Checklisten-Symbol";
+"cd_leveler" = "Wasserwaagen-Symbol";
+"cd_events" = "Öffne Ereigniskarte";
+"cd_my_location" = "Mein Standort-Symbol";
+"cd_app_settings" = "App-Einstellungen-Symbol";
+
+//Partner
+"navigate_to_event" = "Zum Ereignis navigieren";
+"cd_arrow_back" = "zurück gehen";
+
+//Settings
+"measuring_system" = "Messsystem";
+"language" = "Sprache";
+"help" = "Hilfe";
+"term_of_use" = "Nutzungsbedingungen";
+"privacy_policy" = "Datenschutzerklärung";
+"build" = "Build";
+"version" = "App-Version";
+"technical_infos" = "Technische Informationen";
+"app_settings" = "App-Einstellungen";
+"french" = "Deutsch";
+"english" = "Englisch";
+"italian" = "Italienisch";
+"spanish" = "Spanisch";
+"german" = "Französisch";
+"meter" = "Meter";
+"miles" = "Meilen";
+"serv" = "zurück gehen";
+
+//Sorting
+"sorting" = "Sortierung";
+"sort_places" = "Orte sortieren";
+"none" = "Kein";
+"by_distance_from_you" = "Nach Entfernung von Ihnen";
+"distance_from_searched_location" = "Nach Entfernung vom gesuchten Ort";
+"by_date" = "Nach Datum (frühestens zuerst)";
+"apply_sorting" = "Sortierung anwenden";
+"z" = "Lupe-Symbol";
+
+//Spot Sheet
+"verified" = "Geprüft";
+"overview" = "Überblick";
+"details" = "Details";
+"contact_info" = "Kontaktinformationen";
+"phone" = "Telefon";
+"website" = "Website";
+"from_you" = "von Ihnen";
+"view_all_services" = "Alle Dienstleistungen an diesem Ort anzeigen";
+"view_all_brands" = "Alle Marken an diesem Ort anzeigen";
+"navigate" = "Navigieren";
+"services" = "Dienstleistungen";
+"official_dealers" = "Offizielle Händler";
+"accessories" = "Zubehör";
+"services_subtitle" = "Dies sind zusätzliche Informationen";
+"dealers_subtitle" = "Cet endroit est un concessionnaire officiel des marques répertoriées";
+"accessories_subtitle" = "Diese Marken werden an diesem Ort verkauft und/oder gewartet.";
+
+//checkLists
+"travel_checklists" = "Reise-Checklisten";
+"clear_all" = "Alles löschen";
+
+//myLocation
+"my_location" = "Mein aktueller Standort";
+"my_parking" = "Mein Parkplatz";
+"park_here" = "Hier parken";
+"delete" = "Löschen";
+"delete_location_popup" = "Do you want to permanently delete this saved location?  The action cannot be undone.";

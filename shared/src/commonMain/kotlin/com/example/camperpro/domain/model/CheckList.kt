@@ -10,9 +10,9 @@ data class CheckList(
     //    val description: String,
     //    val imageLink: String,
     val tags: List<String>,
-    val tasks: List<Task>
+    val todos: List<Todo>
 ) : CommonParcelable
 
 @CommonParcelize
-data class Task(val id: String, val name: String) : CommonParcelable
+data class Todo(val id: String, val name: String) : CommonParcelable
 

@@ -1,0 +1,137 @@
+
+//Around location
+"around_location_placeholder" = "Appuyez pour commencer à taper";
+"around_location_subtitle" = " city";
+"cd_magnifying_glass_icon" = "icône de loupe";
+
+//Filter
+"filters_title" = "Filtrer";
+"search_details_subtitle" = "Détails de recherche";
+"choose_motorhome_brand" = "Choisissez la marque de camping-car";
+"choose_services_type" = "Choisissez le type de services";
+"choose_accessories_brand" = "Choisissez la marque d\'accessoires";
+"all_motorhome_brand" = "toutes les marques de camping-car";
+"all_services_type" = "tous les types de services";
+"all_accessories_brand" = "toutes les marques d\'accessoires";
+"apply_filters" = "Appliquer des filtres";
+"search_placeholder" = "Appuyez pour commencer à taper";
+"last_searched" = "Dernière recherche";
+"search_result" = "Résultats de recherche";
+"filter_step1_title" = "Comment pouvons-nous vous aider aujourd\'hui?";
+"filter_step2_title" = "Sélectionnez les détails";
+"filter_step1_option1" = " upgrade or buy motorhome";
+"filter_step1_option2" = "Trouver les concessionnaires de camping-car officiels";
+"filter_step1_option3" = "Rechercher des accessoires de camping-car";
+"choose_country" = "Choisissez un pays";
+"confirm_selection" = "Confirmer la sélection";
+"motorhome_brands" = "Marques de camping-car";
+"motorhome_services" = "Services de camping-car";
+"where_do_you_want_to_go" = "Où voulez-vous aller";
+"cd_filter_icon" = "icône de filtre";
+"cd_filter_option" = "ouvrir et choisir %1$s";
+
+//Global
+"all" = "Tout";
+"reset" = "Réinitialiser";
+"step" = "Pas";
+"slider_missing_network_title" = "Connexion au réseau perdue";
+"slider_missing_network_text" = "Veuillez vérifier vos paramètres internet";
+"slider_missing_gps_text" = "Veuillez activer votre GPS";
+"slider_missing_gps_title" = "Signal GPS perdu";
+"popup_missing_network_title" = "Connexion au réseau perdue";
+"popup_missing_gps_title" = "Signal GPS perdu";
+"popup_missing_network_text" = "Vous ne pouvez pas accéder à cette fonction hors ligne";
+"popup_missing_gps_text" = "you can\'t access this function without location";
+"loading" = "enabled";
+"get_offer" = "Obtenez une offre limitée dans le temps!";
+
+//MainMap Screen
+"appbar_around_me" = "Autour de moi";
+"appbar_around_location" = "Autour d\'un lieu";
+"appbar_partners" = "Partenaires";
+"appbar_menu" = "Plus";
+"search_this_area" = "Rechercher dans cette zone";
+"cd_button_vertical_list" = "passer en mode liste";
+"cd_button_filter" = "passer en mode liste";
+"cd_button_mapstyle" = "Changer la couche de carte";
+"cd_around_me" = "afficher les lieux autour de moi";
+"cd_around_location" = "ouvrir l\'écran pour rechercher autour d\'un emplacement";
+"cd_partners" = "ouvrir l\'écran des partenaires";
+"cd_menu" = "ouvrir le menu";
+"cd_search_here" = "rechercher à cet emplacement";
+
+//More
+"menu_travel_tools" = "Outils de voyage";
+"menu_events" = "Événements";
+"menu_leveler" = "Niveau à bulle";
+"menu_my_location" = "Ma position";
+"menu_app_settings" = "Paramètres de l\'application";
+"menu_travel_checklists" = "Listes de contrôle de voyage";
+"cd_travel_tools" = "icône d\'outils de voyage";
+"cd_travel_checklist" = "icône de liste de contrôle de voyage";
+"cd_leveler" = "icône de niveau à bulle";
+"cd_events" = "ouvrir la carte des événements";
+"cd_my_location" = "icône de ma position";
+"cd_app_settings" = "icône des paramètres de l\'application";
+
+//Partner
+"navigate_to_event" = "Naviguer vers l\'événement";
+"cd_arrow_back" = "retourner en arrière";
+
+//Settings
+"measuring_system" = "Système de mesure";
+"language" = "Langue";
+"help" = "Aide";
+"term_of_use" = "Conditions d\'utilisation";
+"privacy_policy" = "Politique de confidentialité";
+"build" = "Construire";
+"version" = "Version de l\'application";
+"technical_infos" = "Informations techniques";
+"app_settings" = "Paramètres de l\'application";
+"french" = "Français";
+"english" = "Anglais";
+"italian" = "Italien";
+"spanish" = "Espagnol";
+"german" = "Allemand";
+"meter" = "metre";
+"miles" = "miles";
+"serv" = "l";
+
+//Sorting
+"sorting" = "Tri";
+"sort_places" = "Trier les lieux";
+"none" = "Aucun";
+"by_distance_from_you" = "Par distance de vous";
+"distance_from_searched_location" = "Par distance de l\'emplacement recherché";
+"by_date" = "Par date (plus tôt en premier)";
+"apply_sorting" = "Appliquer le tri";
+"z" = "icône de loupe";
+
+//Spot Sheet
+"verified" = "Vérifié";
+"overview" = "Vue d\'ensemble";
+"details" = "Détails";
+"contact_info" = "Coordonnées";
+"phone" = "Téléphone";
+"website" = "Site web";
+"from_you" = "de votre position";
+"view_all_services" = "Voir tous les services disponibles à cet endroit";
+"view_all_brands" = "Voir toutes les marques disponibles à cet endroit";
+"navigate" = "Naviguer";
+"services" = "Services";
+"official_dealers" = "Concessionnaires officiels";
+"accessories" = "Accessoires";
+"services_subtitle" = "Il s\'agit d\'informations supplémentaires que nous pouvons ajouter.";
+"dealers_subtitle" = " but it might offer services for other brands as well. Contact place to find out.";
+"accessories_subtitle" = "Ces marques sont vendues et/ou entretenues à cet endroit.";
+
+//checkLists
+"travel_checklists" = "Listes de contrôle de voyage";
+"clear_all" = "Effacer tout";
+
+//myLocation
+"my_location" = "Mon emplacement actuel";
+"my_parking" = "Mon emplacement de stationnement";
+"park_here" = "Stationner ici";
+"delete" = "Supprimer";
+"delete_location_popup" = "Do you want to permanently delete this saved location? The action cannot be undone.";

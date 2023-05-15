@@ -25,7 +25,7 @@ fun Location.distanceFromUserLocationText(preference: KMMPreference): String {
         }
         else -> {
             Globals.geoLoc.lastKnownLocation.let {
-                "${round(this.distanceFrom(it) * 10.0) / 10.0}"
+                "${round(this.distanceFrom(it) * 10.0) / 10.0} km"
             }
         }
     }
@@ -59,6 +59,3 @@ fun Location.distanceFrom(location: Location): Double {
     val toKm = earthRadius * c
     return toKm
 }
-
-fun Double.degreeToRadius() = this * PI / 180.0
-fun Double.radiusToDegree() = this * 180.0 / PI

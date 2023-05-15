@@ -1,8 +1,16 @@
 package com.example.camperpro.utils.di
 
+import com.example.camperpro.data.datasources.local.DatabaseDriverFactory
+import com.example.camperpro.data.datasources.local.FilterDaoDelight
+import com.example.camperpro.data.datasources.local.LocationSearchDaoDelight
+import com.example.camperpro.data.datasources.local.SearchDaoDelight
+import com.example.camperpro.data.datasources.local.dao.FilterDao
+import com.example.camperpro.data.datasources.local.dao.LocationSearchDao
+import com.example.camperpro.data.datasources.local.dao.SearchDao
 import com.example.camperpro.data.datasources.remote.Api
 import com.example.camperpro.data.datasources.remote.CamperProApi
 import com.example.camperpro.data.repositories.*
+import com.example.camperpro.database.CamperproDatabase
 import com.example.camperpro.domain.repositories.*
 import com.example.camperpro.domain.usecases.*
 import com.example.camperpro.utils.Constants
@@ -73,4 +81,7 @@ val useCasesDependencies = module {
     factoryOf(::GetLocationInfos)
     factory { (context: Any?) -> LanguageManager(context) }
 }
+
+
+
 

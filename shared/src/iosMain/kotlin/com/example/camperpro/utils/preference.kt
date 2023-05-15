@@ -36,9 +36,8 @@ actual fun KMMContext.getBool(key: String, default: Boolean): Boolean {
     return NSUserDefaults.standardUserDefaults.boolForKey(key)
 }
 
-// TODO: implement for ios
-
 actual fun KMMContext.remove(key: String) {
+    NSUserDefaults.standardUserDefaults.removeObjectForKey(key)
 }
 
 actual fun KMMContext.contains(key: String): Boolean {

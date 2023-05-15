@@ -46,7 +46,7 @@ fun HomeScreen(navController: NavHostController = rememberNavController()) {
         LocationManager.onLocationUpdated(this) {
             appViewModel.removeGpsMissingNotification()
             val lat = it.coordinates.latitude
-            val long = it.coordinates.longitude
+            val long = it.coordinates.longit ude
             Log.d("location", "$lat, $long")
             Globals.geoLoc.lastKnownLocation = Location(lat, long)
 
@@ -113,8 +113,7 @@ fun HomeScreen(navController: NavHostController = rememberNavController()) {
                 )
 
                 AnimatedVisibility(
-                    modifier =
-                    Modifier.align(Alignment.Center),
+                    modifier = Modifier.align(Alignment.Center),
                     visible = popupState != GlobalPopupState.HID,
                     enter = fadeIn(), exit = fadeOut()
                 ) {
@@ -133,5 +132,6 @@ fun HomeScreen(navController: NavHostController = rememberNavController()) {
         }
     }
 }
+
 
 

@@ -30,7 +30,7 @@ import com.example.camperpro.android.spotSheet.Gallery
 import com.example.camperpro.android.ui.theme.AppColor
 import com.example.camperpro.android.ui.theme.Dimensions
 import com.example.camperpro.domain.model.CheckList
-import com.example.camperpro.domain.model.Task
+import com.example.camperpro.domain.model.Todo
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -136,7 +136,7 @@ fun Body(
         ) {
             Spacer(modifier = Modifier.weight(1f))
             Text(
-                text = "${tasksDone.value.size}/${checkList.tasks.size}",
+                text = "${tasksDone.value.size}/${checkList.todos.size}",
                 color = AppColor.Primary,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.W500
@@ -151,7 +151,7 @@ fun Body(
                     state = scrollState, orientation = Orientation.Vertical
                 )
         ) {
-            items(checkList.tasks) { task ->
+            items(checkList.todos) { task ->
                 TaskItem(task, selected = tasksDone.value.contains(task.id)) {
                     if (tasksDone.value.contains(task.id)) {
                         onTaskUncheck(task.id)
@@ -174,7 +174,7 @@ fun Body(
 }
 
 @Composable
-fun TaskItem(task: Task, selected: Boolean, onClick: () -> Unit) {
+fun TaskItem(todo: Todo, selected: Boolean, onClick: () -> Unit) {
 
     var checkedState by remember { mutableStateOf(selected) }
 
@@ -188,7 +188,7 @@ fun TaskItem(task: Task, selected: Boolean, onClick: () -> Unit) {
     ) {
 
         Text(
-            text = task.name,
+            text = todo.name,
             fontSize = 14.sp,
             fontWeight = FontWeight(450),
             color = AppColor.Tertiary

@@ -345,7 +345,6 @@ fun FilterStepOne(
     ) {
 
         RadioButtonsFilter.values().dropLast(1).forEach { option ->
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()

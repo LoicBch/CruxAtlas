@@ -78,7 +78,7 @@ fun Header(dealer: Dealer, onClose: () -> Unit) {
             Gallery(photos = dealer.photos)
         }
 
-        Column() {
+        Column {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()

@@ -5,11 +5,9 @@ import com.example.camperpro.domain.model.composition.Location
 import kotlinx.coroutines.Job
 import kotlin.native.concurrent.ThreadLocal
 
-// TODO: to replace by class with dependecy injection if this get to messy, (it will)
+// TODO: replace by class with dependecy injection if this get to messy, (spoiler : it will)
 
 object Globals {
-
-    @ThreadLocal
     object geoLoc {
         var lastKnownLocation: Location = Constants.DEFAULT_LOCATION
         var lastSearchedLocation: Location = Constants.DEFAULT_LOCATION
@@ -20,7 +18,6 @@ object Globals {
         lateinit var appLanguage: String
     }
 
-    @ThreadLocal
     object filters {
         lateinit var brands: List<Pair<String, String>>
         lateinit var services: List<Pair<String, String>>
@@ -37,10 +34,9 @@ object Globals {
                 "Spain",
                 "United Kingdom"
             )
-        var onApplyFilters: () -> Unit = {}
     }
 
-    @ThreadLocal
+
     object network {
         var status: ConnectivityObserver.NetworkStatus =
             ConnectivityObserver.NetworkStatus.Unavailable

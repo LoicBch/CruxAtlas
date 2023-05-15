@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+<!--  Around location -->
+<string name="around_location_placeholder">Tik om te beginnen met typen</string>
+<string name="around_location_subtitle"> city</string>
+<string name="cd_magnifying_glass_icon">vergrootglaspictogram</string>
+
+<!--  Filter -->
+<string name="filters_title">Filter</string>
+<string name="search_details_subtitle">Zoekdetails</string>
+<string name="choose_motorhome_brand">Kies motorhome-merk</string>
+<string name="choose_services_type">Kies type diensten</string>
+<string name="choose_accessories_brand">Kies accessoiresmerk</string>
+<string name="all_motorhome_brand">alle motorhome-merken</string>
+<string name="all_services_type">alle type diensten</string>
+<string name="all_accessories_brand">alle accessoiresmerken</string>
+<string name="apply_filters">Filters toepassen</string>
+<string name="search_placeholder">Tik om te beginnen met typen</string>
+<string name="last_searched">Laatst gezocht</string>
+<string name="search_result">Zoekresultaten</string>
+<string name="filter_step1_title">Hoe kunnen we u vandaag helpen?</string>
+<string name="filter_step2_title">Details selecteren</string>
+<string name="filter_step1_option1"> aufrüsten oder kaufen"</string>
+<string name="filter_step1_option2">Vind officiële motorhome-dealers</string>
+<string name="filter_step1_option3">Zoek motorhome-accessoires</string>
+<string name="choose_country">Kies land</string>
+<string name="confirm_selection">Selectie bevestigen</string>
+<string name="motorhome_brands">Motorhome-merken</string>
+<string name="motorhome_services">Motorhome-diensten</string>
+<string name="where_do_you_want_to_go">Waar wil je naartoe?</string>
+<string name="cd_filter_icon">filterpictogram</string>
+<string name="cd_filter_option">openen en %1$s kiezen</string>
+
+<!--  Global -->
+<string name="all">Alle</string>
+<string name="reset">Herstellen</string>
+<string name="step">Stap</string>
+<string name="slider_missing_network_title">Netwerkverbinding verbroken</string>
+<string name="slider_missing_network_text">Controlla le impostazioni internet</string>
+<string name="slider_missing_gps_text">Attiva il GPS</string>
+<string name="slider_missing_gps_title">GPS-signaal verloren</string>
+<string name="popup_missing_network_title">Netwerkverbinding verbroken</string>
+<string name="popup_missing_gps_title">GPS-signaal verloren</string>
+<string name="popup_missing_network_text">U kunt deze functie niet offline gebruiken</string>
+<string name="popup_missing_gps_text">you can\'t access this function without location</string>
+<string name="loading">enabled</string>
+<string name="get_offer">Ontvang aanbieding met beperkte tijd!</string>
+
+<!--  MainMap Screen -->
+<string name="appbar_around_me">Om mij heen</string>
+<string name="appbar_around_location">Rond een plek</string>
+<string name="appbar_partners">Partners</string>
+<string name="appbar_menu">Meer</string>
+<string name="search_this_area">Doorzoek dit gebied</string>
+<string name="cd_button_vertical_list">schakelen naar lijstmodus</string>
+<string name="cd_button_filter">schakelen naar lijstmodus</string>
+<string name="cd_button_mapstyle">Verander kaartlaag</string>
+<string name="cd_around_me">plaatsen weergeven om mij heen</string>
+<string name="cd_around_location">Apri la schermata per cercare intorno a una posizione</string>
+<string name="cd_partners">partnerscherm openen</string>
+<string name="cd_menu">menu openen</string>
+<string name="cd_search_here">zoeken op deze locatie</string>
+
+<!--  More -->
+<string name="menu_travel_tools">Reisgereedschap</string>
+<string name="menu_events">Evenementen</string>
+<string name="menu_leveler">Waterpas</string>
+<string name="menu_my_location">Mijn locatie</string>
+<string name="menu_app_settings">App-instellingen</string>
+<string name="menu_travel_checklists">Reiscontrolelijsten</string>
+<string name="cd_travel_tools">reisgereedschapspictogram</string>
+<string name="cd_travel_checklist">reiscontrolelijstpictogram</string>
+<string name="cd_leveler">waterpaspictogram</string>
+<string name="cd_events">open kaart met evenementen</string>
+<string name="cd_my_location">mijn locatiepictogram</string>
+<string name="cd_app_settings">app-instellingenpictogram</string>
+
+<!--  Partner -->
+<string name="navigate_to_event">Navigeer naar het evenement</string>
+<string name="cd_arrow_back">terug gaan</string>
+
+<!--  Settings -->
+<string name="measuring_system">Meet systeem</string>
+<string name="language">Taal</string>
+<string name="help">Help</string>
+<string name="term_of_use">Gebruiksvoorwaarden</string>
+<string name="privacy_policy">Privacybeleid</string>
+<string name="build">Build</string>
+<string name="version">App-versie</string>
+<string name="technical_infos">Technische informatie</string>
+<string name="app_settings">App-instellingen</string>
+<string name="french">Frans</string>
+<string name="english">Engels</string>
+<string name="italian">Italiaans</string>
+<string name="spanish">Spaans</string>
+<string name="german">Duits</string>
+<string name="meter">meter</string>
+<string name="miles">mijlen</string>
+<string name="serv">terug gaan</string>
+
+<!--  Sorting -->
+<string name="sorting">Sorteren</string>
+<string name="sort_places">Plaatsen sorteren</string>
+<string name="none">Geen</string>
+<string name="by_distance_from_you">Op afstand van u</string>
+<string name="distance_from_searched_location">Op afstand van gezochte locatie</string>
+<string name="by_date">Op datum (eerstvolgende)</string>
+<string name="apply_sorting">Sorteren toepassen</string>
+<string name="z">vergrootglaspictogram</string>
+
+<!--  Spot Sheet -->
+<string name="verified">Geverifieerd</string>
+<string name="overview">Overzicht</string>
+<string name="details">Details</string>
+<string name="contact_info">Contactgegevens</string>
+<string name="phone">Telefoon</string>
+<string name="website">Website</string>
+<string name="from_you">van u</string>
+<string name="view_all_services">Bekijk alle diensten op deze plek</string>
+<string name="view_all_brands">Bekijk alle merken op deze plek</string>
+<string name="navigate">Navigeren</string>
+<string name="services">Diensten</string>
+<string name="official_dealers">Officiële dealers</string>
+<string name="accessories">Accessoires</string>
+<string name="services_subtitle">Queste informazioni aggiuntive possono essere aggiunte.</string>
+<string name="dealers_subtitle"> bietet aber möglicherweise auch Dienstleistungen für andere Marken an. Kontaktieren Sie den Ort</string>
+<string name="accessories_subtitle">Deze merken worden verkocht en/of onderhouden op deze plek.</string>
+
+<!--  checkLists -->
+<string name="travel_checklists">Reiscontrolelijsten</string>
+<string name="clear_all">Alles wissen</string>
+
+<!--  myLocation -->
+<string name="my_location">Mijn huidige locatie</string>
+<string name="my_parking">Mijn parkeerlocatie</string>
+<string name="park_here">Hier parkeren</string>
+<string name="delete">Verwijderen</string>
+<string name="delete_location_popup">"Do you want to permanently delete this saved location? The action cannot be undone."</string>
+</resources>

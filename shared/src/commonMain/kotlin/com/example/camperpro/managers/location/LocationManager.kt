@@ -7,7 +7,6 @@ import kotlin.native.concurrent.ThreadLocal
 
 class LocationManager {
 
-    @ThreadLocal
     companion object : BaseLocationManagerCompanion {
 
         override fun currentLocation(block: OnLocationUpdatedBlock) {
@@ -33,6 +32,7 @@ class LocationManager {
                 onLocationUnavailableBlockMap.value.appending(target, block)
             return this
         }
+
 
         override fun onLocationUpdated(
             target: Any,

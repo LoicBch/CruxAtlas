@@ -10,43 +10,88 @@ import Foundation
 import shared
 import CoreLocation
 import MapKit
+import SwiftUI
 
 extension MainMapScreen {
     @MainActor class MainMapViewModel : ObservableObject {
         
         init(){
-            LocationManager.Companion().requiredPermission = .authorizedalways
-            LocationManager.Companion().onAlwaysAllowsPermissionRequired(target: self) {
-                print("onAlwaysAllowsPermissionRequired")
-            }
-            getSpotAroundPos(location: Location(latitude: 45.7640, longitude: 4.8357))
+            showDealers(location: Globals.geoLoc().lastKnownLocation)
+            getAds()
         }
         
-        @Published var mapRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 45.7, longitude: 4.8), span: MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2))
-        @Published private(set) var mapcenter = Location(latitude: 51.5, longitude: -0.12)
-        
-        @Published private(set) var markers = [MarkerIos]()
-        @Published private(set) var events = [Event]()
-        @Published private(set) var dealers = [Dealer]()
+        @Published var mapRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: Globals.geoLoc().lastKnownLocation.latitude, longitude: Globals.geoLoc().lastKnownLocation.longitude), span: MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2))
+       
+        @Published var markers = [MarkerAnnotation]()
+        @Published var events = [Event]()
+        @Published var dealers = [Dealer]()
         @Published private(set) var updateSource = UpdateSource.default_
-        @Published private(set) var ads = [Ads]()
+        @Published private(set) var ads = [Ad]()
         @Published private(set) var cameraIsOutOfRadiusLimit = false
         @Published private(set) var verticalListIsShowing = false
         @Published private(set) var isLoading = false
         @Published private(set) var placeSearched = ""
-        
+        @Published var mapType = MKMapType.standard
         @Published private(set) var dealersSorted = [Dealer]()
         @Published private(set) var eventsSorted = [Event]()
+        @Published var placeIdToScroll = ""
+        @Published var searchHereButtonIsShowing = false
+        @Published var currentPlaceSelectedId = ""
         
         
         func showDealers(location: Location){
-            
+            isLoading = true
+            searchHereButtonIsShowing = false
+            updateMapRegion(latitude: location.latitude, longitude: location.longitude, zoom: mapRegion.span)
+            mapRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude), span: mapRegion.span)
             Task.init {
                 do {
-                    let dealerss = try await RFetchSpotAtLocationUseCase().execute(location : mapcenter)
-                    dealers = dealerss
-                    self.markers = dealerss.map({ (dealer:Dealer) -> MarkerIos in
-                        MarkerIos(id : UUID(), placeLinkedId : dealer.id, selected : false, latitude: dealer.latitude, longitude: dealer.longitude)
+                    let res = try await RFetchDealersAtLocationUseCase().execute(location : location)!
+                    dealers = res
+                    dealersSorted = res
+                    placeSearched = ""
+                    self.markers = dealers.map({ (dealer:Dealer) -> MarkerAnnotation in
+                        MarkerAnnotation(coordinate: CLLocationCoordinate2D(latitude: dealer.latitude, longitude: dealer.longitude), idPlaceLinked: dealer.id, selected: false)
+                    })
+                    isLoading = false
+                } catch {
+                    // handle error
+                }
+            }
+        }
+         
+        func showEvents(){
+            isLoading = true
+            Task.init {
+                do {
+                    let res = try await RFetchEvents().execute()!
+                    events = res
+                    eventsSorted = res
+                    searchHereButtonIsShowing = false
+                    self.markers = events.map({ (event:Event) -> MarkerAnnotation in
+                        MarkerAnnotation(coordinate: CLLocationCoordinate2D(latitude: event.latitude, longitude: event.longitude), idPlaceLinked: event.id, selected: false)
+                    })
+                    updateSource = UpdateSource.events
+//                    updateMapRegion(latitude: self.markers.first!.coordinate.latitude, longitude: self.markers.first!.coordinate.longitude, zoom: self.mapRegion.span)
+                } catch {
+                    // handle error
+                }
+            }
+        }
+        
+        func showSpotsAroundPlace(place: Place){
+            isLoading = true
+            Task.init {
+                do {
+                    let result = try await RFetchDealersAtLocationUseCase().execute(location : place.location)!
+                    dealers = result
+                    dealersSorted = result
+                    updateSource = UpdateSource.aroundPlace
+                    placeSearched = place.name
+                    searchHereButtonIsShowing = false
+                    updateMapRegion(latitude: place.location.latitude, longitude: place.location.longitude, zoom: mapRegion.span)
+                    self.markers = dealers.map({ (dealer:Dealer) -> MarkerAnnotation in
+                        MarkerAnnotation(coordinate: CLLocationCoordinate2D(latitude: dealer.latitude, longitude: dealer.longitude), idPlaceLinked: dealer.id, selected: false)
                     })
                 } catch {
                     // handle error
@@ -54,19 +99,63 @@ extension MainMapScreen {
             }
         }
         
-        func getLocation(){
-             
-                LocationManager.Companion()
-                    .onLocationUnavailable(target: "SingleRequest") {
-                        print("onLocationUnavailable")
-                    }
-                    .onPermissionUpdated(target: self, block: {
-                        print("onPermissionUpdated. Granted:", $0)
-                    })
-                    .currentLocation { data in
-                        print("location coordinates", Date(), data.coordinates)
-                    }
+        func getAds(){
+            isLoading = true
+            Task.init {
+                do {
+                    ads = try await RFetchAds().execute()!
+                } catch {
+                    // handle error
+                }
+            }
         }
+        
+        func onSortingOptionSelected(sortingOption : SortOption){
+            isLoading = true
+            Task.init {
+                do {
+                    if (updateSource == UpdateSource.events){
+                        eventsSorted = try await RSortEvents().execute(sortOption: sortingOption, eventsToSort: events)!
+                    } else {
+                        dealersSorted = try await RSortDealer().execute(sortOption: sortingOption, dealersToSort: dealers)!
+                    }
+                } catch {
+                    // handle error
+                }
+            }
+        }
+        
+        func onMapStopMoving(location: Location){
+            self.searchHereButtonIsShowing = false 
+            if (updateSource == UpdateSource.aroundMe || updateSource == UpdateSource.default_){
+                if (!Location(latitude: location.latitude, longitude: location.longitude).isAroundLastSearchedLocation){
+                    self.searchHereButtonIsShowing = true
+                }
+            }
+        }
+        
+        func getLocation(){
+            
+            LocationManager.Companion()
+                .onLocationUnavailable(target: "SingleRequest") {
+                    print("onLocationUnavailable")
+                }
+                .onPermissionUpdated(target: self, block: {
+                    print("onPermissionUpdated. Granted:", $0)
+                })
+                .currentLocation { data in
+                    print("location coordinates", Date(), data.coordinates)
+                }
+        }
+        
+        func switchMapStyle(){
+            if (mapType == MKMapType.standard){
+                mapType = MKMapType.satellite
+            }else{
+                mapType = MKMapType.standard
+            }
+        }
+        
         
         func showVerticalList(){
             verticalListIsShowing = true
@@ -80,29 +169,34 @@ extension MainMapScreen {
             verticalListIsShowing = !verticalListIsShowing
         }
         
-        func showEvents(){
-            Task.init {
-                do {
-                    let eventss = try await RFetchSpotAtLocationUseCase().execute(location : mapcenter)
-                    events = eventss
-                    self.events = eventss.map({ (event:Event) -> MarkerIos in
-                        MarkerIos(id : UUID(), placeLinkedId: event.id, selected: false, latitude: event.latitude, longitude: event.longitude)
-                    })
-                } catch {
-                    // handle error
+        func selectMarker(placeLinkedId: String, zoom: MKCoordinateSpan){
+            unSelectMarker(placeLinkedId: currentPlaceSelectedId)
+            currentPlaceSelectedId = placeLinkedId
+            
+            var markerSelected = markers.first(where: {
+                $0.idPlaceLinked == placeLinkedId
+            })
+            if let i = markers.firstIndex(of: markerSelected!) {
+                markers[i] = MarkerAnnotation(coordinate: CLLocationCoordinate2D(latitude: (markerSelected?.coordinate.latitude)!, longitude: (markerSelected?.coordinate.longitude)!), idPlaceLinked: markerSelected!.idPlaceLinked, selected: true)
+            }
+            
+            updateMapRegion(latitude: CGFloat(markerSelected!.coordinate.latitude), longitude: CGFloat(markerSelected!.coordinate.longitude), zoom: zoom)
+            
+        }
+        
+        private func unSelectMarker(placeLinkedId: String){
+            if(placeLinkedId != ""){
+                var markerSelected = markers.first(where: {
+                    $0.idPlaceLinked == placeLinkedId
+                })
+                if let i = markers.firstIndex(of: markerSelected!) {
+                    markers[i] = MarkerAnnotation(coordinate: markerSelected!.coordinate, idPlaceLinked: markerSelected!.idPlaceLinked, selected: false )
                 }
             }
         }
         
-        func getAds(){
-            Task.init {
-                
-            }
+        private func updateMapRegion(latitude: CGFloat, longitude: CGFloat, zoom: MKCoordinateSpan ){
+                mapRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: latitude, longitude: longitude), span: zoom)
         }
-        
-        func onSortingOptionSelected(sortOption: SortOption){
-            
-        }
-        
     }
 }

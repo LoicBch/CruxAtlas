@@ -20,10 +20,10 @@ import MapKit
     @Published var bottomSheetIsOpen = false
     @Published var bottomOption = BottomSheetOption.FILTER
     
-    
     func openSheet(option: BottomSheetOption){
         setOption(option: option)
         bottomSheetIsOpen = true
+        print(bottomSheetIsOpen)
     }
     
     func closeSheet(){

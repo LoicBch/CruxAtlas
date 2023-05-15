@@ -22,7 +22,6 @@ class MyLocationViewModel(
     private val getLocationInfos: GetLocationInfos, private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-
     var activeLocation = savedStateHandle.getStateFlow("active_location", LocationInfos())
 
     private var currentLocation = mutableStateOf(Marker("current", false, 0.0, 0.0))

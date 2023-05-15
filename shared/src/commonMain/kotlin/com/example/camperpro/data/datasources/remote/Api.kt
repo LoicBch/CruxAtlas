@@ -20,7 +20,7 @@ interface Api {
 
     suspend fun getChecklists(): ResultWrapper<List<CheckList>>
     suspend fun getPartners(): ResultWrapper<List<Partner>>
-    suspend fun getEvents(countriesFilters: String): ResultWrapper<List<Event>>
+    suspend fun getEvents(countriesFilters: String?): ResultWrapper<List<Event>>
     suspend fun locate(lat: String, long: String): ResultWrapper<LocationInfos>
 
 }
