@@ -1,23 +1,16 @@
 PODS:
-  - Introspect (0.3.1)
   - shared (1.0)
 
 DEPENDENCIES:
-  - Introspect
   - shared (from `../shared`)
-
-SPEC REPOS:
-  trunk:
-    - Introspect
 
 EXTERNAL SOURCES:
   shared:
     :path: "../shared"
 
 SPEC CHECKSUMS:
-  Introspect: 4a3e10358b43237f80673b730908c183b3d05a42
   shared: 07cac7993e4f05eda6b76f3a213b070947c3b79f
 
-PODFILE CHECKSUM: 6dbd9e750e23ea27e04d739fc9de3579fb3a5282
+PODFILE CHECKSUM: cb976e7e275a85ac0f87a2394c4de9268ead2adf
 
 COCOAPODS: 1.11.3

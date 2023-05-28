@@ -66,12 +66,8 @@ Compose x SwiftUI -> ViewModel -> Usecase -> Model <- Repository <- Mappers <- D
   markers to the user
 
 ## Ios module
-
-- Current tabView has too much restriction it has a delay when reapearing, it leave a blank 
-  space when it's hided, it somewhat overlap with the content, the color is not permanent.
-  Could be better to spend time to make a custom TabView That implement the app needs.
-- The Mainmap horizontal scrollView replacement after the scroll ended does not always put the 
-  item in the right place after scroll
-- The Filter selected category is not remenbered after selecting a filter.
+  
+- TabView in detailsDealerScreen has strange behavior
+- Performance improvement, map might have strange refocus
 - After loading spots around a place or events map should refocuse to display all visible 
   markers to the user
