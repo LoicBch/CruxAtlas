@@ -39,5 +39,8 @@ data class EventDto(
 
     @SerialName("country_iso")
     var countryIso: String = "",
+
+    @SerialName("image_url")
+    var imageUrl: String = "",
     var url: String = ""
 )

@@ -1,7 +1,5 @@
 package com.example.camperpro.android.composables
 
-import android.graphics.Color
-import android.graphics.drawable.Icon
 import android.inputmethodservice.Keyboard
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -40,7 +38,7 @@ fun PopupParkingLocation(modifier: Modifier, onExit: () -> Unit, onDelete: () ->
                 .padding(vertical = 24.dp, horizontal = 16.dp)
                 .align(Alignment.Center)
         ) {
-            Keyboard.Row(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 16.dp, horizontal = 20.dp)

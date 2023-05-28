@@ -21,7 +21,7 @@ extension MainMapScreen {
         }
         
         @Published var mapRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: Globals.geoLoc().lastKnownLocation.latitude, longitude: Globals.geoLoc().lastKnownLocation.longitude), span: MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2))
-       
+        
         @Published var markers = [MarkerAnnotation]()
         @Published var events = [Event]()
         @Published var dealers = [Dealer]()
@@ -37,13 +37,13 @@ extension MainMapScreen {
         @Published var placeIdToScroll = ""
         @Published var searchHereButtonIsShowing = false
         @Published var currentPlaceSelectedId = ""
+        @Published var mapMovedByCode = false
         
         
         func showDealers(location: Location){
             isLoading = true
             searchHereButtonIsShowing = false
-            updateMapRegion(latitude: location.latitude, longitude: location.longitude, zoom: mapRegion.span)
-            mapRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude), span: mapRegion.span)
+            updateSource = UpdateSource.aroundMe
             Task.init {
                 do {
                     let res = try await RFetchDealersAtLocationUseCase().execute(location : location)!
@@ -53,13 +53,15 @@ extension MainMapScreen {
                     self.markers = dealers.map({ (dealer:Dealer) -> MarkerAnnotation in
                         MarkerAnnotation(coordinate: CLLocationCoordinate2D(latitude: dealer.latitude, longitude: dealer.longitude), idPlaceLinked: dealer.id, selected: false)
                     })
+                    updateMapRegion(latitude: location.latitude, longitude: location.longitude, zoom: mapRegion.span)
                     isLoading = false
                 } catch {
+                    isLoading = false
                     // handle error
                 }
             }
         }
-         
+        
         func showEvents(){
             isLoading = true
             Task.init {
@@ -71,9 +73,13 @@ extension MainMapScreen {
                     self.markers = events.map({ (event:Event) -> MarkerAnnotation in
                         MarkerAnnotation(coordinate: CLLocationCoordinate2D(latitude: event.latitude, longitude: event.longitude), idPlaceLinked: event.id, selected: false)
                     })
+                    
                     updateSource = UpdateSource.events
-//                    updateMapRegion(latitude: self.markers.first!.coordinate.latitude, longitude: self.markers.first!.coordinate.longitude, zoom: self.mapRegion.span)
+                    isLoading = false
+                    mapRegion = self.markers.getRegion()
+                    updateMapRegion(latitude: mapRegion.center.latitude, longitude: mapRegion.center.longitude, zoom: mapRegion.span)
                 } catch {
+                    isLoading = false
                     // handle error
                 }
             }
@@ -93,7 +99,9 @@ extension MainMapScreen {
                     self.markers = dealers.map({ (dealer:Dealer) -> MarkerAnnotation in
                         MarkerAnnotation(coordinate: CLLocationCoordinate2D(latitude: dealer.latitude, longitude: dealer.longitude), idPlaceLinked: dealer.id, selected: false)
                     })
+                    isLoading = false
                 } catch {
+                    isLoading = false
                     // handle error
                 }
             }
@@ -104,7 +112,9 @@ extension MainMapScreen {
             Task.init {
                 do {
                     ads = try await RFetchAds().execute()!
+                    isLoading = false
                 } catch {
+                    isLoading = false
                     // handle error
                 }
             }
@@ -126,7 +136,8 @@ extension MainMapScreen {
         }
         
         func onMapStopMoving(location: Location){
-            self.searchHereButtonIsShowing = false 
+            self.searchHereButtonIsShowing = false
+            self.mapMovedByCode = false
             if (updateSource == UpdateSource.aroundMe || updateSource == UpdateSource.default_){
                 if (!Location(latitude: location.latitude, longitude: location.longitude).isAroundLastSearchedLocation){
                     self.searchHereButtonIsShowing = true
@@ -195,8 +206,12 @@ extension MainMapScreen {
             }
         }
         
-        private func updateMapRegion(latitude: CGFloat, longitude: CGFloat, zoom: MKCoordinateSpan ){
-                mapRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: latitude, longitude: longitude), span: zoom)
+        
+        func updateMapRegion(latitude: CGFloat, longitude: CGFloat, zoom: MKCoordinateSpan ){
+            mapMovedByCode = true
+            mapRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: latitude, longitude: longitude), span: zoom)
+//            mapRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 50.6, longitude: 3.06), span: zoom)
+//            mapRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 44.8, longitude: -0.5), span: zoom)
         }
     }
 }

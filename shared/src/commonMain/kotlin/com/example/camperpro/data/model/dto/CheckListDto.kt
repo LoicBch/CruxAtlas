@@ -4,8 +4,8 @@ package com.example.camperpro.data.model.dto
 data class CheckListDto(
     val id: String,
     val name: String,
-    //    val description: String,
-    //    val imageLink: String,
+    val description: String,
+    val imageLink: String,
     val tags: String,
     val tasks: List<TaskDto>
 )

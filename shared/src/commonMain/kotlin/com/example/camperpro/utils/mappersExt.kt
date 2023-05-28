@@ -55,6 +55,7 @@ fun EventDto.toVo() = Event(
     city,
     country,
     countryIso,
+    listOf(Photo(imageUrl)),
     url
 )
 
@@ -98,7 +99,7 @@ fun List<DealerDto>.toVo() = map { it.toVo() }
 
 @JvmName("toChecklistsVo")
 fun List<CheckListDto>.toVo() = map { it.toVo() }
-fun CheckListDto.toVo() = CheckList(id, name, tags.split(", "), tasks.map { it.toVo() })
+fun CheckListDto.toVo() = CheckList(id, name, description, imageLink, tags.split(", "), tasks.map { it.toVo() })
 fun TaskDto.toVo() = Todo(id, name)
 
 

@@ -21,7 +21,7 @@ struct AppButton: View {
                 action()
             }){
                 Spacer()
-                LocalizedText(key: title)
+                Text(LocalizedStringKey(title))
 //                    .fontWeight(.bold)
                     .font(.system(size: 16))
                     .foregroundColor(Color.white)
@@ -36,7 +36,7 @@ struct AppButton: View {
         }else{
             Button(action: {}){
                 Spacer()
-                LocalizedText(key: title)
+                Text(LocalizedStringKey(title))
 //                    .fontWeight(.bold)
                     .font(.system(size: 16))
                     .foregroundColor(Color.white)

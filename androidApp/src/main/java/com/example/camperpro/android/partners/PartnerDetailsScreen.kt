@@ -1,5 +1,7 @@
 package com.example.camperpro.android.partners
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
@@ -59,6 +61,7 @@ fun PartnerDetailsScreen(navigator: DestinationsNavigator, partner: Partner) {
 fun Header(partner: Partner, onClose: () -> Unit) {
 
     val context = LocalContext.current
+    val shareContent = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { }
 
     Box(Modifier.heightIn(min = 50.dp)) {
 
@@ -88,7 +91,7 @@ fun Header(partner: Partner, onClose: () -> Unit) {
                     .shadow(2.dp, RoundedCornerShape(Dimensions.radiusRound))
                     .zIndex(1f)
                     .background(Color.White, RoundedCornerShape(Dimensions.radiusRound)),
-                           onClick = { context.share(context, "") }) {
+                           onClick = { context.share("", shareContent) }) {
                     Icon(painter = painterResource(id = R.drawable.share), contentDescription = "")
                 }
 

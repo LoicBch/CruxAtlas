@@ -7,6 +7,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.result.ActivityResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 
@@ -56,6 +58,15 @@ fun Context.navigateByGmaps(context: Context, latitude: Double, longitude: Doubl
     }
 }
 
-fun Context.share(context: Context, content: String) {
-
+fun Context.share(
+    content: String,
+    shareContent: ManagedActivityResultLauncher<Intent, ActivityResult>
+) {
+    val sendIntent: Intent = Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(Intent.EXTRA_TEXT, content)
+        type = "text/plain"
+    }
+    val shareIntent = Intent.createChooser(sendIntent, null)
+    shareContent.launch(shareIntent)
 }

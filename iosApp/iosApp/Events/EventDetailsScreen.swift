@@ -20,15 +20,12 @@ struct EventDetailsScreen: View {
         ScrollView{
             VStack{
                 ZStack{
-                    
-//                    let headerSize = getHeaderSize(event: event)
-                    
-//                    if (!event.photos.isEmpty){
-//                        ImageCarouselView(images: event.photos)
-//                    }
+                    if (!event.photos.isEmpty){
+                        ImageCarouselView(images: event.photos)
+                    }
                     
                     VStack{
-                        TopDealerButtons(onClose: { self.presentationMode.wrappedValue.dismiss() })
+                        TopDealerButtons(onClose: { self.presentationMode.wrappedValue.dismiss() }, onShare: { share(shared: event.stringToSend())})
                     }.padding(EdgeInsets(top: 12, leading: 17, bottom: 0, trailing: 17))
                 }
                 
@@ -70,15 +67,7 @@ struct EventDetailsScreen: View {
             
         }.padding(.horizontal, 18)
     }
-}
-
-//func getHeaderSize(event: Event) -> CGFloat{
-//    if (!event.photos.isEmpty){
-//        return 100
-//    }else{
-//        return 50
-//    }
-//}
+}  
 
 struct InfosList: View {
     

@@ -32,7 +32,7 @@ struct SortingSheet: View {
             }.padding(.top, 12).padding(.horizontal, 16)
             
             HStack{
-                LocalizedText(key: "sort_places")
+                Text("sort_places")
                 //                    .fontWeight(.black)
                     .font(.system(size: 14))
                     .foregroundColor(Color.black)

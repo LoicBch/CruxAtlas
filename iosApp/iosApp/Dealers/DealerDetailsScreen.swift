@@ -26,7 +26,8 @@ struct DealerDetailsScreen: View {
     @State var initialHeight: CGFloat = 0
     @State var contactTabHeight: CGFloat = 0
     @State var infosTabHeight: CGFloat = 0
-    @State var currentImage = ""
+    @State var currentImage = "" 
+    
     @Environment(\.presentationMode) var presentationMode
     
     var underLineSize = UIScreen.main.bounds.width / 3
@@ -35,7 +36,6 @@ struct DealerDetailsScreen: View {
         ScrollView(.vertical, showsIndicators: false){
             VStack {
                 ZStack{
-                    
                     let headerSize = getHeaderSize(dealer: dealer)
                     
                     if (dealer.isPremium && !dealer.photos.isEmpty){
@@ -43,14 +43,19 @@ struct DealerDetailsScreen: View {
                     }
                     
                     VStack {
-                        TopDealerButtons(onClose: { self.presentationMode.wrappedValue.dismiss() })
-                        BadgeDealer(dealer: dealer).padding(.top, headerSize)
-                    }.padding(EdgeInsets(top: 12, leading: 17, bottom: 0, trailing: 17))
+                        TopDealerButtons(onClose: { self.presentationMode.wrappedValue.dismiss() }, onShare: {
+                            share(shared: dealer.stringToSend())
+                        })
+                        .padding(.top, 12)
+                        
+                        BadgeDealer(dealer: dealer).padding(.bottom, 10).padding(.top, headerSize)
+                    }
+                    .padding(EdgeInsets(top: 0, leading: 17, bottom: 0, trailing: 17))
                 }
                 
                 HStack{
                     Text("#" + dealer.id)
-                        .fontWeight(.light)
+                        .fontWeight(.bold)
                         .font(.system(size: 11))
                         .foregroundColor(Color("Tertiary"))
                         .padding(.top, 24)
@@ -72,17 +77,17 @@ struct DealerDetailsScreen: View {
                 
                 VStack{
                     HStack{
-                        LocalizedText(key: "overview").onTapGesture {
+                        Text("overview").onTapGesture {
                             selection = 0
                         }
                         .foregroundColor(Color(overViewTabColor))
                         Spacer()
-                        LocalizedText(key: "details").onTapGesture {
+                        Text("details").onTapGesture {
                             selection = 1
                         }
                         .foregroundColor(Color(infosTabColor))
                         Spacer()
-                        LocalizedText(key: "contact_info").onTapGesture {
+                        Text("contact_info").onTapGesture {
                           selection = 2
                         }
                         .foregroundColor(Color(contactsTabColor))
@@ -102,7 +107,7 @@ struct DealerDetailsScreen: View {
                         }
                         
                     }
-                }.padding(EdgeInsets(top: 24, leading: 18, bottom: 0, trailing: 18))
+                }.padding(EdgeInsets(top: 12, leading: 18, bottom: 0, trailing: 18))
                     .frame(width: .infinity)
                 
                 TabView(selection: $selection) {
@@ -187,23 +192,22 @@ struct DealerDetailsScreen: View {
                 })
             
             AppButton(action: {
-                
                 let coordinate = CLLocationCoordinate2DMake(dealer.latitude, dealer.longitude)
                 let mapItem = MKMapItem(placemark: MKPlacemark(coordinate: coordinate, addressDictionary:nil))
                 mapItem.name = "Target location"
                 mapItem.openInMaps(launchOptions: [MKLaunchOptionsDirectionsModeKey : MKLaunchOptionsDirectionsModeDriving])
                 
             }, title: "navigate", isEnable: true)
-            .padding(.top, 42)
+            .padding(.top, 42).padding(.bottom, 25)
         }
     }
 }
 
 func getHeaderSize(dealer: Dealer) -> CGFloat{
     if (dealer.isPremium && !dealer.photos.isEmpty){
-        return 100
+        return 80
     }else{
-        return 50
+        return 40
     }
 }
 
@@ -219,7 +223,7 @@ struct BadgeDealer: View {
                     .padding(5)
                     .background(Color.white)
                     .cornerRadius(5)
-                    .shadow(radius: 5, x:-1, y: 1)
+                    .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
             }
             
             if (!dealer.brands.isEmpty){
@@ -228,7 +232,7 @@ struct BadgeDealer: View {
                     .padding(5)
                     .background(Color.white)
                     .cornerRadius(5)
-                    .shadow(radius: 5, x:-1, y: 1)
+                    .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
             }
             
             Spacer()
@@ -239,13 +243,13 @@ struct BadgeDealer: View {
                         .frame(height: 30)
                         .padding(.leading, 5)
                     
-                    LocalizedText(key: "verified")
+                    Text("verified")
                         .font(.system(size: 12))
                         .foregroundColor(Color("Primary"))
                         .padding(.trailing, 5)
                 }.background(Color.white)
-                    .cornerRadius(15)
-                    .shadow(radius: 5, x:-1, y: 1)
+                    .cornerRadius(5)
+                    .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
             }
         }
     }
@@ -254,44 +258,31 @@ struct BadgeDealer: View {
 struct TopDealerButtons: View {
     
     var onClose: () -> Void
+    var onShare: () -> Void
     
     public var body: some View{
         HStack{
             Button(action: {
                 onClose()
             }){
-                Image(systemName: "xmark")
-            }
-            .frame(width: 50, height: 50)
-            .background(Color(red: 136, green: 175, blue: 255))
-            .cornerRadius(25)
-            .shadow(radius: 25, x: 1, y: 2)
-            .buttonStyle(.plain)
+                Image("cross")
+            }.buttonStyle(AppButtonStyle())
             
             Spacer()
             
             Button(action: {
-                
+                onShare()
             }){
                 Image("share")
             }
-            .frame(width: 50, height: 50)
-            .background(Color(red: 136, green: 175, blue: 255))
-            .cornerRadius(25)
-            .shadow(radius: 25, x: 1, y: 2)
-            .buttonStyle(.plain)
+            .buttonStyle(AppButtonStyle())
             .padding(.trailing, 8)
             
             Button(action: {
                 
             }){
                 Image("help")
-            }
-            .frame(width: 50, height: 50)
-            .background(Color(red: 136, green: 175, blue: 255))
-            .cornerRadius(25)
-            .shadow(radius: 25, x: 1, y: 2)
-            .buttonStyle(.plain)
+            }.buttonStyle(AppButtonStyle())
         }
     }
 }
@@ -305,10 +296,10 @@ struct OverviewTab: View {
         VStack {
             if (dealer.isPremium){
                 ContactRowPremium(dealer: dealer)
-                    .padding(.top, 16)
+                    .padding(.top, 25)
             }else {
                 ContactRow(dealer: dealer)
-                    .padding(.top, 16)
+                    .padding(.top, 25)
             }
             
             HStack{
@@ -319,7 +310,7 @@ struct OverviewTab: View {
                     .foregroundColor(Color.black)
                     .padding(.trailing, 5)
                 Spacer()
-            }.padding(.top, 16)
+            }.padding(.top, 25)
             
             HStack{
                 Image("pin_here")
@@ -357,7 +348,7 @@ struct ServicesBlock: View{
     public var body: some View{
         VStack{
             HStack {
-                LocalizedText(key: "services")
+                Text("services")
                     .font(.system(size: 16))
                     .foregroundColor(Color.black)
                 Spacer()
@@ -373,9 +364,9 @@ struct ServicesBlock: View{
             Divider()
             
             ForEach(services, id: \.self){ service in
+                 
+                var service: String = Globals.filters().services.first(where: {$0.first?.lowercased == service})?.second as! String
                 
-                //                if let service = Globals.filters().services.first(where: { $0.first! as String == service }) {
-                //                    let serviceString = String(describing: service.second)
                 HStack{
                     Text(service)
                         .fontWeight(.medium)
@@ -388,11 +379,11 @@ struct ServicesBlock: View{
             }
             if(!fullList){
                 HStack {
-                    LocalizedText(key: "view_all_services")
+                    Text("view_all_services")
                         .font(.system(size: 14))
                         .foregroundColor(Color("Secondary"))
                     Spacer()
-                    Image(systemName: "chevron.right")
+                    Image(systemName: "arrow.right")
                         .foregroundColor(Color("Secondary"))
                 }.onTapGesture {
                     onViewAll()
@@ -411,7 +402,7 @@ struct BrandsBlock: View{
     public var body: some View{
         VStack{
             HStack {
-                LocalizedText(key: "official_dealers")
+                Text("official_dealers")
                     .font(.system(size: 16))
                     .foregroundColor(Color.black)
                 Spacer()
@@ -430,9 +421,10 @@ struct BrandsBlock: View{
                 ForEach(dealerChunks, id: \.self){ rowElements in
                     HStack{
                         ForEach(rowElements, id: \.self){ rowElements in
-                            //                if let brand = Globals.filters().brands.first(where: { $0.first! as String == brand }) {
-                            //                    let brandString = String(describing: brand.second)
-                            Text(rowElements)
+                            
+                            var brand = Globals.filters().brands.first(where: { $0.first?.lowercased == rowElements })?.second as! String
+                            
+                            Text(brand)
                                 .fontWeight(.medium)
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 5)
@@ -444,8 +436,8 @@ struct BrandsBlock: View{
                                         .stroke(Color("unSelectedFilter"), lineWidth: 1)
                                 )
                         }
+                        Spacer()
                     }.frame(width: .infinity)
-                    Spacer()
                 }
                 
             }else {
@@ -468,11 +460,11 @@ struct BrandsBlock: View{
             
             if (!fullList){
                 HStack {
-                    LocalizedText(key: "view_all_brands")
+                    Text("view_all_brands")
                         .font(.system(size: 14))
                         .foregroundColor(Color("Secondary"))
                     Spacer()
-                    Image(systemName: "chevron.right")
+                    Image(systemName: "arrow.right")
                         .foregroundColor(Color("Secondary"))
                 }.onTapGesture {
                     onViewAll()
@@ -534,6 +526,13 @@ struct ContactRow: View {
             }
             Spacer()
         }
+    }
+}
+
+func share(shared: String) {
+    let activityViewController = UIActivityViewController(activityItems: [shared], applicationActivities: nil)
+    if let rootViewController = UIApplication.shared.windows.first?.rootViewController {
+        rootViewController.present(activityViewController, animated: true, completion: nil)
     }
 }
 
@@ -655,7 +654,7 @@ struct DetailsTab: View {
     
     public var body: some View{
         VStack{
-            ServicesBlock(services: dealer.services, onViewAll: {}, fullList: true)
+            ServicesBlock(services: dealer.services, onViewAll: {}, fullList: true).padding(.top, 42)
             BrandsBlock(brands: dealer.brands, onViewAll: {}, fullList: true).padding(.top, 42)
         }.padding(.horizontal, 18)
     }
@@ -685,7 +684,7 @@ struct ContactTab: View {
                     .padding(.leading, 14)
                 
                 Spacer()
-            }.padding(.top, 24)
+            }.padding(.vertical, 16)
             Divider()
             
             if (!dealer.website.isEmpty){
@@ -697,7 +696,7 @@ struct ContactTab: View {
                         .foregroundColor(Color.black)
                         .padding(.leading, 14)
                     Spacer()
-                }.padding(.top, 24).onTapGesture {
+                }.padding(.vertical, 16).onTapGesture {
                     openURL(URL(string: dealer.website)!)
                 }
                 Divider()
@@ -712,7 +711,7 @@ struct ContactTab: View {
                         .foregroundColor(Color.black)
                         .padding(.leading, 14)
                     Spacer()
-                }.padding(.top, 24).onTapGesture {
+                }.padding(.vertical, 16).onTapGesture {
                     EmailController.shared.sendEmail(subject: dealer.name, body: dealer.name + dealer.name, to: dealer.email)
                 }
                 Divider()
@@ -727,7 +726,7 @@ struct ContactTab: View {
                         .foregroundColor(Color.black)
                         .padding(.leading, 14)
                     Spacer()
-                }.padding(.top, 24).onTapGesture {
+                }.padding(.vertical, 16).onTapGesture {
                     let phone = "tel://"
                     let phoneNumberformatted = phone + dealer.phone
                     guard let url = URL(string: phoneNumberformatted) else { return }
@@ -746,7 +745,7 @@ struct ContactTab: View {
                             .foregroundColor(Color.black)
                             .padding(.leading, 14)
                         Spacer()
-                    }.padding(.top, 24).onTapGesture {
+                    }.padding(.vertical, 16).onTapGesture {
                         openURL(URL(string: dealer.facebook)!)
                     }
                     Divider()
@@ -761,7 +760,7 @@ struct ContactTab: View {
                             .foregroundColor(Color.black)
                             .padding(.leading, 14)
                         Spacer()
-                    }.padding(.top, 24).onTapGesture {
+                    }.padding(.vertical, 16).onTapGesture {
                         openURL(URL(string: dealer.twitter)!)
                     }
                     Divider()
@@ -776,7 +775,7 @@ struct ContactTab: View {
                             .foregroundColor(Color.black)
                             .padding(.leading, 14)
                         Spacer()
-                    }.padding(.top, 24).onTapGesture {
+                    }.padding(.vertical, 16).onTapGesture {
                         openURL(URL(string: dealer.youtube)!)
                     }
                     Divider()

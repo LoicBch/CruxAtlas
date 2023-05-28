@@ -72,6 +72,7 @@ fun SettingsMenu(navigator: DestinationsNavigator) {
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         HeaderSettingsMenu(navigator = navigator)
         MenuList(menuItems)
+        Spacer(modifier = Modifier)
         BuildInfos()
     }
 
@@ -222,7 +223,7 @@ fun BuildInfos() {
     val versionName = packageInfo.versionName
     val versionCode = packageInfo.versionCode
 
-    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = CenterVertically) {
+    Row(modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp), verticalAlignment = CenterVertically) {
         Image(
             modifier = Modifier.size(80.dp),
             painter = painterResource(id = R.drawable.logo),

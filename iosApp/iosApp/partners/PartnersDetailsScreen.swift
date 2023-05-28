@@ -39,8 +39,10 @@ struct PartnersDetailsScreen: View {
                     }
                     
                     VStack{
-                        TopDealerButtons(onClose: { self.presentationMode.wrappedValue.dismiss() })
-                        BadgePartner(partner: partner).padding(.top, headerSize)
+                        TopDealerButtons(onClose: { self.presentationMode.wrappedValue.dismiss() }, onShare: {
+                            share(shared: "\(partner.name) \n\n \(partner.description_)")
+                        })
+                        BadgePartner(partner: partner).padding(.bottom, 10).padding(.top, headerSize)
                     }.padding(EdgeInsets(top: 12, leading: 17, bottom: 0, trailing: 17))
                 }
                 
@@ -77,13 +79,13 @@ struct PartnersDetailsScreen: View {
                 
                 VStack{
                     HStack{
-                        LocalizedText(key: "overview").onTapGesture {
+                        Text("overview").onTapGesture {
                             withAnimation { selection = 0 }
                         }
                         .foregroundColor(Color(overViewTabColor))
                         Spacer()
                       
-                        LocalizedText(key: "contact_info").onTapGesture {
+                        Text("contact_info").onTapGesture {
                             withAnimation { selection = 1 }
                         }
                         .foregroundColor(Color(contactsTabColor))
@@ -176,9 +178,9 @@ struct PartnersDetailsScreen: View {
 
 func getHeaderSize(partner: Partner) -> CGFloat{
     if (!partner.photos.isEmpty){
-        return 100
+        return 80
     }else{
-        return 50
+        return 40
     }
 }
 
@@ -212,7 +214,7 @@ struct ContactTabPartner: View {
                         .foregroundColor(Color.black)
                         .padding(.leading, 14)
                     Spacer()
-                }.padding(.top, 24).onTapGesture {
+                }.padding(.vertical, 16).onTapGesture {
                     openURL(URL(string: partner.website)!)
                 }
                 Divider()
@@ -227,7 +229,7 @@ struct ContactTabPartner: View {
                         .foregroundColor(Color.black)
                         .padding(.leading, 14)
                     Spacer()
-                }.padding(.top, 24).onTapGesture {
+                }.padding(.vertical, 16).onTapGesture {
                     EmailController.shared.sendEmail(subject: partner.name, body: partner.name + partner.name, to: partner.email)
                 }
                 Divider()
@@ -242,7 +244,7 @@ struct ContactTabPartner: View {
                         .foregroundColor(Color.black)
                         .padding(.leading, 14)
                     Spacer()
-                }.padding(.top, 24).onTapGesture {
+                }.padding(.vertical, 16).onTapGesture {
                     let phone = "tel://"
                     let phoneNumberformatted = phone + partner.phone
                     guard let url = URL(string: phoneNumberformatted) else { return }
@@ -260,7 +262,7 @@ struct ContactTabPartner: View {
                             .foregroundColor(Color.black)
                             .padding(.leading, 14)
                         Spacer()
-                    }.padding(.top, 24).onTapGesture {
+                    }.padding(.vertical, 16).onTapGesture {
                         openURL(URL(string: partner.facebook)!)
                     }
                     Divider()
@@ -275,7 +277,7 @@ struct ContactTabPartner: View {
                             .foregroundColor(Color.black)
                             .padding(.leading, 14)
                         Spacer()
-                    }.padding(.top, 24).onTapGesture {
+                    }.padding(.vertical, 16).onTapGesture {
                         openURL(URL(string: partner.twitter)!)
                     }
                     Divider()
@@ -290,7 +292,7 @@ struct ContactTabPartner: View {
                             .foregroundColor(Color.black)
                             .padding(.leading, 14)
                         Spacer()
-                    }.padding(.top, 24).onTapGesture {
+                    }.padding(.vertical, 16).onTapGesture {
                         openURL(URL(string: partner.youtube)!)
                     }
                     Divider()
@@ -422,7 +424,7 @@ struct BadgePartner: View {
                 .padding(5)
                 .background(Color.white)
                 .cornerRadius(5)
-                .shadow(radius: 5, x:-1, y: 1)
+                .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
             
             Spacer()
             
@@ -431,14 +433,14 @@ struct BadgePartner: View {
                     .frame(height: 30)
                     .padding(.leading, 5)
                 
-                LocalizedText(key: "verified")
-//                    .fontWeight(.light)
+                Text("verified")
+                    .fontWeight(.light)
                     .font(.system(size: 12))
                     .foregroundColor(Color("Primary"))
                     .padding(.trailing, 5)
             }.background(Color.white)
                 .cornerRadius(15)
-                .shadow(radius: 5, x:-1, y: 1)
+                .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
         }
     }
 }

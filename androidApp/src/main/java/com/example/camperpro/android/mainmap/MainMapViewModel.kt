@@ -41,18 +41,6 @@ class MainMapViewModel(
         previousSelectedMarkerIndex = index
     }
 
-    // We can insert a new item
-    //    fun addRecord(titleText: String, urgency: Boolean) {
-    //        markers.add(TodoItem(markers.size, titleText, urgency))
-    //    }
-
-    //    // We can retrieve an entire new list
-    //    fun updatelist() {
-    //        markers = mutableStateListOf(fetchFromRepository())
-    //        _markers.value = markers
-    //    }
-
-
     private val ads = savedStateHandle.getStateFlow("ads", emptyList<Ad>())
     val loading = savedStateHandle.getStateFlow("loading", false)
     private val verticalListIsShowing =
@@ -128,7 +116,6 @@ class MainMapViewModel(
                     savedStateHandle["updateSource"] = UpdateSource.EVENTS
                     markers.clear()
                     markers.addAll(call.value!!.toMarker().toList())
-
                     savedStateHandle["events"] = call.value
                     savedStateHandle["eventsSorted"] = call.value
                     savedStateHandle["loading"] = false
@@ -148,8 +135,8 @@ class MainMapViewModel(
                     markers.clear()
                     markers.addAll(call.value!!.toMarker())
 
-                    savedStateHandle["dealers"] = call.value
-                    savedStateHandle["dealersSorted"] = call.value
+                    savedStateHandle["dealers"] = call.value!!.toList()
+                    savedStateHandle["dealersSorted"] = call.value!!.toList()
                     savedStateHandle["updateSource"] = UpdateSource.AROUND_PLACE
                     savedStateHandle["placeSearched"] = place.name
                     savedStateHandle["loading"] = false

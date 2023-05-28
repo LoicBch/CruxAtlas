@@ -71,6 +71,14 @@ struct ShowOnlyWithNetwork: EnvironmentKey {
     static var defaultValue: () -> Bool = { false }
 }
 
+struct OnLanguageUpdate: EnvironmentKey {
+    static var defaultValue: (String) -> Void = { _ in }
+}
+
+struct OnAppLoading: EnvironmentKey {
+    static var defaultValue: (Bool) -> Void = { _ in }
+}
+
 extension EnvironmentValues {
     var withNetworkOnly: (() -> Void) -> Void {
         get { self[WithNetworkOnlyKey.self] }
@@ -90,6 +98,16 @@ extension EnvironmentValues {
     var showOnlyWithNetwork: () -> Bool {
         get { self[ShowOnlyWithNetwork.self] }
         set { self[ShowOnlyWithNetwork.self] = newValue }
+    }
+    
+    var onLanguageUpdate: (String) -> Void {
+        get { self[OnLanguageUpdate.self] }
+        set { self[OnLanguageUpdate.self] = newValue }
+    }
+    
+    var onLoading: (Bool) -> Void{
+        get { self[OnAppLoading.self] }
+        set { self[OnAppLoading.self] = newValue }
     }
 }
 
@@ -146,6 +164,10 @@ extension Dealer {
     func fullGeolocation() -> String {
         return "\(self.latitude), \(self.longitude) (lat, lng)\nN \(self.latitude.toDMS()), E \(self.longitude.toDMS())"
     }
+    
+    func stringToSend() -> String {
+        return "\(self.name)\n\n\(self.fullLocation)\n\(self.fullGeolocation())"
+    }
 }
 
 extension Event {
@@ -155,6 +177,10 @@ extension Event {
     
     func fullGeolocation() -> String {
         return "\(self.latitude), \(self.longitude) (lat, lng)\nN \(self.latitude.toDMS()), E \(self.longitude.toDMS())"
+    }
+    
+    func stringToSend() -> String {
+        return "\(self.name)\n\n\(self.fullLocation)\n\(self.fullGeolocation())"
     }
 }
 
@@ -210,5 +236,52 @@ extension Filter{
 extension MKMapView{
     func markerAnnotation() -> [MarkerAnnotation]{
         return (self.annotations.filter({$0 is MarkerAnnotation})) as! [MarkerAnnotation]
+    }
+}
+
+extension URL {
+    func ping(completion: @escaping (Int?, Error?) -> Void) {
+        var request = URLRequest(url: self)
+        request.httpMethod = "HEAD"
+
+        let task = URLSession.shared.dataTask(with: request) { (_, response, error) in
+            if let error = error {
+                completion(nil, error)
+            } else if let httpResponse = response as? HTTPURLResponse {
+                completion(httpResponse.statusCode, nil)
+            }
+        }
+
+        task.resume()
+    }
+}
+
+extension [MarkerAnnotation] {
+    func getRegion() -> MKCoordinateRegion {
+        var latitudeMin = Double.greatestFiniteMagnitude
+        var latitudeMax = -Double.greatestFiniteMagnitude
+        var longitudeMin = Double.greatestFiniteMagnitude
+        var longitudeMax = -Double.greatestFiniteMagnitude
+
+        // Calcul des valeurs minimales et maximales des coordonnées
+        for annotation in self {
+            let coordinate = annotation.coordinate
+            latitudeMin = Swift.min(latitudeMin, coordinate.latitude)
+            latitudeMax = Swift.max(latitudeMax, coordinate.latitude)
+            longitudeMin = Swift.min(longitudeMin, coordinate.longitude)
+            longitudeMax = Swift.max(longitudeMax, coordinate.longitude)
+        }
+
+        // Calcul des coordonnées centrales
+        let centerLatitude = (latitudeMin + latitudeMax) / 2
+        let centerLongitude = (longitudeMin + longitudeMax) / 2
+
+        // Calcul des écarts de latitude et de longitude
+        let latitudeDelta = abs(latitudeMax - latitudeMin) * 1.3
+        let longitudeDelta = abs(longitudeMax - longitudeMin) * 1.3
+
+        // Création de la région
+        return MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: centerLatitude, longitude: centerLongitude),
+                                  span: MKCoordinateSpan(latitudeDelta: latitudeDelta, longitudeDelta: longitudeDelta))
     }
 }

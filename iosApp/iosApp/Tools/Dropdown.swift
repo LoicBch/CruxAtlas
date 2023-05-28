@@ -18,26 +18,29 @@ struct Dropdown<Content: View>: View{
     public var body: some View{
         VStack {
             HStack{
-                Image("tools")
-                LocalizedText(key: title).padding(.leading, 20)
+                if isExpanded {
+                    Image("tools_selected")
+                }else {
+                    Image("tools")
+                }
+                
+                Text(LocalizedStringKey(title)).fontWeight(.bold).padding(.leading, 20).foregroundColor(isExpanded ? Color("Primary") : Color("Tertiary"))
                 Spacer()
                 Image("arrow_dropdown")
                     .rotationEffect(isExpanded ? .degrees(180) : .degrees(0))
-                    .animation(.easeInOut(duration: 0.5))
             }
-            .onTapGesture {
-                withAnimation(){
-                    isExpanded.toggle()
-                }
-            }
+            
             .frame(width: .infinity, height: 70)
             .padding(.horizontal, 15)
-            
             
             if isExpanded {
                 content
                     .padding(.leading, 40)
-                    .animation(.linear)
+                    .animation(.easeInOut)
+            }
+        }.background(Color.white).onTapGesture {
+            withAnimation(){
+                isExpanded.toggle()
             }
         }
     }

@@ -19,155 +19,136 @@ struct MoreScreen: View {
         MenuItem(id: UUID(), label: "menu_my_location", destination: { AnyView(MyLocationMapScreen()) }, drawable: "my_location", isSubMenu: true),
         MenuItem(id: UUID(), label: "menu_app_settings", destination: { AnyView(AppSettingScreen()) }, drawable: "settings", isSubMenu: false)
     ]
-    
-    @Binding var isEventsMapOpening: Bool
-    @Binding var tabSelected: Int
-    
-    @State private var tabBar: UITabBar! = nil
+      
     @State private var myLocationActive = false
-    
     @Environment(\.showOnlyWithGps) var showOnlyWithGps
+    @EnvironmentObject var appState: AppState
+    @EnvironmentObject var navState: NavigationViewState
+    
     
     public var body: some View {
+        ScrollView{
             VStack{
                 HStack(){
                     Image("menu_selected")
-                    LocalizedText(key: "appbar_menu")
+                    Text("appbar_menu")
                         .font(.system(size: 22, weight: .bold))
                         .padding(.leading, 16)
-                }.frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 15)
-                NavigationView(){
-                    if(tabBar != nil){
+                }.frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 15).padding(.top, 16)
+                
+                ForEach(MenuItems.filter({!$0.isSubMenu}), id: \.id) { menuItem in
                     VStack{
-                        ForEach(MenuItems.filter({!$0.isSubMenu}), id: \.id) { menuItem in
-                            VStack{
-                                if (menuItem.label == "menu_events"){
-                                    MenuItemRow(menuItem: menuItem).onTapGesture {
-                                        isEventsMapOpening = true
-                                        tabSelected = 0
+                        if (menuItem.label == "menu_events"){
+                            Divider().padding(.horizontal, 15)
+                            MenuItemRow(menuItem: menuItem).background(Color.white).onTapGesture {
+                                appState.isEventsMapOpening = true
+                                navState.bottomNavSelectedTab = .mainMap
+                            }
+                            Divider().padding(.horizontal, 15)
+                            Dropdown(content: {
+                                VStack{
+                                    NavigationLink (destination: CheckListScreen()
+                                        .navigationBarBackButtonHidden(true)
+                                    ){
+                                        MenuItemRow(menuItem: MenuItems.first(where: {$0.drawable == "checklist"})!)
                                     }
-                                    Divider().padding(.horizontal, 15)
-                                    Dropdown(content: {
-                                        VStack{
-                                            NavigationLink (destination: CheckListScreen()
-                                                .navigationBarBackButtonHidden(true)
-                                                .disableBottomBar(bottomBar: tabBar)){
-                                                    MenuItemRow(menuItem: MenuItems.first(where: {$0.drawable == "checklist"})!)
+                                    
+                                    NavigationLink (destination:   MyLocationMapScreen().navigationBarBackButtonHidden(true)
+                                                    ,
+                                                    isActive: $myLocationActive,label: {
+                                        MenuItemRow(menuItem: MenuItems.first(where: {$0.drawable == "my_location"})!).onTapGesture{
+                                            if (showOnlyWithGps()){
+                                                myLocationActive = true
+                                            }else{
+                                                myLocationActive = false
                                             }
-                                             
-                                            NavigationLink (destination:   MyLocationMapScreen().navigationBarBackButtonHidden(true)
-                                                .disableBottomBar(bottomBar: tabBar),
-                                                            isActive: $myLocationActive,label: {
-                                                MenuItemRow(menuItem: MenuItems.first(where: {$0.drawable == "my_location"})!).onTapGesture{
-                                                    if (showOnlyWithGps()){
-                                                        myLocationActive = true
-                                                    }else{
-                                                        myLocationActive = false
-                                                    }
-                                                }
-                                            })
                                         }
-                                    }, title: "menu_travel_tools")
-                                }else{
-                                    NavigationLink{
-                                        menuItem.destination()
-                                            .navigationBarBackButtonHidden(true)
-                                            .disableBottomBar(bottomBar: tabBar)
-                                    } label: {
-                                        MenuItemRow(menuItem: menuItem)
-                                    }
+                                    })
                                 }
-                                Divider().padding(.horizontal, 15)
+                            }, title: "menu_travel_tools")
+                        }else{
+                            NavigationLink{
+                                menuItem.destination()
+                                    .navigationBarBackButtonHidden(true)
+                            } label: {
+                                MenuItemRow(menuItem: menuItem)
                             }
                         }
-                        //            activate when SplashScreen is done
-                        //            ForEach(menuPubItem) { pubMenu in
-                        //                PubMenuContainer(menuAd: pubMenu)
-                        //                Divider()
-                        //            }
-                        Spacer()
+                        Divider().padding(.horizontal, 15)
                     }
                 }
-                }.background(TabBarAccessor { tabbar in
-                    self.tabBar = tabbar
-                })
-            }
-    }
-    
-    struct MenuItemRow : View{
-        
-        var menuItem: MenuItem<AnyView>
-        
-        public var body: some View{
-            
-            HStack{
-                Image(menuItem.drawable)
-                LocalizedText(key: menuItem.label)
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(Color("Tertiary"))
-                    .padding(.leading, 20)
+                
+                ForEach(Array(Globals().menuLinks), id:\.self) { pubMenu in
+                    PubMenuContainer(menuAd: pubMenu)
+                    Divider().padding(.horizontal, 15)
+                }
                 Spacer()
-                Image(systemName: "chevron.right").foregroundColor(Color("Secondary"))
             }
-            .frame(width: .infinity, height: 70)
-            .padding(.horizontal, 15)
         }
     }
+}
+
+struct MenuItemRow : View{
     
-    struct MenuItem<Content: View>: Identifiable {
-        var id: UUID
-        var label: String
-        var destination: () -> Content
-        let drawable: String
-        let isSubMenu: Bool
+    var menuItem: MenuItem<AnyView>
+    
+    public var body: some View{
+        
+        HStack{
+            Image(menuItem.drawable)
+            Text(LocalizedStringKey(menuItem.label))
+                .font(.system(size: 16, weight: .bold))
+                .foregroundColor(Color("Tertiary"))
+                .padding(.leading, 20)
+            Spacer()
+            Image(systemName: "arrow.right").foregroundColor(Color("Secondary"))
+        }
+        .frame(width: .infinity, height: 70)
+        .padding(.horizontal, 15)
     }
+}
+
+struct MenuItem<Content: View>: Identifiable {
+    var id: UUID
+    var label: String
+    var destination: () -> Content
+    let drawable: String
+    let isSubMenu: Bool
+}
+
+struct PubMenuContainer: View {
     
-    struct PubMenuContainer: View {
-        
-        var menuAd: MenuLinkIdentifiable
-        
-        public var body: some View{
-            HStack{
-                UrlImage(url: menuAd.urlImage)
-                    .frame(width: 30, height: 30)
-                    .scaledToFit()
-                VStack{
-                    
-                    Text(menuAd.title)
+    var menuAd: MenuLink
+    
+    public var body: some View{
+        HStack{
+            UrlImage(url: menuAd.icon)
+                .frame(width: 30, height: 30)
+                .scaledToFit()
+            VStack{
+                HStack{
+                    Text(menuAd.name)
                         .font(.system(size: 16, weight: .medium))
                         .foregroundColor(Color("Tertiary"))
-                    
+                    Spacer()
+                }
+                
+                HStack{
                     Text(menuAd.subtitle)
                         .font(.system(size: 11, weight: .medium))
                         .foregroundColor(Color("Tertiary"))
-                    
-                }.padding(.leading, 20)
-                Spacer()
-                Image(systemName: "chevron.right").foregroundColor(Color("Secondary"))
-            }
+                    Spacer()
+                }
+            }.padding(.leading, 20)
+            Spacer()
+            Image(systemName: "arrow.right").foregroundColor(Color("Secondary"))
+        }.frame(width: .infinity, height: 70)
             .padding(.horizontal, 15)
             .onTapGesture {
-                guard let url = URL(string: menuAd.click) else { return }
+                guard let url = URL(string: menuAd.url) else { return }
+                guard let urlStat = URL(string: menuAd.urlstat) else { return }
+                urlStat.ping(completion: {_ , _ in})
                 UIApplication.shared.open(url)
             }
-        }
-    }
-    
-    struct MenuLinkIdentifiable: Identifiable{
-        var id: UUID
-        var title: String
-        var subtitle: String
-        var urlImage: String
-        var click: String
-    }
-    
-    func toIdentifiable(menuLinks: [MenuLink]) -> [MenuLinkIdentifiable]{
-        
-        var identifiables: [MenuLinkIdentifiable] = []
-        
-        menuLinks.forEach({
-            identifiables.append(MenuLinkIdentifiable(id: UUID(), title: $0.name, subtitle: $0.subtitle, urlImage: $0.icon, click: $0.urlstat))
-        })
-        return identifiables
     }
 }

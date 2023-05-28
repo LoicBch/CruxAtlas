@@ -95,21 +95,11 @@ class CamperProApi(private var client: HttpClient) : Api {
     }
 
     override suspend fun locate(lat: String, long: String): ResultWrapper<LocationInfos> {
-
-        val res = safeApiCall {
-            client.get(Constants.API.LOCATE) {
-                url {
-                    parameters.append("lat", lat)
-                    parameters.append("long", long)
-                }
-            }.body<LocationInfoResponse>().toVo()
-        }
-        print(res.flattenIos()?.address)
         return safeApiCall {
             client.get(Constants.API.LOCATE) {
                 url {
                     parameters.append("lat", lat)
-                    parameters.append("long", long)
+                    parameters.append("lon", long)
                 }
             }.body<LocationInfoResponse>().toVo()
         }
@@ -124,5 +114,4 @@ class CamperProApi(private var client: HttpClient) : Api {
             }.body<PartnerResponse>().partners.toVo()
         }
     }
-
 }

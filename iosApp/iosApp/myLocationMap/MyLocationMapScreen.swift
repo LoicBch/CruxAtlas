@@ -15,15 +15,16 @@ import MapKit
 struct MyLocationMapScreen: View {
     
     @StateObject private var viewModel = MylocationMapViewModel()
+    @Environment(\.presentationMode) var presentationMode
     
     public var body: some View {
         VStack{
             HStack{
-                Image(systemName: "xmark").onTapGesture {
-                    
-                }
+                Image(systemName: "arrow.left").onTapGesture {
+                    presentationMode.wrappedValue.dismiss()
+                }.padding(.leading, 20)
                 Spacer()
-                LocalizedText(key: "location_map")
+                Text("menu_my_location")
                 Spacer()
             }.padding(.top, 12)
             ZStack{
@@ -74,23 +75,23 @@ struct popupConfirm: View {
     public var body: some View {
         VStack{
             HStack{
-                Image(systemName: "trash.fill").onTapGesture {
+                Image(systemName: "xmark").onTapGesture {
                     onExit()
                 }
                 Spacer()
-                LocalizedText(key: "are_you_sure")
+                Text("are_you_sure")
                     .font(.system(size: 16))
                     .foregroundColor(Color.black)
                 Spacer()
             }
-            LocalizedText(key: "delete_location_popup")
+            Text("delete_location_popup")
                 .padding(.top, 14)
             
             Button(action: {
                 onDelete()
             }){
                 Spacer()
-                LocalizedText(key: "delete")
+                Text("delete")
                     .font(.system(size: 16))
                     .foregroundColor(Color.white)
                     .padding(.vertical, 16)
@@ -119,15 +120,17 @@ struct parkingMarkerBox: View {
     public var body: some View {
         VStack{
             HStack{
-                LocalizedText(key: "my_parking")
-//                    .fontWeight(.medium)
+                Text("my_parking")
+                    .fontWeight(.medium)
                     .font(.system(size: 16))
                     .foregroundColor(Color("Tertiary"))
                 Spacer()
                 Image(systemName: "trash.fill").onTapGesture {
                     onDeleteParkingLocation()
                 }
-                Image("share")
+                Image("share").onTapGesture {
+                    share(shared: "\(parkingLocation.address)\n\n \(parkingLocation.gpsDeciTxt)\n\(parkingLocation.gpsDmsTxt)")
+                }
             }
             
             HStack{
@@ -177,12 +180,14 @@ struct currentLocationMarkerBox: View {
     public var body: some View {
         VStack{
             HStack{
-                LocalizedText(key: "my_location")
-//                    .fontWeight(.medium)
+                Text("my_location")
+                    .fontWeight(.medium)
                     .font(.system(size: 16))
                     .foregroundColor(Color("Tertiary"))
                 Spacer()
-                Image("share")
+                Image("share").onTapGesture {
+                    share(shared: "\(currentPosInfos.address)\n\n \(currentPosInfos.gpsDeciTxt)\n\(currentPosInfos.gpsDmsTxt)" )
+                }
             }
             
             HStack{

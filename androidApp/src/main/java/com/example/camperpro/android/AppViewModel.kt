@@ -292,7 +292,7 @@ class AppViewModel(
         _filterDealerSelected.update {
             Filter(
                 _filterDealerSelected.value.category,
-                _filterDealerSelected.value.getIdFromFilterName(filterName)
+                _filterDealerSelected.value.getIdFromFilterName(filterName)?: ""
             )
         }
     }

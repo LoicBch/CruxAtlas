@@ -19,7 +19,7 @@ struct HistoricSearchList: View{
     public var body: some View{
         VStack{
         HStack{
-            LocalizedText(key: "last_searched")
+            Text("last_searched")
 //                .fontWeight(.medium)
                 .font(.system(size: 12))
                 .foregroundColor(Color.gray)

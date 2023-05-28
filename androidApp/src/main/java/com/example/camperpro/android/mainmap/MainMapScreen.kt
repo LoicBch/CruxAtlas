@@ -5,6 +5,9 @@ package com.example.camperpro.android.mainmap
 import android.app.Application
 import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
@@ -17,6 +20,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -26,23 +30,21 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.example.camperpro.android.LocalDependencyContainer
-import com.example.camperpro.android.MyApplicationTheme
 import com.example.camperpro.android.R
 import com.example.camperpro.android.composables.LoadingModal
 import com.example.camperpro.android.composables.collectAsStateWithLifecycleImmutable
 import com.example.camperpro.android.destinations.AroundLocationScreenDestination
 import com.example.camperpro.android.destinations.DealerDetailsScreenDestination
+import com.example.camperpro.android.destinations.EventDetailScreenDestination
 import com.example.camperpro.android.destinations.MenuScreenDestination
 import com.example.camperpro.android.extensions.hasLocationPermission
 import com.example.camperpro.android.extensions.isScrollingUp
 import com.example.camperpro.android.extensions.lastVisibleItemIndex
-import com.example.camperpro.android.partners.VerticalListItem
 import com.example.camperpro.android.ui.theme.AppColor
 import com.example.camperpro.android.ui.theme.Dimensions
 import com.example.camperpro.domain.model.*
@@ -211,6 +213,11 @@ fun MainMap(
                     BitmapDescriptorFactory.fromResource(R.drawable.marker)
                 }, state = markerState, onClick = {
                     if (updateSource == UpdateSource.EVENTS) {
+                        navigator.navigate(
+                            EventDetailScreenDestination(
+                                events.value.find { it.id == marker.placeLinkedId }!!
+                            )
+                        )
                         true
                     } else {
                         navigator.navigate(
@@ -226,29 +233,22 @@ fun MainMap(
 
         Box(modifier = Modifier.fillMaxSize()) {
             Column(modifier = Modifier.align(Alignment.BottomCenter)) {
+
                 if (!cameraPositionState.isMoving && !cameraPositionState.locationVo.isAroundLastSearchedLocation) {
                     SearchHereButton(onClick = {
                         viewModel.showSpots(cameraPositionState.locationVo)
-                    })
+                    }, cameraPositionState)
+                }
 
+                if (locationSearched.isNotEmpty()) LocationSearchContainer(locationSearched, cameraPositionState)
 
-                if (locationSearched.isNotEmpty()) LocationSearchContainer(locationSearched)
                 if (updateSource == UpdateSource.EVENTS) {
                     if (events.value.isNotEmpty()) {
-
-                        cameraPositionState.move(
-                            CameraUpdateFactory.newLatLngZoom(
-                                LatLng(
-                                    events.value.first().latitude, events.value.first().longitude
-                                ), 15f
-                            )
-                        )
-
                         HorizontalEventsList(cameraPositionState = cameraPositionState,
                                              events = events.value,
                                              onItemClicked = {
                                                  navigator.navigate(
-                                                     com.example.camperpro.android.destinations.EventDetailScreenDestination(
+                                                     EventDetailScreenDestination(
                                                          it
                                                      )
                                                  )
@@ -286,7 +286,7 @@ fun MainMap(
                 VerticalEventsList(eventSortedFlow = viewModel.eventsSorted,
                                    { viewModel.onSortingOptionSelected(it) }) {
                     navigator.navigate(
-                        com.example.camperpro.android.destinations.EventDetailScreenDestination(
+                        EventDetailScreenDestination(
                             it
                         )
                     )
@@ -304,15 +304,20 @@ fun MainMap(
         }
 
 
-        TopButtons(isVerticalListOpen = state.verticalListIsShowing, onListButtonClick = {
-            viewModel.swapVerticalList()
-        }, source = updateSource, onMapPropertiesUpdated = {
-            mapProperties = if (mapProperties.mapType == MapType.NORMAL) {
-                mapProperties.copy(mapType = MapType.SATELLITE)
-            } else {
-                mapProperties.copy(mapType = MapType.NORMAL)
-            }
-        })
+        TopButtons(cameraPositionState = cameraPositionState,
+                   isVerticalListOpen = state.verticalListIsShowing,
+                   onListButtonClick = {
+                       viewModel.swapVerticalList()
+                   },
+                   source = updateSource,
+                   onMapPropertiesUpdated = {
+                       mapProperties = if (mapProperties.mapType == MapType.NORMAL) {
+                           mapProperties.copy(mapType = MapType.SATELLITE)
+                       } else {
+                           mapProperties.copy(mapType = MapType.NORMAL)
+                       }
+                   }
+        )
 
         if (currentlyLoading) {
             LoadingModal(Modifier.align(Alignment.Center))
@@ -328,10 +333,20 @@ fun MainMap(
 }
 
 @Composable
-fun LocationSearchContainer(label: String) {
+fun LocationSearchContainer(label: String, cameraPositionState: CameraPositionState) {
+
+    val overlayAlpha: Float by animateFloatAsState(
+        targetValue = if (cameraPositionState.isMoving && cameraPositionState.cameraMoveStartedReason == CameraMoveStartedReason.GESTURE) 0f else 1f,
+        animationSpec = tween(
+            durationMillis = 200,
+            easing = LinearEasing,
+        )
+    )
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .alpha(overlayAlpha)
             .padding(bottom = 15.dp, start = 16.dp, end = 16.dp)
             .background(Color.White, RoundedCornerShape(15))
             .padding(vertical = 12.dp, horizontal = 15.dp),
@@ -360,9 +375,17 @@ fun LocationSearchContainer(label: String) {
 }
 
 @Composable
-fun SearchHereButton(onClick: () -> Unit) {
+fun SearchHereButton(onClick: () -> Unit, cameraPositionState: CameraPositionState) {
 
-    Row(modifier = Modifier.fillMaxWidth()) {
+    val overlayAlpha: Float by animateFloatAsState(
+        targetValue = if (cameraPositionState.isMoving && cameraPositionState.cameraMoveStartedReason == CameraMoveStartedReason.GESTURE) 0f else 1f,
+        animationSpec = tween(
+            durationMillis = 200,
+            easing = LinearEasing,
+        )
+    )
+
+    Row(modifier = Modifier.fillMaxWidth().alpha(overlayAlpha)) {
 
         Spacer(modifier = Modifier.weight(0.5f))
         Button(
@@ -696,9 +719,18 @@ fun HorizontalEventsList(
         }
     }
 
+    val overlayAlpha: Float by animateFloatAsState(
+        targetValue = if (cameraPositionState.isMoving && cameraPositionState.cameraMoveStartedReason == CameraMoveStartedReason.GESTURE) 0f else 1f,
+        animationSpec = tween(
+            durationMillis = 200,
+            easing = LinearEasing,
+        )
+    )
+
     Column {
         LazyRow(
             modifier = Modifier
+                .alpha(alpha = overlayAlpha)
                 .fillMaxWidth()
                 .height(130.dp), state = listState
         ) {
@@ -842,9 +874,18 @@ fun HorizontalSpotsList(
         }
     }
 
+    val overlayAlpha: Float by animateFloatAsState(
+        targetValue = if (cameraPositionState.isMoving && cameraPositionState.cameraMoveStartedReason == CameraMoveStartedReason.GESTURE) 0f else 1f,
+        animationSpec = tween(
+            durationMillis = 200,
+            easing = LinearEasing,
+        )
+    )
+
     Column {
         LazyRow(
             modifier = Modifier
+                .alpha(alpha = overlayAlpha)
                 .fillMaxWidth()
                 .height(130.dp), state = listState
         ) {
@@ -1079,6 +1120,7 @@ fun MainMapAdContainer(ad: List<Ad>) {
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TopButtons(
+    cameraPositionState: CameraPositionState,
     onListButtonClick: () -> Unit,
     isVerticalListOpen: Boolean,
     source: UpdateSource,
@@ -1087,8 +1129,17 @@ fun TopButtons(
     val appViewModel = LocalDependencyContainer.current.appViewModel
     val scope = rememberCoroutineScope()
 
+    val overlayAlpha: Float by animateFloatAsState(
+        targetValue = if (cameraPositionState.isMoving && cameraPositionState.cameraMoveStartedReason == CameraMoveStartedReason.GESTURE) 0f else 1f,
+        animationSpec = tween(
+            durationMillis = 200,
+            easing = LinearEasing,
+        )
+    )
+
     Row(
         modifier = Modifier
+            .alpha(alpha = overlayAlpha)
             .fillMaxWidth()
             .padding(top = 8.dp, start = Dimensions.appMargin, end = Dimensions.appMargin)
     ) {
@@ -1132,7 +1183,7 @@ fun TopButtons(
                         appViewModel.bottomSheetIsShowing.show()
                     }
                 } else {
-                        onMapPropertiesUpdated.invoke()
+                    onMapPropertiesUpdated.invoke()
                 }
             }
         }) {
@@ -1156,12 +1207,14 @@ fun TopButtons(
                 ), onClick = {
 
                 scope.launch {
-                    when (source) {
-                        UpdateSource.EVENTS -> BottomSheetOption.FILTER_EVENT
-                        else -> {
-                            BottomSheetOption.FILTER
+                    appViewModel.onBottomSheetContentChange(
+                        when (source) {
+                            UpdateSource.EVENTS -> BottomSheetOption.FILTER_EVENT
+                            else -> {
+                                BottomSheetOption.FILTER
+                            }
                         }
-                    }
+                    )
                     appViewModel.bottomSheetIsShowing.show()
                 }
 
@@ -1176,7 +1229,9 @@ fun TopButtons(
             Box {
 
                 IconButton(modifier = Modifier
-                    .shadow(2.dp, RoundedCornerShape(Dimensions.radiusRound))
+                    .shadow(
+                        2.dp, RoundedCornerShape(Dimensions.radiusRound)
+                    )
                     .zIndex(1f)
                     .background(
                         Color.White, RoundedCornerShape(Dimensions.radiusRound)
@@ -1187,12 +1242,14 @@ fun TopButtons(
                         color = AppColor.Primary
                     ), onClick = {
                     scope.launch {
-                        when (source) {
-                            UpdateSource.EVENTS -> BottomSheetOption.FILTER_EVENT
-                            else -> {
-                                BottomSheetOption.FILTER
+                        appViewModel.onBottomSheetContentChange(
+                            when (source) {
+                                UpdateSource.EVENTS -> BottomSheetOption.FILTER_EVENT
+                                else -> {
+                                    BottomSheetOption.FILTER
+                                }
                             }
-                        }
+                        )
                         appViewModel.bottomSheetIsShowing.show()
                     }
 
@@ -1220,8 +1277,6 @@ fun TopButtons(
                 }
             }
         }
-
-
     }
 }
 
@@ -1230,8 +1285,3 @@ val CameraPositionState.locationVo
         this.position.target.latitude, this.position.target.longitude
     )
 
-@Preview
-@Composable
-fun MainMapPreview() {
-    MyApplicationTheme {}
-}

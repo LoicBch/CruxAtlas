@@ -18,21 +18,21 @@ struct EventFilterScreen: View{
     
     public var body: some View{
         
-        
-        if(isSelectingCountry){
-            FilterChosenScreen(
-                onBoxTap: { isSelectingCountry = true },
-                countrySelected: viewModel.eventFilterSelected,
-                countriesHistoric: viewModel.eventFiltersUsed,
-                onApply: {
-                    onClose()
-                    viewModel.applyFilter()
-                    
-                }
-            )
-        }else{
-//            FilterSelectionScreen()
-        }
+        Text("Not available yet")
+//        if(isSelectingCountry){
+//            FilterChosenScreen(
+//                onBoxTap: { isSelectingCountry = true },
+//                countrySelected: viewModel.eventFilterSelected,
+//                countriesHistoric: viewModel.eventFiltersUsed,
+//                onApply: {
+//                    onClose()
+//                    viewModel.applyFilter()
+//
+//                }
+//            )
+//        }else{
+////            FilterSelectionScreen()
+//        }
     }
 }
 
@@ -50,12 +50,12 @@ struct FilterChosenScreen: View {
                     
                 }
                 Spacer()
-                LocalizedText(key: "filters_title")
+                Text("filters_title")
                 Spacer()
             }.padding(.top, 12)
             
             HStack{
-                LocalizedText(key: "where_do_you_want_to_go")
+                Text("where_do_you_want_to_go")
 //                    .fontWeight(.black)
                     .font(.system(size: 22))
                     .foregroundColor(Color.black)
@@ -86,15 +86,16 @@ struct FilterSelectionScreen: View{
     
     var onSelectionConfirm: ()->Void
     var checkBoxStates: [Bool]
+    var onClose: () -> Void
     
     public var body: some View{
         VStack{
             HStack{
                 Image(systemName: "xmark").onTapGesture {
-                    
+                    onClose()
                 }
                 Spacer()
-                LocalizedText(key: "choose_country")
+                Text("choose_country")
                 Spacer()
             }.padding(.top, 12)
             
@@ -103,8 +104,8 @@ struct FilterSelectionScreen: View{
             }).padding(.top, 22)
             
             HStack{
-                LocalizedText(key: "last_searched")
-//                    .fontWeight(.black)
+                Text("last_searched")
+                    .fontWeight(.black)
                     .font(.system(size: 14))
                     .foregroundColor(Color.black)
                 Spacer()
@@ -113,8 +114,8 @@ struct FilterSelectionScreen: View{
             ResultList(results: [], onItemClick: {_ in })
             
             HStack{
-                LocalizedText(key: "all_countries")
-//                    .fontWeight(.black)
+                Text("all_countries")
+                    .fontWeight(.black)
                     .font(.system(size: 14))
                     .foregroundColor(Color.black)
                 Spacer()
@@ -136,8 +137,8 @@ struct CheckboxsGroup: View{
     public var body: some View{
         HStack{
             Image("repair")
-            LocalizedText(key: "filter_step1_option1")
-//                .fontWeight(.medium)
+            Text("filter_step1_option1")
+                .fontWeight(.medium)
                 .font(.system(size: 14))
                 .foregroundColor(Color("Tertiary"))
                 .padding(.leading, 10)
@@ -149,8 +150,8 @@ struct CheckboxsGroup: View{
         
         HStack{
             Image("dealers")
-            LocalizedText(key: "filter_step1_option2")
-//                .fontWeight(.medium)
+            Text("filter_step1_option2")
+                .fontWeight(.medium)
                 .font(.system(size: 14))
                 .foregroundColor(Color("Tertiary"))
                 .padding(.leading, 10)

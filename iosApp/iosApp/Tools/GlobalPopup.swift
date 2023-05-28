@@ -20,7 +20,7 @@ struct GlobalPopup: View{
             Spacer()
             VStack{
                 HStack{
-                    LocalizedText(key: getTitle(popupState: state))
+                    Text(LocalizedStringKey(getTitle(popupState: state)))
 //                        .fontWeight(.light)
                         .font(.system(size: 11))
                         .foregroundColor(Color("Tertiary"))
@@ -31,7 +31,7 @@ struct GlobalPopup: View{
                         onExit()
                     }
                 }
-                LocalizedText(key: getContent(popupState:state))
+                Text(LocalizedStringKey(getContent(popupState:state)))
 //                    .fontWeight(.light)
                     .font(.system(size: 11))
                     .foregroundColor(Color("Tertiary"))

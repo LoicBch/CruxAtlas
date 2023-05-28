@@ -12,14 +12,14 @@ import MapKit
 import SwiftUI
 
 struct MyLocationMap: UIViewRepresentable {
-     
+
     @Binding var currentLocation: MarkerAnnotation
     @Binding var parkingLocation: MarkerAnnotation
     @Binding var region: MKCoordinateRegion
-    
+
     var onMapStopMoving: (CLLocationCoordinate2D) -> Void
     var onSelectMarker: (MarkerAnnotation) -> Void
-    
+
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView()
         mapView.setRegion(region, animated: false)
@@ -29,18 +29,18 @@ struct MyLocationMap: UIViewRepresentable {
         mapView.delegate = context.coordinator
         return mapView
     }
-    
-    
+
+
     func updateUIView(_ mapView: MKMapView, context: Context) {
         mapView.mapType = MKMapType.standard
-          
+
         if (annotationsNeedToBeUpdated(mapview: mapView)){
             mapView.removeAnnotations(mapView.annotations)
             mapView.addAnnotation(currentLocation)
             mapView.addAnnotation(parkingLocation)
         }
     }
-    
+
     func annotationsNeedToBeUpdated(mapview: MKMapView) -> Bool{
         if (!mapview.markerAnnotation().isEmpty){
             if (mapview.markerAnnotation().count != markersCount()){
@@ -51,12 +51,12 @@ struct MyLocationMap: UIViewRepresentable {
             let markerSelected = mapview.markerAnnotation().first(where: {
                 return $0.selected
             })
-            
+
             if (markerSelected == nil && idOfSelectedMarker() != ""){
                 print("markers updated because first selection of marker")
                 return true
             }
-            
+
             if (markerSelected != nil && idOfSelectedMarker() != markerSelected!.idPlaceLinked){
                 print(markerSelected!.idPlaceLinked)
                 print(idOfSelectedMarker())
@@ -69,19 +69,19 @@ struct MyLocationMap: UIViewRepresentable {
         print("markers updated because there was no annotations on the map")
         return true
     }
-    
+
     func parkingLocationIsPresentOnMap(mapview: MKMapView) -> Bool{
         let parkingAnnot = mapview.markerAnnotation().first(where: {
             $0.idPlaceLinked == "parking_location"
         })
-        
+
         if (parkingAnnot == nil){
             return false
         }else{
             return true
         }
     }
-    
+
     func idOfSelectedMarker() -> String {
         if (parkingLocation.selected){
             return "parking_location"
@@ -91,7 +91,7 @@ struct MyLocationMap: UIViewRepresentable {
             return ""
         }
     }
-    
+
     func markersCount() -> Int {
         var count = 0
         if (parkingLocation.coordinate.latitude != 0.0){
@@ -102,21 +102,21 @@ struct MyLocationMap: UIViewRepresentable {
         }
         return count
     }
-    
+
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
-    
+
     class Coordinator: NSObject, MKMapViewDelegate {
         var parent: MyLocationMap
         init(_ parent: MyLocationMap) {
             self.parent = parent
         }
-        
-        
+
+
         func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
             let identifier = "marker_annotation"
-            
+
             if (annotation is MarkerAnnotation){
                 let markerAnnotation = annotation as! MarkerAnnotation
                 guard let annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier) else {
@@ -142,18 +142,18 @@ struct MyLocationMap: UIViewRepresentable {
                 return nil
             }
         }
-        
-        
+
+
         func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
             let annotationSelected = view.annotation as! MarkerAnnotation
             parent.onSelectMarker(annotationSelected)
         }
-        
+
         func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
             parent.region = mapView.region
             parent.onMapStopMoving(mapView.region.center)
         }
-        
+
     }
 }
 

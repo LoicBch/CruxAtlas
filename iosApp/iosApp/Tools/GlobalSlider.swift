@@ -22,7 +22,7 @@ struct GlobalSlider: View {
                 withAnimation {
                     VStack{
                         HStack{
-                            LocalizedText(key: getTitle(popupState: state[0]))
+                            Text(LocalizedStringKey(getTitle(popupState: state[0])))
                             Spacer()
                             Image(systemName: "trash").onTapGesture {
                                 switch(state[0]){
@@ -33,7 +33,7 @@ struct GlobalSlider: View {
                             }
                         }
                         HStack{
-                            LocalizedText(key: getContent(popupState: state[0]))
+                            Text(LocalizedStringKey(getContent(popupState: state[0])))
                             Spacer()
                         }
                     }.padding(12)
@@ -46,7 +46,7 @@ struct GlobalSlider: View {
             if (state.count > 1){
                 VStack{
                     HStack{
-                        LocalizedText(key: getTitle(popupState: state[1]))
+                        Text(LocalizedStringKey(getTitle(popupState: state[1])))
                         Spacer()
                         Image(systemName: "x.cross").onTapGesture {
                             switch(state[1]){
@@ -57,7 +57,7 @@ struct GlobalSlider: View {
                         }
                     }
                     HStack{
-                        LocalizedText(key: getContent(popupState: state[1]))
+                        Text(LocalizedStringKey(getContent(popupState: state[1])))
                         Spacer()
                     }
                 }.padding(12)

@@ -19,9 +19,7 @@ struct ImageCarouselView: View {
             ForEach(images, id: \.url){ photo in
                 GeometryReader{ proxy in
                     let size = proxy.size
-                    UrlImage(url: photo.url)
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: size.width, height: 150)
+                    UrlImageGallery(url: photo.url)
                 }.tabItem{
                     Text("")
                 }

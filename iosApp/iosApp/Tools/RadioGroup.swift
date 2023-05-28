@@ -60,7 +60,7 @@ struct RadioButton: View {
         }) {
             HStack(alignment: .center, spacing: 10) {
                 Image(image)
-                LocalizedText(key: id)
+                Text(LocalizedStringKey(id))
                     .font(Font.system(size: textSize))
                     .padding(.leading, 8)
                 Spacer()

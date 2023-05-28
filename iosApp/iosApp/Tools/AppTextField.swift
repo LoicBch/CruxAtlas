@@ -28,6 +28,7 @@ struct AppTextField: View {
                               .opacity(text.isEmpty ? 0.0 : 1.0)
                               .onTapGesture {
                                   self.text = ""
+                                  onTextChange("")
                               }
             }.background(
                 RoundedRectangle(cornerRadius: 4)
@@ -38,7 +39,9 @@ struct AppTextField: View {
         .background(
             RoundedRectangle(cornerRadius: 4)
                 .fill(isFocused ? Color.white : Color("unFocusedTextField"))
-               .frame(width: .infinity, height: 48))
+                .frame(width: .infinity, height: 48)).onAppear{
+                    text = ""
+                }
     }
 }
 

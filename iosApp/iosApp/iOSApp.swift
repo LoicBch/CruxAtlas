@@ -10,8 +10,11 @@ struct iOSApp: App {
     }
     
 	var body: some Scene {
-		WindowGroup {
+		WindowGroup { 
             HomeScreen()
+                .preferredColorScheme(.light)
+                .environmentObject(NavigationViewState())
+                .environmentObject(AppState())
 		}
 	}
 }

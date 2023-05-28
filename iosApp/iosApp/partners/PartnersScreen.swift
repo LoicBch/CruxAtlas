@@ -96,7 +96,7 @@ struct VerticalPartnerListItem: View {
                         .padding(5)
                         .background(Color.white)
                         .cornerRadius(5)
-                        .shadow(radius: 5, x:-1, y: 1)
+                        .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
                     
                     
                     Image("premium_badge")
@@ -104,7 +104,7 @@ struct VerticalPartnerListItem: View {
                         .padding(5)
                         .background(Color.white)
                         .cornerRadius(5)
-                        .shadow(radius: 5, x:-1, y: 1)
+                        .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
                     
                 }.padding(8)
                     .frame(maxWidth: .infinity, alignment: .leading)

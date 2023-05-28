@@ -17,14 +17,13 @@ extension EventFilterScreen{
         @Published private(set) var isLoading = false
         
         init(){
-            getHistoricFilters()
+//            getHistoricFilters()
         }
         
         func getHistoricFilters(){
             isLoading = true
             Task.init {
                 do {
-                    
                     let completeFilterHistoric = try await RGetFiltersSaved().execute()
                     let eventFilterHistoric = completeFilterHistoric?.filter({$0.category == FilterType.countries}) ?? []
                     let uniqueEventFilterHistoric = Dictionary(grouping: eventFilterHistoric, by: { $0.filterName })

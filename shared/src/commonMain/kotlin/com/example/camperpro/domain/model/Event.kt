@@ -21,5 +21,6 @@ class Event(
     val city: String,
     val country: String,
     val countryIso: String,
+    var photos: List<Photo>,
     val website: String
 ) : CommonParcelable

@@ -1,6 +1,8 @@
 package com.example.camperpro.android.spotSheet
 
 import android.app.Application
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
@@ -67,6 +69,7 @@ fun DealerDetailsScreen(navigator: DestinationsNavigator, dealer: Dealer) {
 fun Header(dealer: Dealer, onClose: () -> Unit) {
 
     val context = LocalContext.current
+    val shareContent = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { }
 
     Box(
         Modifier
@@ -82,7 +85,7 @@ fun Header(dealer: Dealer, onClose: () -> Unit) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 40.dp)
+                    .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 30.dp)
             ) {
                 IconButton(modifier = Modifier
                     .shadow(2.dp, RoundedCornerShape(Dimensions.radiusRound))
@@ -99,7 +102,7 @@ fun Header(dealer: Dealer, onClose: () -> Unit) {
                     .shadow(2.dp, RoundedCornerShape(Dimensions.radiusRound))
                     .zIndex(1f)
                     .background(Color.White, RoundedCornerShape(Dimensions.radiusRound)),
-                           onClick = { context.share(context, "") }) {
+                           onClick = { context.share("", shareContent) }) {
                     Icon(painter = painterResource(id = R.drawable.share), contentDescription = "")
                 }
 
@@ -116,7 +119,7 @@ fun Header(dealer: Dealer, onClose: () -> Unit) {
             // TODO: Here the top padding should be automatically derived from the height of the image
             Row(
                 modifier = Modifier
-                    .padding(top = 120.dp, start = 10.dp, end = 10.dp, bottom = 25.dp)
+                    .padding(top = 50.dp, start = 10.dp, end = 10.dp, bottom = 25.dp)
                     .fillMaxWidth()
             ) {
                 if (dealer.services.isNotEmpty()) {
@@ -132,7 +135,6 @@ fun Header(dealer: Dealer, onClose: () -> Unit) {
                     )
                 }
 
-                // TODO:
                 if (dealer.brands.isNotEmpty()) {
                     Image(
                         painter = painterResource(id = R.drawable.dealers),

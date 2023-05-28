@@ -22,12 +22,6 @@ class MarkerAnnotation: NSObject, MKAnnotation {
     }
 }
 
-//extension MarkerAnnotation{
-//    func hasSameSpots(arr: [MarkerAnnotation]) -> Bool{
-//
-//    }
-//}
-
 class MarkerView: MKAnnotationView {
     func updateImage() {
         CATransaction.begin()

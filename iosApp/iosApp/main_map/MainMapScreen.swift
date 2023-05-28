@@ -10,350 +10,173 @@ import SwiftUI
 import shared
 import MapKit
 import Combine
+import Introspect
 
 struct MainMapScreen: View {
     
     @ObservedObject var bottomSheetViewModel: BottomSheetViewModel
     @StateObject private var viewModel = MainMapViewModel()
-    @Binding var placeSelected : Place
-    @Binding var isEventsMapOpening : Bool
-    @Binding var isAroundMeClicked : Bool
-    @Binding var activeFilter : Filter
-    @Binding var verticalSorting: SortingOption
     
-    @State private var tabBar: UITabBar! = nil
+    @State var mapIsMoving: Bool = false
+    @State var dragFromCode: Bool = false
+    
+    @Environment(\.onLoading) var onLoading
+    @EnvironmentObject var appState: AppState
+    
+    var scrollFromDevice = false
     
     public var body: some View {
-        NavigationView {
-            ZStack(alignment: .top){
-                MainMap(
-                    region: $viewModel.mapRegion,
-                    mapType: $viewModel.mapType,
-                    markers: $viewModel.markers,
-                    selectedMarkerId: $viewModel.currentPlaceSelectedId,
-                    onMapStopMoving: { location in
-                        viewModel.onMapStopMoving(location: Location(latitude: location.latitude, longitude: location.longitude))
+        ZStack(alignment: .top){
+            // MARK: - MAP Z-INDEX 0
+            MainMap(
+                region: $viewModel.mapRegion,
+                mapType: $viewModel.mapType,
+                markers: $viewModel.markers,
+                selectedMarkerId: $viewModel.currentPlaceSelectedId,
+                mapIsMoving: $mapIsMoving,
+                onMapStopMoving: { location in
+                    withAnimation {
+                        print("STOPED")
+                        mapIsMoving = false
                     }
-                ){ marker in
-                    if (marker.selected){
-                        viewModel.placeIdToScroll = marker.idPlaceLinked
-                    }else{
-                        viewModel.selectMarker(placeLinkedId: marker.idPlaceLinked, zoom: viewModel.mapRegion.span)
-                        viewModel.placeIdToScroll = marker.idPlaceLinked
+                    viewModel.onMapStopMoving(location: Location(latitude: location.latitude, longitude: location.longitude))
+                }, onMapStartMoving: {
+                    withAnimation {
+                        print("STARTMOVING")
+                        mapIsMoving = true
                     }
                 }
-                .onChange(of: placeSelected){ selectedPlace in
-                    if (selectedPlace.name != ""){
-                        viewModel.showSpotsAroundPlace(place: selectedPlace)
-                    }
-                }.onChange(of: activeFilter){ filter in
+            ){ marker in
+                if (marker.selected){
+                    viewModel.placeIdToScroll = marker.idPlaceLinked
+                }else{
+                    viewModel.selectMarker(placeLinkedId: marker.idPlaceLinked, zoom: viewModel.mapRegion.span)
+                    viewModel.placeIdToScroll = marker.idPlaceLinked
+                }
+            }.onReceive(appState.$aroundMeClicked){ isClicked in
+                if isClicked {
+                    viewModel.showDealers(location: Globals.geoLoc().lastKnownLocation)
+                    appState.aroundMeClicked = false
+                }
+            }.onReceive(appState.$placeSelected){ placeSelected in
+                if (placeSelected.name != ""){
+                    viewModel.showSpotsAroundPlace(place: placeSelected)
+                }
+            }.onReceive(appState.$isEventsMapOpening){ isOpening in
+                if (isOpening){
+                    viewModel.showEvents()
+                }
+            }.onReceive(appState.$filterApplied){ filter in
+                if (filter.isSelected){
                     if (filter.category == FilterType.countries){
                         viewModel.showEvents()
                     }else{
                         viewModel.showDealers(location: Location(latitude: viewModel.mapRegion.center.latitude, longitude: viewModel.mapRegion.center.longitude))
                     }
-                }.onChange(of: verticalSorting){ sortingOption in
-                    viewModel.onSortingOptionSelected(sortingOption: sortingOption.getSortDomain())
-                }.onChange(of: isEventsMapOpening){ isLaunched in
-                    if (isLaunched){
-                        viewModel.showEvents()
-                    }
-                }.onChange(of: isAroundMeClicked){ isClicked in
-                    if isClicked {
-                        viewModel.showDealers(location: Globals.geoLoc().lastKnownLocation)
-                        isAroundMeClicked = false
-                    }
                 }
-                
-                if(viewModel.verticalListIsShowing){
-                    ZStack(alignment: .top){
-                        if (viewModel.updateSource == UpdateSource.events){
-                            VerticalEventsList(events: viewModel.events, bottomBar: self.tabBar)
-                        }else{
-                            VerticaldealersList(dealers: viewModel.dealers, bottomBar: self.tabBar)
-                        }
-                        TopButtons(bottomSheetViewModel: bottomSheetViewModel, showVerticalList: { viewModel.permuteVerticalList() }, onMaptypeChange: { viewModel.switchMapStyle() }, isVerticalListopen: true, currentSource: viewModel.updateSource)
-                    }
-                }else{
-                    VStack(){
-                        TopButtons(bottomSheetViewModel: bottomSheetViewModel, showVerticalList: { viewModel.permuteVerticalList() }, onMaptypeChange: { viewModel.switchMapStyle() }, isVerticalListopen: false, currentSource: viewModel.updateSource)
-                        Spacer()
-                        
-                        if (viewModel.searchHereButtonIsShowing){
-                            SearchHereBox().padding(.bottom, 15).onTapGesture {
-                                viewModel.showDealers(location: Location(latitude: viewModel.mapRegion.center.latitude, longitude: viewModel.mapRegion.center.longitude))
-                            }
-                        }
-                        if (tabBar != nil){
-                            if(viewModel.updateSource == UpdateSource.events){
-                                HorizontalEventList(events: $viewModel.events, placeIdToScroll: $viewModel.placeIdToScroll, onScrollStopped: { placeId in
-                                    withAnimation {
-                                        viewModel.selectMarker(placeLinkedId: placeId, zoom: viewModel.mapRegion.span)
-                                    }
-                                }, bottomBar: self.tabBar)
-                            }else {
-                                HorizontalDealersList(
-                                    dealers: $viewModel.dealers,
-                                    placeIdToScroll: $viewModel.placeIdToScroll,
-                                    onScrollStopped: { placeId in
-                                        withAnimation {
-                                            viewModel.selectMarker(placeLinkedId: placeId, zoom: viewModel.mapRegion.span)
-                                        }
-                                    },
-                                    bottomBar: self.tabBar)
-                            }
-                        }
-                        
-                        if (!viewModel.ads.isEmpty){
-                            MainMapAdContainer(ad: viewModel.ads.first!)
-                        }
-                    }
-                }
+            }.onReceive(appState.$verticalSortingApplied){ sortingOption in
+                viewModel.onSortingOptionSelected(sortingOption: sortingOption.getSortDomain())
             }
-            .background(TabBarAccessor { tabbar in
-                self.tabBar = tabbar
-            })
-        }
-    }
-    
-    struct SearchHereBox: View{
-        public var body: some View{
-            HStack{
-                LocalizedText(key: "search_this_area")
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 10)
-                    .foregroundColor(Color.white)
-            }
-            .background(RoundedRectangle(cornerRadius: 25)
-            .fill(Color("Secondary")).shadow(radius: 2, x:-1, y: 2))
-        }
-    }
-    
-    struct VerticaldealersList: View {
-        
-        var dealers: [Dealer]
-        var bottomBar : UITabBar
-        
-        var body: some View{
-            ScrollView(){
-                LazyVStack{
-                    ForEach(dealers , id: \.self) { dealer in
-                        NavigationLink(destination: DealerDetailsScreen(dealer: dealer)
-                            .navigationBarBackButtonHidden(true)
-                            .disableBottomBar(bottomBar: bottomBar)
-                        ) {
-                            VerticalDealerItem(dealer: dealer)
-                                .frame(width: .infinity, height: 130)
-                                .padding(8)
-                                .background(RoundedRectangle(cornerRadius: 5)
-                                    .fill(Color.white).shadow(radius: 2, x:-1, y: 2))
-                        }
-                    }
-                }.padding(.top, 100).padding(.horizontal, 8)
-            }.background(
-                GeometryReader { geo -> Color in
-                    return Color.white
-                }
-            )
-            .frame(width: .infinity, height: .infinity)
-        }
-    }
-    
-    
-    struct VerticalDealerItem: View {
-        
-        var dealer: Dealer
-        
-        var body: some View{
-            
-            HStack(){
-                if (dealer.isPremium && !dealer.photos.isEmpty) {
-                    ZStack(){
-                        UrlImage(url: dealer.photos[0].url).frame(width: 130, height: 130)
-                    }
-                }
-                
+            // MARK: - BOTTOM CONTROLLER Z-INDEX 1
                 VStack(){
-                    Text(dealer.name)
-                        .fontWeight(.bold)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .font(.system(size: 14))
-                        .foregroundColor(.black)
-                        .padding(.top, 8)
-                        .padding(.leading, 8)
-                    
-                    Text(dealer.fullLocation)
-                        .fontWeight(.bold)
-                        .font(.system(size: 12))
-                        .foregroundColor(Color("Tertiary"))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.top, 5)
-                        .padding(.leading, 8)
-                    
                     Spacer()
-                    HStack(){
-                        if (!dealer.services.isEmpty){
-                            Image("repair")
-                                .frame(width: 16, height: 16)
-                                .padding(5)
-                                .background(Color.white)
-                                .cornerRadius(5)
-                                .shadow(radius: 5, x:-1, y: 1)
-                        }
-                        
-                        if (!dealer.brands.isEmpty){
-                            Image("dealers")
-                                .frame(width: 16, height: 16)
-                                .padding(5)
-                                .background(Color.white)
-                                .cornerRadius(5)
-                                .shadow(radius: 5, x:-1, y: 1)
-                        }
-                        
-                        Spacer()
-                        
-                        if (dealer.photos.isEmpty) {
-                            HStack(){
-                                Image("distance")
-                                    .frame(height: 30)
-                                    .padding(.leading, 5)
-                                
-                                Text(Location(latitude: dealer.latitude, longitude: dealer.longitude).distanceFromUserLocationText())
-                                    .fontWeight(.light)
-                                    .font(.system(size: 12))
-                                    .foregroundColor(Color("Primary"))
-                                    .padding(.trailing, 5)
-                            }.background(Color.white)
-                                .cornerRadius(5)
-                                .shadow(radius: 5, x:-1, y: 1)
-                        }
-                        
-                        if (dealer.isPremium && !dealer.photos.isEmpty) {
-                            HStack(){
-                                Image("distance")
-                                    .frame(height: 30)
-                                    .padding(.leading, 5)
-                                
-                                Text(Location(latitude: dealer.latitude, longitude: dealer.longitude).distanceFromUserLocationText())
-                                    .fontWeight(.light)
-                                    .font(.system(size: 12))
-                                    .foregroundColor(Color("Primary"))
-                                    .padding(.trailing, 5)
-                            }.background(Color.white)
-                                .cornerRadius(15)
-                                .shadow(radius: 5, x:-1, y: 1)
-                        }
-                    }.padding(8)
-                }
-            }
-        }
-    }
-    
-    struct HorizontalDealersList: View {
-        @Binding private var dealers: [Dealer]
-        @Binding private var placeIdToScroll: String
-        private var onScrollStopped: (String) -> Void
-        private var bottomBar: UITabBar
-        
-        @State private var scrollViewContentSize: CGSize = .zero
-        @State private var selectedIndex: Int = 0
-        @State private var previousOffset: CGFloat = 0
-        @State private var scrollDirection: ScrollDirection = .none
-        @State private var scrollOrigin: ScrollOrigin = .user
-        @State private var dealersCurrentlyShowing: String = ""
-        
-        
-        
-        let scrollEndedDetector: CurrentValueSubject<CGFloat, Never>
-        let scrollEndedPublisher: AnyPublisher<CGFloat, Never>
-        
-        init(dealers: Binding<[Dealer]>, placeIdToScroll: Binding<String>, onScrollStopped: @escaping (String) -> Void, bottomBar: UITabBar) {
-            self._dealers = dealers
-            self._placeIdToScroll = placeIdToScroll
-            self.onScrollStopped = onScrollStopped
-            let scrollEndedDetector = CurrentValueSubject<CGFloat, Never>(0)
-            self.scrollEndedPublisher = scrollEndedDetector
-                .debounce(for: .seconds(0.2), scheduler: DispatchQueue.main)
-                .dropFirst()
-                .eraseToAnyPublisher()
-            self.scrollEndedDetector = scrollEndedDetector
-            self.bottomBar = bottomBar
-        }
-        
-        var body: some View {
-            ScrollViewReader { value in
-                ScrollView(.horizontal){
-                    LazyHStack(alignment: .center, spacing: 20){
-                        ForEach(dealers , id: \.self.id) { dealer in
-                            NavigationLink(destination: DealerDetailsScreen(dealer: dealer)
-                                .navigationBarBackButtonHidden(true)
-                                .disableBottomBar(bottomBar: bottomBar)
-                            ) {
-                                HorizontalListDealerItem(dealer: dealer)
-                                    .background(RoundedRectangle(cornerRadius: 5)
-                                        .fill(Color.white))
-                                    .padding(.leading, 8)
-                                    .frame(width: UIScreen.main.bounds.width * 0.85)
-                                    .onAppear {
-                                        //                                        print("\(dealer.name) just appeared")
-                                        dealersCurrentlyShowing = dealer.id
-                                    }
-                                    .onDisappear(){
-                                        //                                        print("\(dealer.name) just disapeared")
-                                    }.background(GeometryReader {
-                                        Color.clear.preference(key: ViewOffsetKey.self,
-                                                               value: -$0.frame(in: .named("scroll")).origin.x)
-                                    })
-                                    .onPreferenceChange(ViewOffsetKey.self) { scrollEndedDetector.send($0) }
+                    
+                    if (viewModel.searchHereButtonIsShowing){
+                        SearchHereBox().padding(.bottom, 15).onTapGesture {
+                            viewModel.showDealers(location: Location(latitude: viewModel.mapRegion.center.latitude, longitude: viewModel.mapRegion.center.longitude))
+                        }.opacity(mapIsMoving && viewModel.searchHereButtonIsShowing && !viewModel.mapMovedByCode ? 0 : 1.0)
+                    }
+                    
+                    if(viewModel.updateSource == UpdateSource.events){
+                        HorizontalEventList(events: $viewModel.events, placeIdToScroll: $viewModel.placeIdToScroll, onScrollStopped: { placeId in
+                            withAnimation {
+                                viewModel.selectMarker(placeLinkedId: placeId, zoom: viewModel.mapRegion.span)
                             }
-                        }
-                    }
-                }
-                .onChange(of: placeIdToScroll, perform: { placeIdToScroll in
-                    if(placeIdToScroll != ""){
-                        scrollOrigin = .programmatic
-                        value.scrollTo(placeIdToScroll, anchor: .leading)
-                    }
-                })
-                .coordinateSpace(name: "scroll")
-                .onReceive(scrollEndedPublisher) { offset in
-                    if (scrollOrigin == .user){
-                        withAnimation(){
-                            scrollOrigin = .programmatic
-                            value.scrollTo(dealersCurrentlyShowing, anchor: .leading)
-                        }
-                    }else{
-                        scrollOrigin = .user
+                        })
+                        
+                        .opacity(mapIsMoving && !viewModel.mapMovedByCode ? 0 : 1.0)
+                    } else {
+                        HorizontalDealersList(
+                            dealers: $viewModel.dealers,
+                            placeIdToScroll: $viewModel.placeIdToScroll,
+                            onScrollStoped: { placeId in
+                                withAnimation {
+                                    viewModel.selectMarker(placeLinkedId: placeId, zoom: viewModel.mapRegion.span)
+                                }
+                            })
+                        .opacity(mapIsMoving && !viewModel.mapMovedByCode ? 0 : 1.0)
                     }
                     
-                    // doesnt work as expected, we would had to calculate position of specific item on the width screen to determine if we should focus n-1 or n+1
-                    //                    and have a array of dealersCurrentlyShowing to keep track
-                    if (offset > 0){
-                        scrollDirection = .right
-                    }else{
-                        scrollDirection = .left
-                    }
-                    
-                    if (dealersCurrentlyShowing != ""){
-                        print(offset)
-                        onScrollStopped(dealersCurrentlyShowing)
+                    if (!viewModel.ads.isEmpty){
+                        MainMapAdContainer(ad: viewModel.ads.first!)
+                            .opacity(mapIsMoving && !viewModel.mapMovedByCode ? 0 : 1.0)
                     }
                 }
-                .frame(width: .infinity, height: 130)
+            
+            // MARK: - VERTICAL LIST OVERLAY Z-INDEX 2
+            
+            if(viewModel.verticalListIsShowing){
+                    if (viewModel.updateSource == UpdateSource.events){
+                        VerticalEventsList(events: viewModel.events)
+                    }else{
+                        VerticaldealersList(dealers: viewModel.dealers)
+                    }
             }
+            
+            // MARK: - TOP CONTROLLER Z-INDEX 3
+            
+            TopButtons(bottomSheetViewModel: bottomSheetViewModel, showVerticalList: { viewModel.permuteVerticalList() }, onMaptypeChange: { viewModel.switchMapStyle() }, isVerticalListopen: viewModel.verticalListIsShowing, currentSource: viewModel.updateSource, filterIsActive: appState.filterApplied.filterId != "")
+                .opacity(mapIsMoving && !viewModel.mapMovedByCode ? 0 : 1.0)
+            
+            }.onChange(of: viewModel.isLoading){
+            onLoading($0)
         }
     }
 }
 
-struct ViewOffsetKey: PreferenceKey {
-    typealias Value = CGFloat
-    static var defaultValue = CGFloat.zero
-    static func reduce(value: inout Value, nextValue: () -> Value) {
-        value += nextValue()
+struct SearchHereBox: View{
+    public var body: some View{
+        HStack{
+            Text("search_this_area")
+                .padding(.horizontal, 20)
+                .padding(.vertical, 10)
+                .foregroundColor(Color.white)
+        }
+        .background(RoundedRectangle(cornerRadius: 25)
+            .fill(Color("Secondary")).shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2))
     }
 }
 
-struct HorizontalListDealerItem: View {
+struct VerticaldealersList: View {
+    
+    var dealers: [Dealer]
+    
+    var body: some View{
+        ScrollView(){
+            LazyVStack{
+                ForEach(dealers , id: \.self) { dealer in
+                    NavigationLink(destination: DealerDetailsScreen(dealer: dealer)
+                        .navigationBarBackButtonHidden(true)
+                    ) {
+                        VerticalDealerItem(dealer: dealer)
+                            .frame(width: .infinity, height: 130)
+                            .padding(8)
+                            .background(RoundedRectangle(cornerRadius: 8)
+                                .fill(Color.white).shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2))
+                    }
+                }
+            }.padding(.top, 100).padding(.horizontal, 8)
+        }.background(
+            GeometryReader { geo -> Color in
+                return Color.white
+            }
+        )
+        .frame(width: .infinity, height: .infinity)
+    }
+}
+
+
+struct VerticalDealerItem: View {
     
     var dealer: Dealer
     
@@ -362,7 +185,7 @@ struct HorizontalListDealerItem: View {
         HStack(){
             if (dealer.isPremium && !dealer.photos.isEmpty) {
                 ZStack(){
-                    UrlImage(url: dealer.photos[0].url).frame(width: 130, height: 130)
+                    UrlImageList(url: dealer.photos[0].url)
                 }
             }
             
@@ -391,7 +214,7 @@ struct HorizontalListDealerItem: View {
                             .padding(5)
                             .background(Color.white)
                             .cornerRadius(5)
-                            .shadow(radius: 5, x:-1, y: 1)
+                            .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
                     }
                     
                     if (!dealer.brands.isEmpty){
@@ -400,7 +223,7 @@ struct HorizontalListDealerItem: View {
                             .padding(5)
                             .background(Color.white)
                             .cornerRadius(5)
-                            .shadow(radius: 5, x:-1, y: 1)
+                            .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
                     }
                     
                     Spacer()
@@ -418,7 +241,7 @@ struct HorizontalListDealerItem: View {
                                 .padding(.trailing, 5)
                         }.background(Color.white)
                             .cornerRadius(5)
-                            .shadow(radius: 5, x:-1, y: 1)
+                            .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
                     }
                     
                     if (dealer.isPremium && !dealer.photos.isEmpty) {
@@ -434,7 +257,149 @@ struct HorizontalListDealerItem: View {
                                 .padding(.trailing, 5)
                         }.background(Color.white)
                             .cornerRadius(15)
-                            .shadow(radius: 5, x:-1, y: 1)
+                            .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
+                    }
+                }.padding(8)
+            }
+        }
+    }
+}
+
+
+extension View {
+    func onFrameChange(_ frameHandler: @escaping (CGRect)->(),
+                       enabled isEnabled: Bool = true) -> some View {
+        guard isEnabled else { return AnyView(self) }
+        return AnyView(self.background(GeometryReader { (geometry: GeometryProxy) in
+            Color.clear.beforeReturn {
+                frameHandler(geometry.frame(in: .global))
+            }
+        }))
+    }
+    
+    private func beforeReturn(_ onBeforeReturn: ()->()) -> Self {
+        onBeforeReturn()
+        return self
+    }
+}
+
+struct HorizontalDealersList: View {
+    @Binding  var dealers: [Dealer]
+    @Binding  var placeIdToScroll: String
+    var onScrollStoped: (String) -> Void
+    
+    var body: some View {
+        MapDealersScrollView(dealers: $dealers, itemIdToScrollTo: $placeIdToScroll){
+            LazyHStack(spacing: 10){
+                ForEach(dealers , id: \.self.id) { dealer in
+                    NavigationLink(destination: DealerDetailsScreen(dealer: dealer)
+                        .navigationBarBackButtonHidden(true)
+                    ) {
+                        HorizontalListDealerItem(dealer: dealer)
+                            .background(RoundedRectangle(cornerRadius: 5)
+                                .fill(Color.white))
+                            .frame(width: UIScreen.main.bounds.width * 0.85)
+                            .padding(.leading, dealers.first == dealer ? 10 : 0)
+                    }
+                }
+            }
+        } onDraggingStoped: { itemId in
+            onScrollStoped(itemId)
+        } onDecelerating: { itemId in
+            onScrollStoped(itemId)
+        }
+        .frame(width: .infinity, height: 130)
+    }
+}
+
+struct ViewOffsetKey: PreferenceKey {
+    typealias Value = CGFloat
+    static var defaultValue = CGFloat.zero
+    static func reduce(value: inout Value, nextValue: () -> Value) {
+        value += nextValue()
+    }
+}
+
+struct HorizontalListDealerItem: View {
+    
+    var dealer: Dealer
+    
+    var body: some View{
+        
+        HStack(){
+            if (dealer.isPremium && !dealer.photos.isEmpty) {
+                UrlImageList(url: dealer.photos[0].url)
+            }
+            
+            VStack(){
+                Text(dealer.name)
+                    .fontWeight(.bold)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .font(.system(size: 14))
+                    .foregroundColor(.black)
+                    .padding(.top, 8)
+                    .padding(.leading, 8)
+                
+                Text(dealer.fullLocation)
+                    .fontWeight(.bold)
+                    .font(.system(size: 12))
+                    .foregroundColor(Color("Tertiary"))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.top, 5)
+                    .padding(.leading, 8)
+                
+                Spacer()
+                HStack(){
+                    if (!dealer.services.isEmpty){
+                        Image("repair")
+                            .frame(width: 16, height: 16)
+                            .padding(5)
+                            .background(Color.white)
+                            .cornerRadius(5)
+                            .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
+                    }
+                    
+                    if (!dealer.brands.isEmpty){
+                        Image("dealers")
+                            .frame(width: 16, height: 16)
+                            .padding(5)
+                            .background(Color.white)
+                            .cornerRadius(5)
+                            .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
+                    }
+                    
+                    Spacer()
+                    
+                    if (dealer.photos.isEmpty) {
+                        HStack(){
+                            Image("distance")
+                                .frame(height: 30)
+                                .padding(.leading, 5)
+                            
+                            Text(Location(latitude: dealer.latitude, longitude: dealer.longitude).distanceFromUserLocationText())
+                                .fontWeight(.bold)
+                                .font(.system(size: 12))
+                                .foregroundColor(Color("Primary"))
+                                .padding(.trailing, 5)
+                        }.background(Color.white)
+                            .cornerRadius(5)
+                            .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
+                    }
+                    
+                    if (dealer.isPremium && !dealer.photos.isEmpty) {
+                        HStack(){
+                            Image("distance")
+                                .frame(height: 30)
+                                .padding(.leading, 5)
+                            
+                            Text(Location(latitude: dealer.latitude, longitude: dealer.longitude).distanceFromUserLocationText())
+                                .fontWeight(.light)
+                                .font(.system(size: 12))
+                                .foregroundColor(Color("Primary"))
+                                .padding(.trailing, 5)
+                        }.background(Color.white)
+                            .cornerRadius(15)
+                            .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
                     }
                 }.padding(8)
             }
@@ -443,24 +408,19 @@ struct HorizontalListDealerItem: View {
 }
 
 struct VerticalEventsList: View {
-    
-    
     var events: [Event]
-    var bottomBar : UITabBar
-    
     var body: some View{
         ScrollView(){
             LazyVStack{
                 ForEach(events , id: \.self) { event in
                     NavigationLink(destination: EventDetailsScreen(event: event)
                         .navigationBarBackButtonHidden(true)
-                        .disableBottomBar(bottomBar: bottomBar)
                     ) {
                         VerticalEventItem(event: event)
                             .frame(width: .infinity, height: 130)
                             .padding(8)
-                            .background(RoundedRectangle(cornerRadius: 5)
-                                .fill(Color.white).shadow(radius: 2, x:-1, y: 2))
+                            .background(RoundedRectangle(cornerRadius: 8)
+                                .fill(Color.white).shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2))
                     }
                 }
             }.padding(.top, 100).padding(.horizontal, 8)
@@ -471,7 +431,6 @@ struct VerticalEventsList: View {
         )
         .frame(width: .infinity, height: .infinity)
     }
-    
 }
 
 struct VerticalEventItem: View {
@@ -480,11 +439,11 @@ struct VerticalEventItem: View {
     var body: some View{
         
         HStack(){
-            //            if (event.photos.isEmpty) {
-            //                ZStack(){
-            //                    UrlImage(url: event.photos[0].url).frame(width: 130, height: 130)
-            //                }
-            //            }
+            if (event.photos.isEmpty) {
+                ZStack(){
+                    UrlImageList(url: event.photos[0].url)
+                }
+            }
             
             VStack(){
                 Text(event.name)
@@ -505,16 +464,15 @@ struct VerticalEventItem: View {
                 
                 Spacer()
                 HStack(){
-                    
                     HStack(){
                         Text(event.country)
-                            .fontWeight(.light)
+                            .fontWeight(.bold)
                             .font(.system(size: 12))
                             .foregroundColor(Color("Primary"))
-                            .padding(.trailing, 5)
+                            .padding(5)
                     }.background(Color.white)
                         .cornerRadius(5)
-                        .shadow(radius: 5, x:-1, y: 1)
+                        .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
                     
                     Spacer()
                     
@@ -524,14 +482,14 @@ struct VerticalEventItem: View {
                             .padding(.leading, 5)
                         
                         Text(Location(latitude: event.latitude, longitude: event.longitude).distanceFromUserLocationText())
-                            .fontWeight(.light)
+                            .fontWeight(.bold)
                             .font(.system(size: 12))
                             .foregroundColor(Color("Primary"))
-                            .padding(.trailing, 5)
+                            .padding(5)
                     }.background(Color.white)
                         .cornerRadius(5)
-                        .shadow(radius: 5, x:-1, y: 1)
-                }
+                        .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
+                }.padding(.leading, 8)
             }.padding(8)
         }
     }
@@ -539,96 +497,31 @@ struct VerticalEventItem: View {
 
 struct HorizontalEventList: View {
     @Binding var events: [Event]
-    @Binding private var placeIdToScroll: String
-    private var onScrollStopped: (String) -> Void
-    private var bottomBar: UITabBar
-    
-    @State private var scrollViewContentSize: CGSize = .zero
-    @State private var selectedIndex: Int = 0
-    @State private var previousOffset: CGFloat = 0
-    @State private var scrollDirection: ScrollDirection = .none
-    @State private var scrollOrigin: ScrollOrigin = .user
-    @State private var eventCurrentlyShowing: String = ""
-    
-    
-    
-    let scrollEndedDetector: CurrentValueSubject<CGFloat, Never>
-    let scrollEndedPublisher: AnyPublisher<CGFloat, Never>
-    
-    init(events: Binding<[Event]>, placeIdToScroll: Binding<String>, onScrollStopped: @escaping (String) -> Void, bottomBar: UITabBar) {
-        self._events = events
-        self._placeIdToScroll = placeIdToScroll
-        self.onScrollStopped = onScrollStopped
-        let scrollEndedDetector = CurrentValueSubject<CGFloat, Never>(0)
-        self.scrollEndedPublisher = scrollEndedDetector
-            .debounce(for: .seconds(0.2), scheduler: DispatchQueue.main)
-            .dropFirst()
-            .eraseToAnyPublisher()
-        self.scrollEndedDetector = scrollEndedDetector
-        self.bottomBar = bottomBar
-    }
+    @Binding var placeIdToScroll: String
+    var onScrollStopped: (String) -> Void
     
     var body: some View {
-        ScrollViewReader { value in
-            ScrollView(.horizontal){
-                LazyHStack(alignment: .center, spacing: 20){
-                    ForEach(events , id: \.self.id) { event in
-                        NavigationLink(destination: EventDetailsScreen(event: event)
-                            .navigationBarBackButtonHidden(true)
-                            .disableBottomBar(bottomBar: bottomBar)
-                        ) {
-                            HorizontalEventItem(event: event)
-                                .background(RoundedRectangle(cornerRadius: 5)
-                                    .fill(Color.white))
-                                .padding(.leading, 8)
-                                .frame(width: UIScreen.main.bounds.width * 0.85)
-                                .onAppear {
-                                    eventCurrentlyShowing = event.id
-                                }
-                                .onDisappear(){
-                                }.background(GeometryReader {
-                                    Color.clear.preference(key: ViewOffsetKey.self,
-                                                           value: -$0.frame(in: .named("scroll")).origin.x)
-                                })
-                                .onPreferenceChange(ViewOffsetKey.self) { scrollEndedDetector.send($0) }
-                        }
+        MapEventsScrollView(events: $events, itemIdToScrollTo: $placeIdToScroll){
+            LazyHStack(spacing: 10){
+                ForEach(events , id: \.self.id) { event in
+                    NavigationLink(destination: EventDetailsScreen(event: event)
+                        .navigationBarBackButtonHidden(true)
+                    ) {
+                        HorizontalEventItem(event: event)
+                            .background(RoundedRectangle(cornerRadius: 5)
+                                .fill(Color.white))
+                            .frame(width: UIScreen.main.bounds.width * 0.85)
+                            .padding(.leading, events.first == event ? 10 : 0)
                     }
                 }
             }
-            .onChange(of: placeIdToScroll, perform: { placeIdToScroll in
-                if(placeIdToScroll != ""){
-                    scrollOrigin = .programmatic
-                    value.scrollTo(placeIdToScroll, anchor: .leading)
-                }
-            })
-            .coordinateSpace(name: "scroll")
-            .onReceive(scrollEndedPublisher) { offset in
-                if (scrollOrigin == .user){
-                    withAnimation(){
-                        scrollOrigin = .programmatic
-                        value.scrollTo(eventCurrentlyShowing, anchor: .leading)
-                    }
-                }else{
-                    scrollOrigin = .user
-                }
-                
-                // doesnt work as expected, we would had to calculate position of specific item on the width screen to determine if we should focus n-1 or n+1
-                //                    and have a array of dealersCurrentlyShowing to keep track
-                if (offset > 0){
-                    scrollDirection = .right
-                }else{
-                    scrollDirection = .left
-                }
-                
-                if (eventCurrentlyShowing != ""){
-                    print(offset)
-                    onScrollStopped(eventCurrentlyShowing)
-                }
-            }
-            .frame(width: .infinity, height: 130)
+        } onDraggingStoped: { itemId in
+            onScrollStopped(itemId)
+        } onDecelerating: { itemId in
+            onScrollStopped(itemId)
         }
+        .frame(width: .infinity, height: 130)
     }
-    
 }
 
 struct HorizontalEventItem: View {
@@ -637,11 +530,11 @@ struct HorizontalEventItem: View {
     
     var body: some View{
         HStack(){
-            //            if (event.photos.isEmpty) {
-            //                ZStack(){
-            //                    UrlImage(url: event.photos[0].url).frame(width: 130, height: 130)
-            //                }
-            //            }
+            if (event.photos.isEmpty) {
+                ZStack(){
+                    UrlImageList(url: event.photos[0].url)
+                }
+            }
             
             VStack(){
                 Text(event.name)
@@ -665,13 +558,13 @@ struct HorizontalEventItem: View {
                     
                     HStack(){
                         Text(event.country)
-                            .fontWeight(.light)
+                            .fontWeight(.bold)
                             .font(.system(size: 12))
                             .foregroundColor(Color("Primary"))
-                            .padding(.trailing, 5)
+                            .padding(5)
                     }.background(Color.white)
                         .cornerRadius(5)
-                        .shadow(radius: 5, x:-1, y: 1)
+                        .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
                     
                     Spacer()
                     
@@ -687,7 +580,7 @@ struct HorizontalEventItem: View {
                             .padding(.trailing, 5)
                     }.background(Color.white)
                         .cornerRadius(5)
-                        .shadow(radius: 5, x:-1, y: 1)
+                        .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
                 }
             }.padding(8)
         }
@@ -700,11 +593,11 @@ struct MainMapAdContainer: View{
     let ad : Ad
     
     var body: some View{
-        UrlImage(url: ad.url)
-            .frame(height: 80)
-            .scaledToFit()
+        UrlImagePub(url: ad.url)
             .onTapGesture {
-                guard let url = URL(string: ad.click) else { return }
+                guard let url = URL(string: ad.url) else { return }
+                guard let urlStat = URL(string: ad.click) else { return }
+                urlStat.ping(completion: {_, _ in})
                 UIApplication.shared.open(url)
             }
     }
@@ -719,6 +612,7 @@ struct TopButtons: View {
     var onMaptypeChange: () -> Void
     var isVerticalListopen: Bool
     var currentSource: UpdateSource
+    var filterIsActive: Bool
     
     var body: some View {
         HStack(alignment: .top){
@@ -731,11 +625,7 @@ struct TopButtons: View {
                     Image("list")
                 }
             }
-            .frame(width: 50, height: 50)
-            .background(Color(red: 136, green: 175, blue: 255))
-            .cornerRadius(25)
-            .shadow(radius: 25, x: 1, y: 2)
-            .buttonStyle(.plain)
+            .buttonStyle(FilterButtonStyle(filterActive: false))
             
             Spacer()
             
@@ -754,19 +644,14 @@ struct TopButtons: View {
                 }else{
                     onMaptypeChange()
                 }
-                
             }){
                 if(isVerticalListopen){
-                    Image("sort")
+                    Image("sort").resizable().frame(width: 24, height: 24)
                 }else{
                     Image("map_layer")
                 }
             }
-            .frame(width: 50, height: 50)
-            .background(Color(red: 136, green: 175, blue: 255))
-            .cornerRadius(25)
-            .shadow(radius: 25, x: 1, y: 2)
-            .buttonStyle(.plain)
+            .buttonStyle(FilterButtonStyle(filterActive: false))
             
             
             Button(action: {
@@ -780,11 +665,7 @@ struct TopButtons: View {
             }){
                 Image("filter")
             }
-            .frame(width: 50, height: 50)
-            .background(Color(red: 136, green: 175, blue: 255))
-            .cornerRadius(25)
-            .shadow(radius: 25, x: 1, y: 2)
-            .buttonStyle(.plain)
+            .buttonStyle(FilterButtonStyle(filterActive: !Globals.filters().brands.isEmpty || !Globals.filters().services.isEmpty))
         }
         .padding(EdgeInsets(top: 8, leading: 16, bottom: 0, trailing: 16))
     }
@@ -826,13 +707,6 @@ struct MainMapScreen_Previews: PreviewProvider {
     }
 }
 
-
-enum ScrollDirection {
-    case right
-    case left
-    case none
-}
-
 enum ScrollOrigin {
     case user
     case programmatic
@@ -845,4 +719,3 @@ struct OffsetPreferenceKey: PreferenceKey {
         value = nextValue()
     }
 }
-//}

@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -11,6 +11,20 @@
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
 		7591232B454109175C2646DC /* Pods_iosApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C2C3D1E238EE0D2466176D0E /* Pods_iosApp.framework */; };
+		CE0647E52A1E47DC002B306F /* BottomNavTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE0647E42A1E47DC002B306F /* BottomNavTab.swift */; };
+		CE0647E72A1E486D002B306F /* NavigationViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE0647E62A1E486D002B306F /* NavigationViewState.swift */; };
+		CE0647E92A1E4DA8002B306F /* BottomNavContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE0647E82A1E4DA8002B306F /* BottomNavContainer.swift */; };
+		CE0647EB2A1E4DC7002B306F /* CustomTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE0647EA2A1E4DC7002B306F /* CustomTabView.swift */; };
+		CE0647ED2A1E4E94002B306F /* BottomNavTabItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE0647EC2A1E4E94002B306F /* BottomNavTabItem.swift */; };
+		CE0647F32A1E5110002B306F /* BottomNavModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE0647F22A1E5110002B306F /* BottomNavModifier.swift */; };
+		CE0647F92A1E766A002B306F /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE0647F82A1E766A002B306F /* AppState.swift */; };
+		CE317CC62A1F8FDF00BC018B /* ScrollViewOffsetReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE317CC52A1F8FDF00BC018B /* ScrollViewOffsetReader.swift */; };
+		CE317D932A210DDD00BC018B /* CustomScrollViewTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE317D922A210DDD00BC018B /* CustomScrollViewTest.swift */; };
+		CE317D962A21547400BC018B /* MapDealersScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE317D952A21547400BC018B /* MapDealersScrollView.swift */; };
+		CE317DB02A21693000BC018B /* ScrollTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE317DAF2A21693000BC018B /* ScrollTest.swift */; };
+		CE317DC72A2216C200BC018B /* UiScrollViewTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE317DC62A2216C200BC018B /* UiScrollViewTest.swift */; };
+		CE317DC92A22660800BC018B /* MapUiScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE317DC82A22660800BC018B /* MapUiScrollView.swift */; };
+		CE317DCB2A227B4200BC018B /* MapEventsScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE317DCA2A227B4200BC018B /* MapEventsScrollView.swift */; };
 		CE451CE2297AD2A3004761B2 /* BottomSheetViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE451CE1297AD2A3004761B2 /* BottomSheetViewModel.swift */; };
 		CE481B072A07EA9200F59619 /* ImageCarousel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE481B062A07EA9200F59619 /* ImageCarousel.swift */; };
 		CE481B092A080F9C00F59619 /* TabViewAccessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE481B082A080F9C00F59619 /* TabViewAccessor.swift */; };
@@ -40,7 +54,9 @@
 		CE72DD252A02E3AB005F118E /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE72DD242A02E3AB005F118E /* NetworkMonitor.swift */; };
 		CE7818C82912D600009C4032 /* MainMapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7818C72912D600009C4032 /* MainMapViewModel.swift */; };
 		CE7818CA2912D61C009C4032 /* MainMapScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7818C92912D61C009C4032 /* MainMapScreen.swift */; };
-		CEDCEA0D2A127E64001F89F6 /* LocalizedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDCEA0C2A127E64001F89F6 /* LocalizedText.swift */; };
+		CEDCEA292A1579C9001F89F6 /* LoadingBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDCEA282A1579C9001F89F6 /* LoadingBox.swift */; };
+		CEDCEA2B2A1822EF001F89F6 /* CheckBoxAppStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDCEA2A2A1822EF001F89F6 /* CheckBoxAppStyle.swift */; };
+		CEDCEA2D2A18277F001F89F6 /* FilterButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDCEA2C2A18277F001F89F6 /* FilterButtonStyle.swift */; };
 		CEE0920929E8674000E44D02 /* CheckListsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEE0920829E8674000E44D02 /* CheckListsViewModel.swift */; };
 		CEE0920B29E86C7300E44D02 /* CheckListScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEE0920A29E86C7300E44D02 /* CheckListScreen.swift */; };
 		CEE0920D29E8711000E44D02 /* MyLocationMapScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEE0920C29E8711000E44D02 /* MyLocationMapScreen.swift */; };
@@ -72,6 +88,20 @@
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AEDEA92E7BA4EFE38251C119 /* Pods-iosApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iosApp.debug.xcconfig"; path = "Target Support Files/Pods-iosApp/Pods-iosApp.debug.xcconfig"; sourceTree = "<group>"; };
 		C2C3D1E238EE0D2466176D0E /* Pods_iosApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_iosApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		CE0647E42A1E47DC002B306F /* BottomNavTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomNavTab.swift; sourceTree = "<group>"; };
+		CE0647E62A1E486D002B306F /* NavigationViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationViewState.swift; sourceTree = "<group>"; };
+		CE0647E82A1E4DA8002B306F /* BottomNavContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomNavContainer.swift; sourceTree = "<group>"; };
+		CE0647EA2A1E4DC7002B306F /* CustomTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabView.swift; sourceTree = "<group>"; };
+		CE0647EC2A1E4E94002B306F /* BottomNavTabItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomNavTabItem.swift; sourceTree = "<group>"; };
+		CE0647F22A1E5110002B306F /* BottomNavModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomNavModifier.swift; sourceTree = "<group>"; };
+		CE0647F82A1E766A002B306F /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		CE317CC52A1F8FDF00BC018B /* ScrollViewOffsetReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollViewOffsetReader.swift; sourceTree = "<group>"; };
+		CE317D922A210DDD00BC018B /* CustomScrollViewTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomScrollViewTest.swift; sourceTree = "<group>"; };
+		CE317D952A21547400BC018B /* MapDealersScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapDealersScrollView.swift; sourceTree = "<group>"; };
+		CE317DAF2A21693000BC018B /* ScrollTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollTest.swift; sourceTree = "<group>"; };
+		CE317DC62A2216C200BC018B /* UiScrollViewTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UiScrollViewTest.swift; sourceTree = "<group>"; };
+		CE317DC82A22660800BC018B /* MapUiScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapUiScrollView.swift; sourceTree = "<group>"; };
+		CE317DCA2A227B4200BC018B /* MapEventsScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapEventsScrollView.swift; sourceTree = "<group>"; };
 		CE451CE1297AD2A3004761B2 /* BottomSheetViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetViewModel.swift; sourceTree = "<group>"; };
 		CE481B062A07EA9200F59619 /* ImageCarousel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCarousel.swift; sourceTree = "<group>"; };
 		CE481B082A080F9C00F59619 /* TabViewAccessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabViewAccessor.swift; sourceTree = "<group>"; };
@@ -101,7 +131,9 @@
 		CE72DD242A02E3AB005F118E /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
 		CE7818C72912D600009C4032 /* MainMapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMapViewModel.swift; sourceTree = "<group>"; };
 		CE7818C92912D61C009C4032 /* MainMapScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMapScreen.swift; sourceTree = "<group>"; };
-		CEDCEA0C2A127E64001F89F6 /* LocalizedText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizedText.swift; sourceTree = "<group>"; };
+		CEDCEA282A1579C9001F89F6 /* LoadingBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingBox.swift; sourceTree = "<group>"; };
+		CEDCEA2A2A1822EF001F89F6 /* CheckBoxAppStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckBoxAppStyle.swift; sourceTree = "<group>"; };
+		CEDCEA2C2A18277F001F89F6 /* FilterButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterButtonStyle.swift; sourceTree = "<group>"; };
 		CEE0920829E8674000E44D02 /* CheckListsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckListsViewModel.swift; sourceTree = "<group>"; };
 		CEE0920A29E86C7300E44D02 /* CheckListScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckListScreen.swift; sourceTree = "<group>"; };
 		CEE0920C29E8711000E44D02 /* MyLocationMapScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyLocationMapScreen.swift; sourceTree = "<group>"; };
@@ -187,6 +219,8 @@
 		7555FF7D242A565900829871 /* iosApp */ = {
 			isa = PBXGroup;
 			children = (
+				CE0647E32A1E4769002B306F /* Navigation */,
+				CEDCEA172A152414001F89F6 /* Fonts */,
 				CEE0922F29E9C4FD00E44D02 /* Tools */,
 				CEE0922229E9AF8600E44D02 /* Localiazble */,
 				CEE0921529E8723A00E44D02 /* Events */,
@@ -205,6 +239,38 @@
 				058557D7273AAEEB004C7B11 /* Preview Content */,
 			);
 			path = iosApp;
+			sourceTree = "<group>";
+		};
+		CE0647E32A1E4769002B306F /* Navigation */ = {
+			isa = PBXGroup;
+			children = (
+				CE0647E42A1E47DC002B306F /* BottomNavTab.swift */,
+				CE0647E62A1E486D002B306F /* NavigationViewState.swift */,
+				CE0647E82A1E4DA8002B306F /* BottomNavContainer.swift */,
+				CE0647EA2A1E4DC7002B306F /* CustomTabView.swift */,
+				CE0647EC2A1E4E94002B306F /* BottomNavTabItem.swift */,
+				CE0647F22A1E5110002B306F /* BottomNavModifier.swift */,
+			);
+			path = Navigation;
+			sourceTree = "<group>";
+		};
+		CE317D942A21546300BC018B /* MapScrollView */ = {
+			isa = PBXGroup;
+			children = (
+				CE317D952A21547400BC018B /* MapDealersScrollView.swift */,
+				CE317DC82A22660800BC018B /* MapUiScrollView.swift */,
+				CE317DCA2A227B4200BC018B /* MapEventsScrollView.swift */,
+			);
+			path = MapScrollView;
+			sourceTree = "<group>";
+		};
+		CE317DAE2A21690A00BC018B /* ScrollTest */ = {
+			isa = PBXGroup;
+			children = (
+				CE317DAF2A21693000BC018B /* ScrollTest.swift */,
+				CE317DC62A2216C200BC018B /* UiScrollViewTest.swift */,
+			);
+			path = ScrollTest;
 			sourceTree = "<group>";
 		};
 		CE6B660E2979B45D00F600F7 /* partners */ = {
@@ -256,8 +322,17 @@
 				CE7818C92912D61C009C4032 /* MainMapScreen.swift */,
 				CE6B660C2979A97700F600F7 /* HomeScreen.swift */,
 				CE451CE1297AD2A3004761B2 /* BottomSheetViewModel.swift */,
+				CE0647F82A1E766A002B306F /* AppState.swift */,
+				CE317D922A210DDD00BC018B /* CustomScrollViewTest.swift */,
 			);
 			path = main_map;
+			sourceTree = "<group>";
+		};
+		CEDCEA172A152414001F89F6 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Fonts;
 			sourceTree = "<group>";
 		};
 		CEE0920529E866E200E44D02 /* myLocationMap */ = {
@@ -317,6 +392,8 @@
 		CEE0922F29E9C4FD00E44D02 /* Tools */ = {
 			isa = PBXGroup;
 			children = (
+				CE317D942A21546300BC018B /* MapScrollView */,
+				CE317DAE2A21690A00BC018B /* ScrollTest */,
 				CEE0923229E9C5D300E44D02 /* Extension.swift */,
 				CEE0923429EB2D9700E44D02 /* UrlImage.swift */,
 				CEE0923829EC247300E44D02 /* MapSettings.swift */,
@@ -336,7 +413,10 @@
 				CE481B082A080F9C00F59619 /* TabViewAccessor.swift */,
 				CE481B0D2A0A8D5800F59619 /* GlobalPopup.swift */,
 				CE481B0F2A0A946200F59619 /* GlobalSlider.swift */,
-				CEDCEA0C2A127E64001F89F6 /* LocalizedText.swift */,
+				CEDCEA282A1579C9001F89F6 /* LoadingBox.swift */,
+				CEDCEA2A2A1822EF001F89F6 /* CheckBoxAppStyle.swift */,
+				CEDCEA2C2A18277F001F89F6 /* FilterButtonStyle.swift */,
+				CE317CC52A1F8FDF00BC018B /* ScrollViewOffsetReader.swift */,
 			);
 			path = Tools;
 			sourceTree = "<group>";
@@ -352,6 +432,7 @@
 				7555FF77242A565900829871 /* Sources */,
 				7555FF79242A565900829871 /* Resources */,
 				869CCA95EB2395A6C0C4D414 /* Frameworks */,
+				84EA886CE4AAC538AB102FBD /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -436,6 +517,23 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		84EA886CE4AAC538AB102FBD /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-iosApp/Pods-iosApp-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-iosApp/Pods-iosApp-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-iosApp/Pods-iosApp-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -445,18 +543,23 @@
 			files = (
 				CE72DD232A027F2F005F118E /* LocationInitializer.swift in Sources */,
 				CEE0920D29E8711000E44D02 /* MyLocationMapScreen.swift in Sources */,
+				CE317DB02A21693000BC018B /* ScrollTest.swift in Sources */,
 				2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */,
 				CE72DD0C29F93FA2005F118E /* FilterViewModel.swift in Sources */,
 				CEE0920929E8674000E44D02 /* CheckListsViewModel.swift in Sources */,
 				CEE0921429E8722400E44D02 /* DealerDetailsScreen.swift in Sources */,
 				CEE0921D29E96C1700E44D02 /* CheckListDetailsViewModel.swift in Sources */,
+				CE0647F32A1E5110002B306F /* BottomNavModifier.swift in Sources */,
+				CE317DC92A22660800BC018B /* MapUiScrollView.swift in Sources */,
 				CE451CE2297AD2A3004761B2 /* BottomSheetViewModel.swift in Sources */,
 				CEE0920B29E86C7300E44D02 /* CheckListScreen.swift in Sources */,
 				CEE0921129E8720400E44D02 /* PartnersDetailsScreen.swift in Sources */,
 				CE72DD1B29FF226A005F118E /* EventFilterViewModel.swift in Sources */,
+				CEDCEA2D2A18277F001F89F6 /* FilterButtonStyle.swift in Sources */,
 				CEE0921929E8946000E44D02 /* MyLocationMapViewModel.swift in Sources */,
 				CE72DD212A0139D6005F118E /* MylocationMap.swift in Sources */,
 				CE72DD0A29F937BC005F118E /* HistoricSearchList.swift in Sources */,
+				CE0647E92A1E4DA8002B306F /* BottomNavContainer.swift in Sources */,
 				CE72DD1129FAD05E005F118E /* SplashScreenViewModel.swift in Sources */,
 				CE481B072A07EA9200F59619 /* ImageCarousel.swift in Sources */,
 				CEE0923529EB2D9700E44D02 /* UrlImage.swift in Sources */,
@@ -468,6 +571,9 @@
 				CE725DB92982A3B30088AC04 /* BottomSheetController.swift in Sources */,
 				CE7818CA2912D61C009C4032 /* MainMapScreen.swift in Sources */,
 				CEE0923729EC1DF300E44D02 /* MainMap.swift in Sources */,
+				CE0647F92A1E766A002B306F /* AppState.swift in Sources */,
+				CE317D932A210DDD00BC018B /* CustomScrollViewTest.swift in Sources */,
+				CE0647EB2A1E4DC7002B306F /* CustomTabView.swift in Sources */,
 				CEE0921B29E96AFB00E44D02 /* PartnersViewModel.swift in Sources */,
 				CE6B66172979B56800F600F7 /* PartnersScreen.swift in Sources */,
 				CE6B66152979B55500F600F7 /* MoreScreen.swift in Sources */,
@@ -480,17 +586,25 @@
 				CE72DD1329FC2029005F118E /* RadioGroup.swift in Sources */,
 				CE481B0B2A0A6E6200F59619 /* SortingSheet.swift in Sources */,
 				CE72DD0629F8370F005F118E /* EmailController.swift in Sources */,
-				CEDCEA0D2A127E64001F89F6 /* LocalizedText.swift in Sources */,
 				CE725DB72982A1B10088AC04 /* DealerFilterScreen.swift in Sources */,
 				CE72DD252A02E3AB005F118E /* NetworkMonitor.swift in Sources */,
 				CE481B102A0A946200F59619 /* GlobalSlider.swift in Sources */,
+				CEDCEA2B2A1822EF001F89F6 /* CheckBoxAppStyle.swift in Sources */,
+				CE317D962A21547400BC018B /* MapDealersScrollView.swift in Sources */,
 				CEE0922429E9AFA300E44D02 /* Strings.swift in Sources */,
+				CE317DCB2A227B4200BC018B /* MapEventsScrollView.swift in Sources */,
 				CEE0920F29E8717E00E44D02 /* AppSettingScreen.swift in Sources */,
 				CEE0923929EC247300E44D02 /* MapSettings.swift in Sources */,
 				CE72DD0829F92E94005F118E /* CheckboxStyle.swift in Sources */,
+				CEDCEA292A1579C9001F89F6 /* LoadingBox.swift in Sources */,
+				CE317DC72A2216C200BC018B /* UiScrollViewTest.swift in Sources */,
 				CE72DD0429F7E734005F118E /* SizePreferenceKey.swift in Sources */,
+				CE0647E72A1E486D002B306F /* NavigationViewState.swift in Sources */,
+				CE0647ED2A1E4E94002B306F /* BottomNavTabItem.swift in Sources */,
 				CE6B66132979B52C00F600F7 /* AroundLocationScreen.swift in Sources */,
 				CEE0924129F1543B00E44D02 /* Dropdown.swift in Sources */,
+				CE317CC62A1F8FDF00BC018B /* ScrollViewOffsetReader.swift in Sources */,
+				CE0647E52A1E47DC002B306F /* BottomNavTab.swift in Sources */,
 				CEE0923B29EDA52100E44D02 /* MarkerAnnotation.swift in Sources */,
 				CEE0922129E9704200E44D02 /* AroundLocationViewModel.swift in Sources */,
 			);
@@ -570,7 +684,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 14.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -626,6 +740,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 14.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";

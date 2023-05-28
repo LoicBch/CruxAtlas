@@ -21,6 +21,7 @@ extension HomeScreen {
         @Published var networkIsObserved = false
         @Published var globalSliderState: [SliderState] = []
         @Published var globalPopupState = GlobalPopupState.Hid
+        @Published var appIsLoading = false
         
         private var locationIsEnabled = false
         private var networkIsEnabled = false
