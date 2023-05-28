@@ -31,6 +31,10 @@ extension DealerFilterScreen {
                         .compactMap { $0.value.first }
                     if (!uniqueDealerFilterHistoric.isEmpty && !dealerFilterHistoric.isEmpty){
                         dealerFiltersUsed = Array(uniqueDealerFilterHistoric.prefix(3))
+                        if let dealerFilterSelected = dealerFilterHistoric.first(where: { $0.isSelected}) {
+                        } else {
+                            dealerFilterSelected = Filter(category: FilterType.unselectedDealer, filterId: "", isSelected: false)
+                        }
                         dealerFilterSelected = dealerFilterHistoric.first(where: {$0.isSelected})!
                     }
                     

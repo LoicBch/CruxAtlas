@@ -19,18 +19,19 @@ struct DealerFilterScreen: View {
     var onFilterApplied: (Filter) -> Void
     
     public var body: some View {
-        ScrollView(.vertical){
             if (isSelectingOption){
-                filtersOptions(
-                    categorySelected: viewModel.dealerFilterSelected.category,
-                    onItemTap: {
-                        viewModel.onFilterOptionSelected(filterName: $0)
-                        isSelectingOption = false
-                    },
-                    onFilterOptionSelected: {viewModel.onFilterOptionSelected(filterName: $0)},
-                    dealerFilterUsed: viewModel.dealerFiltersUsed,
-                    onSearchDelete: {viewModel.deleteFilter(filter: $0)}, onClose: onClose
-                )
+                ScrollView(.vertical, showsIndicators: false){
+                    filtersOptions(
+                        categorySelected: viewModel.dealerFilterSelected.category,
+                        onItemTap: {
+                            viewModel.onFilterOptionSelected(filterName: $0)
+                            isSelectingOption = false
+                        },
+                        onFilterOptionSelected: {viewModel.onFilterOptionSelected(filterName: $0)},
+                        dealerFilterUsed: viewModel.dealerFiltersUsed,
+                        onSearchDelete: {viewModel.deleteFilter(filter: $0)}, onClose: onClose
+                    )
+                }
             }else{
                 filtersCategories(
                     categorySelectedId: $categorySelectedId, onChooseOptionsTap: { isSelectingOption = true },
@@ -49,7 +50,6 @@ struct DealerFilterScreen: View {
                     onFilterApplied($0)
                 }
             }
-        }
     }
 }
 
@@ -257,45 +257,21 @@ struct filtersCategories: View{
     
     public var body: some View{
         VStack{
-            HStack{
-                Image(systemName: "xmark").onTapGesture {
-                    
-                }
-                Spacer()
-                Text("filters_title")
-                Spacer()
-                Image("reload").onTapGesture {
-                    onCategorySelected(FilterType.unselectedDealer)
-                }
-            }.padding(.top, 12)
-            
-            HStack{
-                Text("step_1")
-                    .fontWeight(.medium)
-                    .font(.system(size: 12))
-                    .foregroundColor(Color.gray)
-                    .padding(.top, 60)
-                Spacer()
-            }
-            
-            HStack{
-                Text("filter_step1_title")
-                    .fontWeight(.black)
-                    .font(.system(size: 22))
-                    .foregroundColor(Color.black)
-                Spacer()
-            }.padding(.top, 8)
-            
-            Divider()
-            
-            RadioButtonGroup(items:[("Repair, upgrade or buy motorhome","repair"),("Find official motorhome dealers","dealers")], selectedId:  $categorySelectedId) { selected in
-                onCategorySelected(radiobuttonToFilterType(radiobuttonId: selected))
-            }
-            
-            if(filterDealerSelected.category != FilterType.unselectedDealer){
+            ScrollView(.vertical, showsIndicators: false){
+                HStack{
+                    Image(systemName: "xmark").onTapGesture {
+                        
+                    }
+                    Spacer()
+                    Text("filters_title")
+                    Spacer()
+                    Image("reload").onTapGesture {
+                        onCategorySelected(FilterType.unselectedDealer)
+                    }
+                }.padding(.top, 12)
                 
                 HStack{
-                    Text("step_2")
+                    Text("step_1")
                         .fontWeight(.medium)
                         .font(.system(size: 12))
                         .foregroundColor(Color.gray)
@@ -304,31 +280,57 @@ struct filtersCategories: View{
                 }
                 
                 HStack{
-                    Text("filter_step2_title")
+                    Text("filter_step1_title")
                         .fontWeight(.black)
                         .font(.system(size: 22))
                         .foregroundColor(Color.black)
                     Spacer()
                 }.padding(.top, 8)
+                
                 Divider()
                 
-                if(filterDealerSelected.filterId != ""){
-
-                    MaterialTextField(buttonLabel: $buttonLabel, onTap: {
-                        onChooseOptionsTap()
-                    }).padding(.top, 15)
-                } else {
-                    FilterSelectionBox(buttonLabel: $buttonLabel, onTap: {
-                        onChooseOptionsTap()
-                    }).padding(.top, 15)
+                RadioButtonGroup(items:[("Repair, upgrade or buy motorhome","repair"),("Find official motorhome dealers","dealers")], selectedId:  $categorySelectedId) { selected in
+                    onCategorySelected(radiobuttonToFilterType(radiobuttonId: selected))
                 }
-                 
-                HistoricSearchList(filterSearchs: dealerFiltersUsed, onSelectSearch: { filterName in
-                    onDealerOptionSelected(filterName)
-                }, onDeleteSearch: { filter in
-                    onFilterDelete(filter)
-                })
                 
+                if(filterDealerSelected.category != FilterType.unselectedDealer){
+                    
+                    HStack{
+                        Text("step_2")
+                            .fontWeight(.medium)
+                            .font(.system(size: 12))
+                            .foregroundColor(Color.gray)
+                            .padding(.top, 60)
+                        Spacer()
+                    }
+                    
+                    HStack{
+                        Text("filter_step2_title")
+                            .fontWeight(.black)
+                            .font(.system(size: 22))
+                            .foregroundColor(Color.black)
+                        Spacer()
+                    }.padding(.top, 8)
+                    Divider()
+                    
+                    if(filterDealerSelected.filterId != ""){
+                        
+                        MaterialTextField(buttonLabel: $buttonLabel, onTap: {
+                            onChooseOptionsTap()
+                        }).padding(.top, 15)
+                    } else {
+                        FilterSelectionBox(buttonLabel: $buttonLabel, onTap: {
+                            onChooseOptionsTap()
+                        }).padding(.top, 15)
+                    }
+                    
+                    HistoricSearchList(filterSearchs: dealerFiltersUsed, onSelectSearch: { filterName in
+                        onDealerOptionSelected(filterName)
+                    }, onDeleteSearch: { filter in
+                        onFilterDelete(filter)
+                    })
+                    
+                }
             }
             
             Spacer()

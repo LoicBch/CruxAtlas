@@ -665,7 +665,7 @@ struct TopButtons: View {
             }){
                 Image("filter")
             }
-            .buttonStyle(FilterButtonStyle(filterActive: !Globals.filters().brands.isEmpty || !Globals.filters().services.isEmpty))
+            .buttonStyle(FilterButtonStyle(filterActive: filterIsActive))
         }
         .padding(EdgeInsets(top: 8, leading: 16, bottom: 0, trailing: 16))
     }
