@@ -1,0 +1,3 @@
+package com.appmobiledition.laundryfinder.utils
+
+actual interface CommonParcelable
