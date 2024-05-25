@@ -21,7 +21,7 @@ import com.appmobiledition.laundryfinder.android.R
 import kotlinx.coroutines.launch
 
 enum class FilterOptions {
-    Revolution, Other
+    DIFFICULTY, OtherClimbingFilters
 }
 
 @OptIn(ExperimentalMaterialApi::class)

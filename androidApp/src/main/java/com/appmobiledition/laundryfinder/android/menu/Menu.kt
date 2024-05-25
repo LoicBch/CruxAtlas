@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import com.appmobiledition.laundryfinder.android.LocalDependencyContainer
 import com.appmobiledition.laundryfinder.android.R
 import com.appmobiledition.laundryfinder.android.composables.Dropdown
+import com.appmobiledition.laundryfinder.android.destinations.SettingsMenuDestination
 import com.appmobiledition.laundryfinder.android.ui.theme.AppColor
 import com.appmobiledition.laundryfinder.android.ui.theme.Dimensions
 import com.appmobiledition.laundryfinder.domain.model.MenuLink
@@ -68,7 +69,7 @@ fun MenuScreen(
 //        ),
         MenuItem(
             R.string.menu_app_settings, {
-//                navigator.navigate(SettingsMenuDestination)
+                navigator.navigate(SettingsMenuDestination)
             }, R.drawable.settings, R.string.cd_app_settings, false
         )
     )

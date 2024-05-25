@@ -18,7 +18,7 @@ fun Double.toDMS(): String {
 
 //Faire un objet location et mettre cette extension sur location
 //val LaundryDto.fullLocation get() = "$ville, $code_postal"
-val LaundryDto.fullLocation get() = "test"
+val LaundryDto.fullLocation get() = "climbing address"
 val LaundryDto.fullGeolocalisation
     get() = "$latitude, $longitude (lat, lng)\nN ${
         latitude!!.toDouble()

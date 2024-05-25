@@ -78,6 +78,7 @@
 
     <!--  Partner -->
     <string name="navigate_to_event">Naviguer vers l\'événement</string>
+    <string name="unity_viewer">Open 3D Viewer</string>
     <string name="cd_arrow_back">retourner en arrière</string>
 
     <!--  Settings -->

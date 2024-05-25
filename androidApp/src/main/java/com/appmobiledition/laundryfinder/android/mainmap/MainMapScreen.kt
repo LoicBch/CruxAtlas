@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap.Companion.Butt
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
@@ -38,6 +39,7 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.appmobiledition.laundryfinder.android.LocalDependencyContainer
 import com.appmobiledition.laundryfinder.android.R
+import com.appmobiledition.laundryfinder.android.composables.AppButton
 import com.appmobiledition.laundryfinder.android.composables.LoadingModal
 import com.appmobiledition.laundryfinder.android.composables.collectAsStateWithLifecycleImmutable
 import com.appmobiledition.laundryfinder.android.destinations.AroundLocationScreenDestination
@@ -46,6 +48,7 @@ import com.appmobiledition.laundryfinder.android.destinations.MenuScreenDestinat
 import com.appmobiledition.laundryfinder.android.extensions.hasLocationPermission
 import com.appmobiledition.laundryfinder.android.extensions.isScrollingUp
 import com.appmobiledition.laundryfinder.android.extensions.lastVisibleItemIndex
+import com.appmobiledition.laundryfinder.android.extensions.navigateByGmaps
 import com.appmobiledition.laundryfinder.android.spotSheet.LaundryDetailScreen
 import com.appmobiledition.laundryfinder.android.ui.theme.AppColor
 import com.appmobiledition.laundryfinder.android.ui.theme.Dimensions
@@ -118,100 +121,100 @@ fun MainMap(
     val appViewModel = LocalDependencyContainer.current.appViewModel
 
     LaunchedEffect(true) {
-        viewModel.event.collect {
-            when (it) {
-                is MainMapViewModel.MainMapEvent.UpdateRegion -> {
-                    cameraPositionState.move(
-                        CameraUpdateFactory.newLatLngBounds(
-                            it.bounds,
-                            it.padding
-                        )
-                    )
-                }
-            }
-        }
+//        viewModel.event.collect {
+//            when (it) {
+//                is MainMapViewModel.MainMapEvent.UpdateRegion -> {
+//                    cameraPositionState.move(
+//                        CameraUpdateFactory.newLatLngBounds(
+//                            it.bounds,
+//                            it.padding
+//                        )
+//                    )
+//                }
+//            }
+//        }
     }
 
     LaunchedEffect(true) {
 
-        if (updateSource == UpdateSource.DEFAULT) {
-//            viewModel.getAds()
-            if (context.hasLocationPermission) {
-                cameraPositionState.move(
-                    CameraUpdateFactory.newLatLng(
-                        LatLng(
-                            Globals.geoLoc.lastKnownLocation.latitude,
-                            Globals.geoLoc.lastKnownLocation.longitude
-                        )
-                    )
-                )
-                viewModel.showLaundry(Globals.geoLoc.lastKnownLocation)
-            } else {
-                cameraPositionState.move(
-                    CameraUpdateFactory.newLatLng(
-                        LatLng(
-                            Constants.DEFAULT_LOCATION.latitude,
-                            Constants.DEFAULT_LOCATION.longitude
-                        )
-                    )
-                )
-            }
-        }
+//        if (updateSource == UpdateSource.DEFAULT) {
+////            viewModel.getAds()
+//            if (context.hasLocationPermission) {
+//                cameraPositionState.move(
+//                    CameraUpdateFactory.newLatLng(
+//                        LatLng(
+//                            Globals.geoLoc.lastKnownLocation.latitude,
+//                            Globals.geoLoc.lastKnownLocation.longitude
+//                        )
+//                    )
+//                )
+//                viewModel.showLaundry(Globals.geoLoc.lastKnownLocation)
+//            } else {
+//                cameraPositionState.move(
+//                    CameraUpdateFactory.newLatLng(
+//                        LatLng(
+//                            Constants.DEFAULT_LOCATION.latitude,
+//                            Constants.DEFAULT_LOCATION.longitude
+//                        )
+//                    )
+//                )
+//            }
+//        }
     }
 
     LaunchedEffect(appViewModel.filtersApplied) {
-        appViewModel.filtersApplied.collect {
-            if (it != FilterType.COUNTRIES) {
-                viewModel.showSpots(cameraPositionState.locationVo, true)
-            } else {
-                viewModel.showEvents()
-            }
-        }
+//        appViewModel.filtersApplied.collect {
+//            if (it != FilterType.COUNTRIES) {
+//                viewModel.showSpots(cameraPositionState.locationVo, true)
+//            } else {
+//                viewModel.showEvents()
+//            }
+//        }
     }
 
     LaunchedEffect(appViewModel.loadAroundMeIsPressed) {
-        appViewModel.loadAroundMeIsPressed.collect {
-            if (it) {
-                if (context.hasLocationPermission) {
-                    cameraPositionState.move(
-                        CameraUpdateFactory.newLatLng(
-                            LatLng(
-                                Globals.geoLoc.lastKnownLocation.latitude,
-                                Globals.geoLoc.lastKnownLocation.longitude
-                            )
-                        )
-                    )
-                    viewModel.showLaundry(Globals.geoLoc.lastKnownLocation)
-                }
-            }
-        }
+//        appViewModel.loadAroundMeIsPressed.collect {
+//            if (it) {
+//                if (context.hasLocationPermission) {
+//                    cameraPositionState.move(
+//                        CameraUpdateFactory.newLatLng(
+//                            LatLng(
+//                                Globals.geoLoc.lastKnownLocation.latitude,
+//                                Globals.geoLoc.lastKnownLocation.longitude
+//                            )
+//                        )
+//                    )
+//                    viewModel.showLaundry(Globals.geoLoc.lastKnownLocation)
+//                }
+//            }
+//        }
     }
 
     launchEventsSearchRecipient.onNavResult { result ->
-        when (result) {
-            is NavResult.Canceled -> {}
-            is NavResult.Value -> {
-                viewModel.showEvents()
-                appViewModel.onBottomSheetContentChange(BottomSheetOption.FILTER_EVENT)
-            }
-        }
+//        when (result) {
+//            is NavResult.Canceled -> {}
+//            is NavResult.Value -> {
+//                viewModel.showEvents()
+//                appViewModel.onBottomSheetContentChange(BottomSheetOption.FILTER_EVENT)
+//            }
+//        }
     }
 
     locationSearchRecipient.onNavResult { result ->
-        when (result) {
-            is NavResult.Canceled -> {}
-            is NavResult.Value -> {
-                appViewModel.onEventDisplayedChange(false)
-                cameraPositionState.move(
-                    CameraUpdateFactory.newLatLng(
-                        LatLng(
-                            result.value.location.latitude, result.value.location.longitude
-                        )
-                    )
-                )
-                viewModel.showSpotsAroundPlace(result.value)
-            }
-        }
+//        when (result) {
+//            is NavResult.Canceled -> {}
+//            is NavResult.Value -> {
+//                appViewModel.onEventDisplayedChange(false)
+//                cameraPositionState.move(
+//                    CameraUpdateFactory.newLatLng(
+//                        LatLng(
+//                            result.value.location.latitude, result.value.location.longitude
+//                        )
+//                    )
+//                )
+//                viewModel.showSpotsAroundPlace(result.value)
+//            }
+//        }
     }
 
     Box {
@@ -227,7 +230,8 @@ fun MainMap(
                 val markerState = MarkerState(position = LatLng(marker.latitude, marker.longitude))
                 Log.d("SELECTED", marker.selected.toString())
                 Marker(icon = if (marker.selected) {
-                    BitmapDescriptorFactory.fromResource(R.drawable.marker_selected)
+//                    BitmapDescriptorFactory.fromResource(R.drawable.marker_selected)
+                    BitmapDescriptorFactory.fromResource(R.drawable.marker)
                 } else {
                     BitmapDescriptorFactory.fromResource(R.drawable.marker)
                 }, state = markerState, onClick = {
@@ -244,11 +248,11 @@ fun MainMap(
         Box(modifier = Modifier.fillMaxSize()) {
             Column(modifier = Modifier.align(Alignment.BottomCenter)) {
 
-                if (!cameraPositionState.isMoving && !cameraPositionState.locationVo.isAroundLastSearchedLocation) {
-                    SearchHereButton(onClick = {
-                        viewModel.showLaundry(cameraPositionState.locationVo)
-                    }, cameraPositionState)
-                }
+//                if (!cameraPositionState.isMoving && !cameraPositionState.locationVo.isAroundLastSearchedLocation) {
+//                    SearchHereButton(onClick = {
+////                        viewModel.showLaundry(cameraPositionState.locationVo)
+//                    }, cameraPositionState)
+//                }
 
                 if (locationSearched.isNotEmpty()) LocationSearchContainer(
                     locationSearched,
@@ -965,6 +969,16 @@ fun HorizontalListItem(dealer: LaundryDto) {
             text = dealer.fullLocation,
             color = AppColor.neutralText
         )
+
+        AppButton(
+            isActive = true,
+            onClick = {
+
+            },
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            textRes = R.string.unity_viewer
+        )
+
         Spacer(modifier = Modifier.weight(1f))
 
         Row {

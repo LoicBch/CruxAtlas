@@ -10,6 +10,7 @@ object AppColor {
     val Secondary = Color(0xFF6750A4)
     val Tertiary = Color(0xFF42556E)
     val PrimaryContainer = Color(0xFFDDE2F6)
+    val white = Color(0xFFFFFFFF)
     val SplashScreenBackground = Color(0xFF4457A7)
     val ClearGrey = Color(0x6649454F)
     val Red = Color(0xFFDC362E)

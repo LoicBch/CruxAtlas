@@ -92,6 +92,11 @@ fun List<Dealer>.toMarker() = map { it.toMarker() }
 fun LaundryDto.toMarker() = Marker(id!!, false, this.latitude!!.toDouble(), this.longitude!!.toDouble())
 fun List<LaundryDto>.toMarker() = map { it.toMarker() }
 
+@JvmName("listClimbingToListMarker")
+fun Laundry.toMarker() = Marker(id.toString(), false, this.latitude, this.longitude)
+@JvmName("listClimbingToListMark")
+fun List<Laundry>.toMarker() = map { it.toMarker() }
+
 @JvmName("toEventsVo")
 fun List<EventDto>.toVo() = map { it.toVo() }
 

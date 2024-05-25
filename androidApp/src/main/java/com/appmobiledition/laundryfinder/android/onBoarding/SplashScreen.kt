@@ -50,7 +50,7 @@ fun SplashScreen(navController: NavController, viewModel: SplashScreenViewModel)
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = AppColor.SplashScreenBackground), contentAlignment = Alignment
+            .background(color = AppColor.white), contentAlignment = Alignment
             .Center
     ) {
         Image(painter = painterResource(id = R.drawable.logo), contentDescription = "")
