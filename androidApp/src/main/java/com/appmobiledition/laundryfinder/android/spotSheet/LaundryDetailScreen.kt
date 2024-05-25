@@ -114,7 +114,8 @@ fun Header(dealer: LaundryDto, onClose: () -> Unit, onHelp: () -> Unit) {
     ) {
 
 //        if (dealer.photos.isNotEmpty()) {
-//            Gallery(photos = dealer.photos)
+        val photos = listOf(PhotoDto(1.toString(), "", "", "", "", ""),PhotoDto(1.toString(), "", "", "", "", ""))
+            Gallery(photos)
 //        }
 
         Column {
@@ -167,7 +168,7 @@ fun Gallery(photos: List<PhotoDto>) {
                     modifier = Modifier
                         .height(250.dp),
                     //                        .fillParentMaxWidth(),
-                    imageModel = { photo.link_large },
+                    imageModel = { R.drawable.vatertag },
                     imageOptions = ImageOptions(
                         contentScale = ContentScale.FillBounds, alignment = Alignment.Center
                     )
