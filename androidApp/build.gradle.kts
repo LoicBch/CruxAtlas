@@ -50,6 +50,9 @@ android {
 
 dependencies {
     implementation(project(":shared"))
+    implementation(files("libs/launcher-debug.aar"))
+    implementation(files("libs/unityLibrary-debug.aar"))
+
     implementation("com.google.android.gms:play-services-location:21.0.1")
 
     //Dependency injection

@@ -64,12 +64,12 @@ fun SettingsMenu(navigator: DestinationsNavigator) {
                            Pair(stringResource(id = R.string.language)) {
                                languagePopupIsShown.value = true
                            },
-                           Pair(stringResource(id = R.string.help)) { uriHandler.openUri(Constants.HELP_URL) },
+                           Pair(stringResource(id = R.string.help)) {  },
                            Pair(stringResource(id = R.string.term_of_use)) {
-                               uriHandler.openUri(Constants.A_PROPOS_URL)
+
                            },
                            Pair(stringResource(id = R.string.privacy_policy)) {
-                               uriHandler.openUri(Constants.PRIVACY_POLICY_URL)
+
                            })
 
     Column() {

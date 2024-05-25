@@ -3,8 +3,11 @@
 package com.appmobiledition.laundryfinder.android.mainmap
 
 import android.app.Application
+import android.content.Intent
 import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -39,6 +42,7 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.appmobiledition.laundryfinder.android.LocalDependencyContainer
 import com.appmobiledition.laundryfinder.android.R
+import com.appmobiledition.laundryfinder.android.UnityParentActivity
 import com.appmobiledition.laundryfinder.android.composables.AppButton
 import com.appmobiledition.laundryfinder.android.composables.LoadingModal
 import com.appmobiledition.laundryfinder.android.composables.collectAsStateWithLifecycleImmutable
@@ -970,10 +974,20 @@ fun HorizontalListItem(dealer: LaundryDto) {
             color = AppColor.neutralText
         )
 
+        val context = LocalContext.current
+        val launcher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.StartActivityForResult(),
+            onResult = { result ->
+                // Traiter le résultat ici
+            }
+        )
+
         AppButton(
             isActive = true,
             onClick = {
-
+                val intent = Intent(context, UnityParentActivity::class.java)
+                    .putExtra("unity", "my_unity_scene")
+                launcher.launch(intent)
             },
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             textRes = R.string.unity_viewer
