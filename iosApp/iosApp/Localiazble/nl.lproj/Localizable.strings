@@ -135,3 +135,10 @@
 "park_here" = "Hier parkeren";
 "delete" = "Verwijderen";
 "delete_location_popup" = "Do you want to permanently delete this saved location? The action cannot be undone.";
+
+//Help
+"need_help" = "Need help";
+"help_subtitle" = "Find out everything about Camper-Pro:";
+"faq_link" = "camper-pro.com/faq";
+"bug_report" = "Want to report a bug? Outdated information?";
+"bug_text" = "Send us an email and we’ll get back to you as soon as possible: contact@camper-pro.com";

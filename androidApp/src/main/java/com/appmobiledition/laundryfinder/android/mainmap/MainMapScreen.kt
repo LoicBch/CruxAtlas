@@ -41,14 +41,15 @@ import com.appmobiledition.laundryfinder.android.R
 import com.appmobiledition.laundryfinder.android.composables.LoadingModal
 import com.appmobiledition.laundryfinder.android.composables.collectAsStateWithLifecycleImmutable
 import com.appmobiledition.laundryfinder.android.destinations.AroundLocationScreenDestination
-import com.appmobiledition.laundryfinder.android.destinations.DealerDetailsScreenDestination
-import com.appmobiledition.laundryfinder.android.destinations.EventDetailScreenDestination
+import com.appmobiledition.laundryfinder.android.destinations.LaundryDetailScreenDestination
 import com.appmobiledition.laundryfinder.android.destinations.MenuScreenDestination
 import com.appmobiledition.laundryfinder.android.extensions.hasLocationPermission
 import com.appmobiledition.laundryfinder.android.extensions.isScrollingUp
 import com.appmobiledition.laundryfinder.android.extensions.lastVisibleItemIndex
+import com.appmobiledition.laundryfinder.android.spotSheet.LaundryDetailScreen
 import com.appmobiledition.laundryfinder.android.ui.theme.AppColor
 import com.appmobiledition.laundryfinder.android.ui.theme.Dimensions
+import com.appmobiledition.laundryfinder.data.model.dto.LaundryDto
 import com.appmobiledition.laundryfinder.domain.model.*
 import com.appmobiledition.laundryfinder.domain.model.composition.*
 import com.appmobiledition.laundryfinder.managers.location.LocationManager
@@ -88,6 +89,7 @@ fun MainMap(
 
     val dealers by viewModel.dealers.collectAsStateWithLifecycleImmutable()
     val events by viewModel.events.collectAsStateWithLifecycleImmutable()
+    val laundry by viewModel.laundry.collectAsStateWithLifecycleImmutable()
 
     var mapProperties by remember {
         mutableStateOf(MapProperties(isMyLocationEnabled = true, mapType = MapType.NORMAL))
@@ -133,7 +135,7 @@ fun MainMap(
     LaunchedEffect(true) {
 
         if (updateSource == UpdateSource.DEFAULT) {
-            viewModel.getAds()
+//            viewModel.getAds()
             if (context.hasLocationPermission) {
                 cameraPositionState.move(
                     CameraUpdateFactory.newLatLng(
@@ -143,7 +145,7 @@ fun MainMap(
                         )
                     )
                 )
-                viewModel.showSpots(Globals.geoLoc.lastKnownLocation)
+                viewModel.showLaundry(Globals.geoLoc.lastKnownLocation)
             } else {
                 cameraPositionState.move(
                     CameraUpdateFactory.newLatLng(
@@ -158,7 +160,6 @@ fun MainMap(
     }
 
     LaunchedEffect(appViewModel.filtersApplied) {
-
         appViewModel.filtersApplied.collect {
             if (it != FilterType.COUNTRIES) {
                 viewModel.showSpots(cameraPositionState.locationVo, true)
@@ -180,7 +181,7 @@ fun MainMap(
                             )
                         )
                     )
-                    viewModel.showSpots(Globals.geoLoc.lastKnownLocation)
+                    viewModel.showLaundry(Globals.geoLoc.lastKnownLocation)
                 }
             }
         }
@@ -230,21 +231,12 @@ fun MainMap(
                 } else {
                     BitmapDescriptorFactory.fromResource(R.drawable.marker)
                 }, state = markerState, onClick = {
-                    if (updateSource == UpdateSource.EVENTS) {
                         navigator.navigate(
-                            EventDetailScreenDestination(
-                                events.value.find { it.id == marker.placeLinkedId }!!
+                            LaundryDetailScreenDestination(
+                                laundry.value.find { it.id == marker.placeLinkedId }!!
                             )
                         )
                         true
-                    } else {
-                        navigator.navigate(
-                            DealerDetailsScreenDestination(
-                                dealers.value.find { it.id == marker.placeLinkedId }!!
-                            )
-                        )
-                        true
-                    }
                 })
             }
         }
@@ -254,7 +246,7 @@ fun MainMap(
 
                 if (!cameraPositionState.isMoving && !cameraPositionState.locationVo.isAroundLastSearchedLocation) {
                     SearchHereButton(onClick = {
-                        viewModel.showSpots(cameraPositionState.locationVo)
+                        viewModel.showLaundry(cameraPositionState.locationVo)
                     }, cameraPositionState)
                 }
 
@@ -275,11 +267,11 @@ fun MainMap(
                         HorizontalEventsList(cameraPositionState = cameraPositionState,
                                              events = events.value,
                                              onItemClicked = {
-                                                 navigator.navigate(
-                                                     EventDetailScreenDestination(
-                                                         it
-                                                     )
-                                                 )
+//                                                 navigator.navigate(
+//                                                     EventDetailScreenDestination(
+//                                                         it
+//                                                     )
+//                                                 )
                                              },
                                              onScrollEnded = { event ->
                                                  viewModel.selectMarker(
@@ -288,12 +280,12 @@ fun MainMap(
                                              })
                     }
                 } else {
-                    if (dealers.value.isNotEmpty()) {
+                    if (laundry.value.isNotEmpty()) {
                         HorizontalSpotsList(cameraPositionState = cameraPositionState,
-                                            spots = dealers.value,
+                                            spots = laundry.value,
                                             onItemClicked = {
                                                 navigator.navigate(
-                                                    DealerDetailsScreenDestination(
+                                                    LaundryDetailScreenDestination(
                                                         it
                                                     )
                                                 )
@@ -313,17 +305,17 @@ fun MainMap(
             if (updateSource == UpdateSource.EVENTS) {
                 VerticalEventsList(eventSortedFlow = viewModel.eventsSorted,
                                    { viewModel.onSortingOptionSelected(it) }) {
-                    navigator.navigate(
-                        EventDetailScreenDestination(
-                            it
-                        )
-                    )
+//                    navigator.navigate(
+//                        EventDetailScreenDestination(
+//                            it
+//                        )
+//                    )
                 }
             } else {
                 VerticalDealersList(dealersSortedFlow = viewModel.dealersSorted,
                                     { viewModel.onSortingOptionSelected(it) }) {
                     navigator.navigate(
-                        DealerDetailsScreenDestination(
+                        LaundryDetailScreenDestination(
                             it
                         )
                     )
@@ -569,11 +561,10 @@ fun VerticalEventListItem(event: Event) {
 
 @Composable
 fun VerticalDealersList(
-    dealersSortedFlow: StateFlow<List<Dealer>>,
+    dealersSortedFlow: StateFlow<List<LaundryDto>>,
     onSortOptionSelected: (SortOption) -> Unit,
-    onItemClicked: (Dealer) -> Unit
+    onItemClicked: (LaundryDto) -> Unit
 ) {
-
     val sorting = LocalDependencyContainer.current.appViewModel.verticalListSortingOption
     val dealersSorted by dealersSortedFlow.collectAsStateWithLifecycleImmutable()
     val appViewModel = LocalDependencyContainer.current.appViewModel
@@ -614,37 +605,27 @@ fun VerticalDealersList(
 }
 
 @Composable
-fun VerticalListItem(dealer: Dealer) {
+fun VerticalListItem(dealer: LaundryDto) {
 
     val application = LocalContext.current.applicationContext as Application
 
-    if (dealer.isPremium && dealer.photos.isNotEmpty()) {
-        Box {
-            GlideImage(
-                modifier = Modifier
-                    .clip(
-                        RoundedCornerShape(
-                            topStart = 8.dp, bottomStart = 8.dp
-                        )
-                    )
-                    .size(130.dp),
-                imageModel = { dealer.photos[0].url },
-                imageOptions = ImageOptions(
-                    contentScale = ContentScale.FillHeight, alignment = Alignment.Center
-                )
-            )
-
-            Image(
-                painter = painterResource(id = R.drawable.premium_badge),
-                contentDescription = "",
-                modifier = Modifier
-                    .shadow(2.dp, RoundedCornerShape(15))
-                    .zIndex(1f)
-                    .background(Color.White, RoundedCornerShape(15))
-                    .padding(5.dp)
-            )
-        }
-    }
+//    if (dealer.photos.isNotEmpty()) {
+//        Box {
+//            GlideImage(
+//                modifier = Modifier
+//                    .clip(
+//                        RoundedCornerShape(
+//                            topStart = 8.dp, bottomStart = 8.dp
+//                        )
+//                    )
+//                    .size(130.dp),
+//                imageModel = { dealer.photos[0].link_large },
+//                imageOptions = ImageOptions(
+//                    contentScale = ContentScale.FillHeight, alignment = Alignment.Center
+//                )
+//            )
+//        }
+//    }
 
     Column(modifier = Modifier.padding(8.dp)) {
         Text(
@@ -652,7 +633,7 @@ fun VerticalListItem(dealer: Dealer) {
             fontWeight = FontWeight.W500,
             maxLines = 1,
             fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.circularstdmedium)),
-            text = dealer.name
+            text = dealer.name?: ""
         )
         Text(
             modifier = Modifier.padding(bottom = 5.dp),
@@ -665,98 +646,32 @@ fun VerticalListItem(dealer: Dealer) {
 
         Spacer(modifier = Modifier.weight(1f))
 
-        Row {
-            if (dealer.isPremium && dealer.photos.isEmpty()) {
-                Image(
-                    painter = painterResource(id = R.drawable.premium_badge),
-                    contentDescription = "",
-                    modifier = Modifier
-                        .shadow(2.dp, RoundedCornerShape(15))
-                        .zIndex(1f)
-                        .background(Color.White, RoundedCornerShape(15))
-                        .padding(5.dp)
-                )
-            }
-
-            if (dealer.services.isNotEmpty()) {
-                Image(
-                    painter = painterResource(id = R.drawable.repair),
-                    contentDescription = "",
-                    modifier = Modifier
-                        .padding(horizontal = 5.dp)
-                        .shadow(2.dp, RoundedCornerShape(15))
-                        .zIndex(1f)
-                        .background(Color.White, RoundedCornerShape(15))
-                        .padding(5.dp)
-                )
-            }
-
-            if (dealer.brands.isNotEmpty()) {
-                Image(
-                    painter = painterResource(id = R.drawable.dealers),
-                    contentDescription = "",
-                    modifier = Modifier
-                        .shadow(2.dp, RoundedCornerShape(15))
-                        .zIndex(1f)
-                        .background(Color.White, RoundedCornerShape(15))
-                        .padding(5.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            if (dealer.photos.isEmpty()) {
-                Row(
-                    modifier = Modifier
-                        .shadow(2.dp, RoundedCornerShape(15))
-                        .zIndex(1f)
-                        .background(Color.White, RoundedCornerShape(15))
-                        .padding(5.dp), verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        modifier = Modifier.padding(end = 5.dp),
-                        painter = painterResource(id = R.drawable.distance),
-                        contentDescription = "",
-                        tint = AppColor.Primary
-                    )
-                    Text(
-                        text = Location(
-                            dealer.latitude, dealer.longitude
-                        ).distanceFromUserLocationText(KMMPreference(application)),
-                        color = AppColor.neutralText,
-                        fontWeight = FontWeight.W500,
-                        fontFamily = FontFamily(Font(R.font.circularstdmedium)),
-                        fontSize = 12.sp
-                    )
-                }
-            }
-        }
-        if (dealer.isPremium && dealer.photos.isNotEmpty()) {
-            Row(
-                modifier = Modifier
-                    .padding(start = 5.dp, top = 5.dp)
-                    .shadow(2.dp, RoundedCornerShape(15))
-                    .zIndex(1f)
-                    .background(Color.White, RoundedCornerShape(15))
-                    .padding(5.dp), verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    modifier = Modifier.padding(end = 5.dp),
-                    painter = painterResource(id = R.drawable.distance),
-                    contentDescription = "",
-                    tint = AppColor.Primary
-                )
-                Text(
-                    text = Location(
-                        dealer.latitude, dealer.longitude
-                    ).distanceFromUserLocationText(KMMPreference(application)),
-                    color = AppColor.neutralText,
-                    fontWeight = FontWeight.W500,
-                    fontFamily = FontFamily(Font(R.font.circularstdmedium)),
-                    fontSize = 12.sp
-                )
-            }
-        }
+//        if (dealer.photos.isNotEmpty()) {
+//            Row(
+//                modifier = Modifier
+//                    .padding(start = 5.dp, top = 5.dp)
+//                    .shadow(2.dp, RoundedCornerShape(15))
+//                    .zIndex(1f)
+//                    .background(Color.White, RoundedCornerShape(15))
+//                    .padding(5.dp), verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                Icon(
+//                    modifier = Modifier.padding(end = 5.dp),
+//                    painter = painterResource(id = R.drawable.distance),
+//                    contentDescription = "",
+//                    tint = AppColor.Primary
+//                )
+//                Text(
+//                    text = Location(
+//                        dealer.latitude!!.toDouble(), dealer.longitude!!.toDouble()
+//                    ).distanceFromUserLocationText(KMMPreference(application)),
+//                    color = AppColor.neutralText,
+//                    fontWeight = FontWeight.W500,
+//                    fontFamily = FontFamily(Font(R.font.circularstdmedium)),
+//                    fontSize = 12.sp
+//                )
+//            }
+//        }
     }
 }
 
@@ -920,9 +835,9 @@ fun HorizontalEventListItem(event: Event) {
 @Composable
 fun HorizontalSpotsList(
     cameraPositionState: CameraPositionState,
-    spots: List<Dealer>,
-    onItemClicked: (Dealer) -> Unit,
-    onScrollEnded: (Dealer) -> Unit
+    spots: List<LaundryDto>,
+    onItemClicked: (LaundryDto) -> Unit,
+    onScrollEnded: (LaundryDto) -> Unit
 ) {
 
     val listState = rememberLazyListState()
@@ -947,7 +862,7 @@ fun HorizontalSpotsList(
                 .fillMaxWidth()
                 .height(130.dp), state = listState
         ) {
-            items(items = spots, key = { spot -> spot.id }) { item ->
+            items(items = spots, key = { laundry -> laundry.id!! }) { item ->
                 Row(modifier = Modifier
                     .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
                     .shadow(2.dp, RoundedCornerShape(8))
@@ -969,8 +884,8 @@ fun HorizontalSpotsList(
                         cameraPositionState.animate(
                             CameraUpdateFactory.newLatLngZoom(
                                 LatLng(
-                                    spots[listState.firstVisibleItemIndex].latitude,
-                                    spots[listState.firstVisibleItemIndex].longitude
+                                    spots[listState.firstVisibleItemIndex].latitude!!.toDouble(),
+                                    spots[listState.firstVisibleItemIndex].longitude!!.toDouble()
                                 ), 15f
                             ), 1000
                         )
@@ -986,8 +901,8 @@ fun HorizontalSpotsList(
                             cameraPositionState.animate(
                                 CameraUpdateFactory.newLatLngZoom(
                                     LatLng(
-                                        spots[listState.lastVisibleItemIndex!!].latitude,
-                                        spots[listState.lastVisibleItemIndex!!].longitude
+                                        spots[listState.lastVisibleItemIndex!!].latitude!!.toDouble(),
+                                        spots[listState.lastVisibleItemIndex!!].longitude!!.toDouble()
                                     ), 15f
                                 ), 1000
                             )
@@ -997,8 +912,8 @@ fun HorizontalSpotsList(
                             cameraPositionState.animate(
                                 CameraUpdateFactory.newLatLngZoom(
                                     LatLng(
-                                        spots[listState.firstVisibleItemIndex].latitude,
-                                        spots[listState.firstVisibleItemIndex].longitude
+                                        spots[listState.firstVisibleItemIndex].latitude!!.toDouble(),
+                                        spots[listState.firstVisibleItemIndex].longitude!!.toDouble()
                                     ), 15f
                                 ), 1000
                             )
@@ -1012,40 +927,27 @@ fun HorizontalSpotsList(
 }
 
 @Composable
-fun HorizontalListItem(dealer: Dealer) {
+fun HorizontalListItem(dealer: LaundryDto) {
 
     val application = LocalContext.current.applicationContext as Application
 
-    if (dealer.isPremium && dealer.photos.isNotEmpty()) {
-        Box {
-
-            GlideImage(
-                modifier = Modifier
-                    .clip(
-                        RoundedCornerShape(
-                            topStart = 8.dp, bottomStart = 8.dp
-                        )
-                    )
-                    .size(130.dp),
-                imageModel = { dealer.photos[0].url },
-                imageOptions = ImageOptions(
-                    contentScale = ContentScale.FillHeight, alignment = Alignment.Center
-                )
-            )
-
-            Image(
-                painter = painterResource(id = R.drawable.premium_badge),
-                contentDescription = "",
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(end = 5.dp, bottom = 5.dp)
-                    .shadow(2.dp, RoundedCornerShape(15))
-                    .zIndex(1f)
-                    .background(Color.White, RoundedCornerShape(15))
-                    .padding(5.dp)
-            )
-        }
-    }
+//    if (dealer.photos.isNotEmpty()) {
+//        Box {
+//            GlideImage(
+//                modifier = Modifier
+//                    .clip(
+//                        RoundedCornerShape(
+//                            topStart = 8.dp, bottomStart = 8.dp
+//                        )
+//                    )
+//                    .size(130.dp),
+//                imageModel = { dealer.photos[0].link_thumb },
+//                imageOptions = ImageOptions(
+//                    contentScale = ContentScale.FillHeight, alignment = Alignment.Center
+//                )
+//            )
+//        }
+//    }
 
     Column(modifier = Modifier.padding(8.dp)) {
         Text(
@@ -1053,7 +955,7 @@ fun HorizontalListItem(dealer: Dealer) {
             fontWeight = FontWeight.W500,
             maxLines = 1,
             fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.circularstdmedium)),
-            text = dealer.name
+            text = dealer.name?: "",
         )
         Text(
             modifier = Modifier.padding(bottom = 5.dp),
@@ -1066,97 +968,60 @@ fun HorizontalListItem(dealer: Dealer) {
         Spacer(modifier = Modifier.weight(1f))
 
         Row {
-            if (dealer.isPremium && dealer.photos.isEmpty()) {
-                Image(
-                    painter = painterResource(id = R.drawable.premium_badge),
-                    contentDescription = "",
-                    modifier = Modifier
-                        .shadow(2.dp, RoundedCornerShape(15))
-                        .zIndex(1f)
-                        .background(Color.White, RoundedCornerShape(15))
-                        .padding(5.dp)
-                )
-            }
-
-            if (dealer.services.isNotEmpty()) {
-                Image(
-                    painter = painterResource(id = R.drawable.repair),
-                    contentDescription = "",
-                    modifier = Modifier
-                        .padding(horizontal = 5.dp)
-                        .shadow(2.dp, RoundedCornerShape(15))
-                        .zIndex(1f)
-                        .background(Color.White, RoundedCornerShape(15))
-                        .padding(5.dp)
-                )
-            }
-
-            if (dealer.brands.isNotEmpty()) {
-                Image(
-                    painter = painterResource(id = R.drawable.dealers),
-                    contentDescription = "",
-                    modifier = Modifier
-                        .padding(horizontal = 5.dp)
-                        .shadow(2.dp, RoundedCornerShape(15))
-                        .zIndex(1f)
-                        .background(Color.White, RoundedCornerShape(15))
-                        .padding(5.dp)
-                )
-            }
 
             Spacer(modifier = Modifier.weight(1f))
 
-            if (dealer.photos.isEmpty()) {
-                Row(
-                    modifier = Modifier
-                        .shadow(2.dp, RoundedCornerShape(15))
-                        .zIndex(1f)
-                        .background(Color.White, RoundedCornerShape(15))
-                        .padding(5.dp), verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        modifier = Modifier.padding(end = 5.dp),
-                        painter = painterResource(id = R.drawable.distance),
-                        contentDescription = "",
-                        tint = AppColor.Primary
-                    )
-                    Text(
-                        text = Location(
-                            dealer.latitude, dealer.longitude
-                        ).distanceFromUserLocationText(KMMPreference(application)),
-                        color = AppColor.neutralText,
-                        fontWeight = FontWeight.W500,
-                        fontFamily = FontFamily(Font(R.font.circularstdmedium)),
-                        fontSize = 12.sp
-                    )
-                }
-            }
+//            if (dealer.photos.isEmpty()) {
+//                Row(
+//                    modifier = Modifier
+//                        .shadow(2.dp, RoundedCornerShape(15))
+//                        .zIndex(1f)
+//                        .background(Color.White, RoundedCornerShape(15))
+//                        .padding(5.dp), verticalAlignment = Alignment.CenterVertically
+//                ) {
+//                    Icon(
+//                        modifier = Modifier.padding(end = 5.dp),
+//                        painter = painterResource(id = R.drawable.distance),
+//                        contentDescription = "",
+//                        tint = AppColor.Primary
+//                    )
+//                    Text(
+//                        text = Location(
+//                            dealer.latitude!!.toDouble(), dealer.longitude!!.toDouble()
+//                        ).distanceFromUserLocationText(KMMPreference(application)),
+//                        color = AppColor.neutralText,
+//                        fontWeight = FontWeight.W500,
+//                        fontFamily = FontFamily(Font(R.font.circularstdmedium)),
+//                        fontSize = 12.sp
+//                    )
+//                }
+//            }
         }
-        if (dealer.isPremium && dealer.photos.isNotEmpty()) {
-            Row(
-                modifier = Modifier
-                    .shadow(2.dp, RoundedCornerShape(15))
-                    .zIndex(1f)
-                    .background(Color.White, RoundedCornerShape(15))
-                    .padding(5.dp), verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    modifier = Modifier.padding(end = 5.dp),
-                    painter = painterResource(id = R.drawable.distance),
-                    contentDescription = "",
-                    tint = AppColor.Primary
-                )
-                Text(
-                    text = Location(
-                        dealer.latitude, dealer.longitude
-                    ).distanceFromUserLocationText(KMMPreference(application)),
-                    color = AppColor.neutralText,
-                    fontWeight = FontWeight.W500,
-                    fontFamily = FontFamily(Font(R.font.circularstdmedium)),
-                    fontSize = 12.sp
-                )
-            }
-        }
+//        if (dealer.photos.isNotEmpty()) {
+//            Row(
+//                modifier = Modifier
+//                    .shadow(2.dp, RoundedCornerShape(15))
+//                    .zIndex(1f)
+//                    .background(Color.White, RoundedCornerShape(15))
+//                    .padding(5.dp), verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                Icon(
+//                    modifier = Modifier.padding(end = 5.dp),
+//                    painter = painterResource(id = R.drawable.distance),
+//                    contentDescription = "",
+//                    tint = AppColor.Primary
+//                )
+//                Text(
+//                    text = Location(
+//                        dealer.latitude!!.toDouble(), dealer.longitude!!.toDouble()
+//                    ).distanceFromUserLocationText(KMMPreference(application)),
+//                    color = AppColor.neutralText,
+//                    fontWeight = FontWeight.W500,
+//                    fontFamily = FontFamily(Font(R.font.circularstdmedium)),
+//                    fontSize = 12.sp
+//                )
+//            }
+//        }
     }
 }
 

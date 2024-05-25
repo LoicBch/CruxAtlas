@@ -21,6 +21,7 @@ struct MainMapScreen: View {
     
     @Environment(\.onLoading) var onLoading
     @EnvironmentObject var appState: AppState
+    let statusBarHeight = UIApplication.shared.windows.filter {$0.isKeyWindow}.first?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0
     
     var scrollFromDevice = false
     
@@ -54,7 +55,7 @@ struct MainMapScreen: View {
                 }
             }.onReceive(appState.$aroundMeClicked){ isClicked in
                 if isClicked {
-                    viewModel.showDealers(location: Globals.geoLoc().lastKnownLocation)
+                    viewModel.showDealers(location: Globals.geoLoc().lastKnownLocation, SetZoomToSeeAllPlace: false)
                     appState.aroundMeClicked = false
                 }
             }.onReceive(appState.$placeSelected){ placeSelected in
@@ -70,11 +71,17 @@ struct MainMapScreen: View {
                     if (filter.category == FilterType.countries){
                         viewModel.showEvents()
                     }else{
-                        viewModel.showDealers(location: Location(latitude: viewModel.mapRegion.center.latitude, longitude: viewModel.mapRegion.center.longitude))
+                        viewModel.showDealers(location: Location(latitude: viewModel.mapRegion.center.latitude, longitude: viewModel.mapRegion.center.longitude), SetZoomToSeeAllPlace: true)
                     }
+                }else{
+                    viewModel.unSelectFilterView()
                 }
             }.onReceive(appState.$verticalSortingApplied){ sortingOption in
-                viewModel.onSortingOptionSelected(sortingOption: sortingOption.getSortDomain())
+                viewModel.onSortingOptionSelected(sortingOption: sortingOption)
+            }.onAppear{
+                if (viewModel.updateSource == UpdateSource.events){
+                    viewModel.showDealers(location: Globals.geoLoc().lastKnownLocation, SetZoomToSeeAllPlace: false)
+                }
             }
             // MARK: - BOTTOM CONTROLLER Z-INDEX 1
                 VStack(){
@@ -82,7 +89,7 @@ struct MainMapScreen: View {
                     
                     if (viewModel.searchHereButtonIsShowing){
                         SearchHereBox().padding(.bottom, 15).onTapGesture {
-                            viewModel.showDealers(location: Location(latitude: viewModel.mapRegion.center.latitude, longitude: viewModel.mapRegion.center.longitude))
+                            viewModel.showDealers(location: Location(latitude: viewModel.mapRegion.center.latitude, longitude: viewModel.mapRegion.center.longitude), SetZoomToSeeAllPlace: false)
                         }.opacity(mapIsMoving && viewModel.searchHereButtonIsShowing && !viewModel.mapMovedByCode ? 0 : 1.0)
                     }
                     
@@ -92,7 +99,6 @@ struct MainMapScreen: View {
                                 viewModel.selectMarker(placeLinkedId: placeId, zoom: viewModel.mapRegion.span)
                             }
                         })
-                        
                         .opacity(mapIsMoving && !viewModel.mapMovedByCode ? 0 : 1.0)
                     } else {
                         HorizontalDealersList(
@@ -116,19 +122,33 @@ struct MainMapScreen: View {
             
             if(viewModel.verticalListIsShowing){
                     if (viewModel.updateSource == UpdateSource.events){
-                        VerticalEventsList(events: viewModel.events)
+                        VerticalEventsList(events: viewModel.eventsSorted).onAppear{
+                            viewModel.onSortingOptionSelected(sortingOption: appState.verticalSortingApplied)
+                        }
                     }else{
-                        VerticaldealersList(dealers: viewModel.dealers)
+                        VerticaldealersList(dealers: viewModel.dealersSorted).onAppear{
+                            viewModel.onSortingOptionSelected(sortingOption: appState.verticalSortingApplied)
+                        }
                     }
             }
             
             // MARK: - TOP CONTROLLER Z-INDEX 3
             
-            TopButtons(bottomSheetViewModel: bottomSheetViewModel, showVerticalList: { viewModel.permuteVerticalList() }, onMaptypeChange: { viewModel.switchMapStyle() }, isVerticalListopen: viewModel.verticalListIsShowing, currentSource: viewModel.updateSource, filterIsActive: appState.filterApplied.filterId != "")
-                .opacity(mapIsMoving && !viewModel.mapMovedByCode ? 0 : 1.0)
+            TopButtons(bottomSheetViewModel: bottomSheetViewModel, showVerticalList: { viewModel.permuteVerticalList() }, onMaptypeChange: {
+                    viewModel.switchMapStyle()
+            }, isVerticalListopen: viewModel.verticalListIsShowing, currentSource: viewModel.updateSource, filterIsActive: appState.filterApplied.filterId != "" || viewModel.isFilterApplied.filterId != "", sortingIsActive: appState.verticalSortingApplied != SortingOption.none || viewModel.isSortingApplied )
+                .opacity(mapIsMoving && !viewModel.mapMovedByCode ? 0 : 1.0).padding(EdgeInsets(top: statusBarHeight, leading: 0, bottom: 0, trailing: 0))
             
-            }.onChange(of: viewModel.isLoading){
+        }.ignoresSafeArea()
+            .onChange(of: viewModel.isFilterApplied){ newValue in
+                if (newValue.filterId != ""){
+                    appState.filterApplied = newValue
+                }
+        }
+        .onChange(of: viewModel.isLoading){
             onLoading($0)
+        }.onAppear{
+            
         }
     }
 }
@@ -161,13 +181,13 @@ struct VerticaldealersList: View {
                             .frame(width: .infinity, height: 130)
                             .padding(8)
                             .background(RoundedRectangle(cornerRadius: 8)
-                                .fill(Color.white).shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2))
+                                .fill(Color.white).shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)).padding(.bottom, 10)
                     }
                 }
             }.padding(.top, 100).padding(.horizontal, 8)
         }.background(
             GeometryReader { geo -> Color in
-                return Color.white
+                return Color("LightGrey")
             }
         )
         .frame(width: .infinity, height: .infinity)
@@ -184,23 +204,22 @@ struct VerticalDealerItem: View {
         HStack(){
             if (dealer.isPremium && !dealer.photos.isEmpty) {
                 ZStack(){
-                    UrlImageList(url: dealer.photos[0].url)
+                    UrlImageVerticalList(url: dealer.photos[0].url)
                 }
             }
             
             VStack(){
                 Text(dealer.name)
-                    .fontWeight(.bold)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .font(.system(size: 14))
+                    .font(.custom("CircularStd-Medium", size: 14))
                     .foregroundColor(.black)
                     .padding(.top, 8)
                     .padding(.leading, 8)
                 
                 Text(dealer.fullLocation)
-                    .fontWeight(.bold)
-                    .font(.system(size: 12))
-                    .foregroundColor(Color("Tertiary"))
+                    .fontWeight(.medium)
+                    .font(.custom("CircularStd-Medium", size: 12))
+                    .foregroundColor(Color("Tertiary50"))
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.top, 5)
                     .padding(.leading, 8)
@@ -234,8 +253,8 @@ struct VerticalDealerItem: View {
                                 .padding(.leading, 5)
                             
                             Text(Location(latitude: dealer.latitude, longitude: dealer.longitude).distanceFromUserLocationText())
-                                .fontWeight(.light)
-                                .font(.system(size: 12))
+                                .fontWeight(.medium)
+                                .font(.custom("CircularStd-Medium", size: 12))
                                 .foregroundColor(Color("Primary"))
                                 .padding(.trailing, 5)
                         }.background(Color.white)
@@ -250,12 +269,12 @@ struct VerticalDealerItem: View {
                                 .padding(.leading, 5)
                             
                             Text(Location(latitude: dealer.latitude, longitude: dealer.longitude).distanceFromUserLocationText())
-                                .fontWeight(.light)
-                                .font(.system(size: 12))
+                                .fontWeight(.medium)
+                                .font(.custom("CircularStd-Medium", size: 12))
                                 .foregroundColor(Color("Primary"))
                                 .padding(.trailing, 5)
                         }.background(Color.white)
-                            .cornerRadius(15)
+                            .cornerRadius(8)
                             .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
                     }
                 }.padding(8)
@@ -296,9 +315,10 @@ struct HorizontalDealersList: View {
                     ) {
                         HorizontalListDealerItem(dealer: dealer)
                             .background(RoundedRectangle(cornerRadius: 5)
-                                .fill(Color.white))
+                                .fill(Color.white).shadow(color: Color.black.opacity(0.2), radius: 2, x: 1, y: 3))
                             .frame(width: UIScreen.main.bounds.width * 0.85)
                             .padding(.leading, dealers.first == dealer ? 10 : 0)
+                            .padding(.bottom, 3)
                     }
                 }
             }
@@ -332,19 +352,20 @@ struct HorizontalListDealerItem: View {
             
             VStack(){
                 Text(dealer.name)
-                    .fontWeight(.bold)
+                    .fontWeight(.medium)
+                    .multilineTextAlignment(.leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .font(.system(size: 14))
+                    .font(.custom("CircularStd-Medium", size: 14))
                     .foregroundColor(.black)
                     .padding(.top, 8)
                     .padding(.leading, 8)
                 
                 Text(dealer.fullLocation)
-                    .fontWeight(.bold)
-                    .font(.system(size: 12))
-                    .foregroundColor(Color("Tertiary"))
+                    .fontWeight(.medium)
+                    .font(.custom("CircularStd-Medium", size: 12))
+                    .foregroundColor(Color("Tertiary50"))
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.top, 5)
+                    .padding(.top, 4)
                     .padding(.leading, 8)
                 
                 Spacer()
@@ -376,12 +397,12 @@ struct HorizontalListDealerItem: View {
                                 .padding(.leading, 5)
                             
                             Text(Location(latitude: dealer.latitude, longitude: dealer.longitude).distanceFromUserLocationText())
-                                .fontWeight(.bold)
-                                .font(.system(size: 12))
+                                .fontWeight(.medium)
+                                .font(.custom("CircularStd-Medium", size: 12))
                                 .foregroundColor(Color("Primary"))
                                 .padding(.trailing, 5)
                         }.background(Color.white)
-                            .cornerRadius(5)
+                            .cornerRadius(8)
                             .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
                     }
                     
@@ -392,12 +413,12 @@ struct HorizontalListDealerItem: View {
                                 .padding(.leading, 5)
                             
                             Text(Location(latitude: dealer.latitude, longitude: dealer.longitude).distanceFromUserLocationText())
-                                .fontWeight(.light)
-                                .font(.system(size: 12))
+                                .fontWeight(.medium)
+                                .font(.custom("CircularStd-Medium", size: 12))
                                 .foregroundColor(Color("Primary"))
                                 .padding(.trailing, 5)
                         }.background(Color.white)
-                            .cornerRadius(15)
+                            .cornerRadius(8)
                             .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
                     }
                 }.padding(8)
@@ -420,12 +441,13 @@ struct VerticalEventsList: View {
                             .padding(8)
                             .background(RoundedRectangle(cornerRadius: 8)
                                 .fill(Color.white).shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2))
+                            .padding(.bottom, 10)
                     }
                 }
             }.padding(.top, 100).padding(.horizontal, 8)
         }.background(
             GeometryReader { geo -> Color in
-                return Color.white
+                return Color("LightGrey")
             }
         )
         .frame(width: .infinity, height: .infinity)
@@ -446,17 +468,17 @@ struct VerticalEventItem: View {
             
             VStack(){
                 Text(event.name)
-                    .fontWeight(.bold)
+                    .fontWeight(.medium)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .font(.system(size: 14))
+                    .font(.custom("CircularStd-Medium", size: 14))
                     .foregroundColor(.black)
                     .padding(.top, 8)
                     .padding(.leading, 8)
                 
                 Text("\(event.dateBegin) - \(event.dateEnd)")
-                    .fontWeight(.bold)
-                    .font(.system(size: 12))
-                    .foregroundColor(Color("Tertiary"))
+                    .fontWeight(.medium)
+                    .font(.custom("CircularStd-Medium", size: 12))
+                    .foregroundColor(Color("Tertiary50"))
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.top, 5)
                     .padding(.leading, 8)
@@ -465,12 +487,12 @@ struct VerticalEventItem: View {
                 HStack(){
                     HStack(){
                         Text(event.country)
-                            .fontWeight(.bold)
-                            .font(.system(size: 12))
+                            .fontWeight(.medium)
+                            .font(.custom("CircularStd-Medium", size: 12))
                             .foregroundColor(Color("Primary"))
                             .padding(5)
                     }.background(Color.white)
-                        .cornerRadius(5)
+                        .cornerRadius(8)
                         .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
                     
                     Spacer()
@@ -481,12 +503,12 @@ struct VerticalEventItem: View {
                             .padding(.leading, 5)
                         
                         Text(Location(latitude: event.latitude, longitude: event.longitude).distanceFromUserLocationText())
-                            .fontWeight(.bold)
-                            .font(.system(size: 12))
+                            .fontWeight(.medium)
+                            .font(.custom("CircularStd-Medium", size: 12))
                             .foregroundColor(Color("Primary"))
                             .padding(5)
                     }.background(Color.white)
-                        .cornerRadius(5)
+                        .cornerRadius(8)
                         .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
                 }.padding(.leading, 8)
             }.padding(8)
@@ -508,9 +530,10 @@ struct HorizontalEventList: View {
                     ) {
                         HorizontalEventItem(event: event)
                             .background(RoundedRectangle(cornerRadius: 5)
-                                .fill(Color.white))
+                                .fill(Color.white).shadow(color: Color.black.opacity(0.2), radius: 2, x: 1, y: 3))
                             .frame(width: UIScreen.main.bounds.width * 0.85)
                             .padding(.leading, events.first == event ? 10 : 0)
+                            .padding(.bottom, 3)
                     }
                 }
             }
@@ -537,17 +560,17 @@ struct HorizontalEventItem: View {
             
             VStack(){
                 Text(event.name)
-                    .fontWeight(.bold)
+                    .fontWeight(.medium)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .font(.system(size: 14))
+                    .font(.custom("CircularStd-Medium", size: 14))
                     .foregroundColor(.black)
                     .padding(.top, 8)
                     .padding(.leading, 8)
                 
                 Text("\(event.dateBegin) - \(event.dateEnd)")
-                    .fontWeight(.bold)
-                    .font(.system(size: 12))
-                    .foregroundColor(Color("Tertiary"))
+                    .fontWeight(.medium)
+                    .font(.custom("CircularStd-Medium", size: 12))
+                    .foregroundColor(Color("Tertiary50"))
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.top, 5)
                     .padding(.leading, 8)
@@ -557,12 +580,12 @@ struct HorizontalEventItem: View {
                     
                     HStack(){
                         Text(event.country)
-                            .fontWeight(.bold)
-                            .font(.system(size: 12))
+                            .fontWeight(.medium)
+                            .font(.custom("CircularStd-Medium", size: 12))
                             .foregroundColor(Color("Primary"))
                             .padding(5)
                     }.background(Color.white)
-                        .cornerRadius(5)
+                        .cornerRadius(8)
                         .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
                     
                     Spacer()
@@ -573,12 +596,12 @@ struct HorizontalEventItem: View {
                             .padding(.leading, 5)
                         
                         Text(Location(latitude: event.latitude, longitude: event.longitude).distanceFromUserLocationText())
-                            .fontWeight(.light)
-                            .font(.system(size: 12))
+                            .fontWeight(.medium)
+                            .font(.custom("CircularStd-Medium", size: 12))
                             .foregroundColor(Color("Primary"))
                             .padding(.trailing, 5)
                     }.background(Color.white)
-                        .cornerRadius(5)
+                        .cornerRadius(8)
                         .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
                 }
             }.padding(8)
@@ -612,19 +635,19 @@ struct TopButtons: View {
     var isVerticalListopen: Bool
     var currentSource: UpdateSource
     var filterIsActive: Bool
+    var sortingIsActive: Bool
     
     var body: some View {
         HStack(alignment: .top){
             Button(action: {
-                showVerticalList()
+                    showVerticalList()
             }){
                 if(isVerticalListopen){
-                    Image("map")
+                    Image("map_round")
                 }else{
-                    Image("list")
+                    Image("list_round")
                 }
             }
-            .buttonStyle(FilterButtonStyle(filterActive: false))
             
             Spacer()
             
@@ -645,12 +668,15 @@ struct TopButtons: View {
                 }
             }){
                 if(isVerticalListopen){
-                    Image("sort").resizable().frame(width: 24, height: 24)
+                    if (sortingIsActive){
+                        Image("sort_active_round")
+                    }else{
+                        Image("sort_round")
+                    }
                 }else{
-                    Image("map_layer")
+                    Image("map_layer_round")
                 }
             }
-            .buttonStyle(FilterButtonStyle(filterActive: false))
             
             
             Button(action: {
@@ -662,11 +688,14 @@ struct TopButtons: View {
                     }
                 }
             }){
-                Image("filter")
+                if (filterIsActive){
+                    Image("filter_active_round")
+                }else{
+                    Image("filter_round")
+                }
             }
-            .buttonStyle(FilterButtonStyle(filterActive: filterIsActive))
         }
-        .padding(EdgeInsets(top: 8, leading: 16, bottom: 0, trailing: 16))
+        .padding(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
     }
 }
 
@@ -683,8 +712,8 @@ struct LocationSearchContainer: View {
                 .padding(.leading, 14)
                 .background(Color.white)
             
-            Text(label)
-                .font(.system(size: 14, weight: .bold))
+            Text(label).fontWeight(.medium)
+                .font(.custom("CircularStd-Medium", size: 14))
                 .foregroundColor(Color.black)
                 .padding(.leading, 22)
             

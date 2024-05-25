@@ -14,23 +14,15 @@ import SwiftUI
 struct PartnersScreen: View {
     
     @StateObject var viewModel: PartnersViewModel = PartnersViewModel()
-    @State private var tabBar: UITabBar! = nil
     
     public var body: some View {
-        NavigationView{
-            if (tabBar != nil){
-                VerticalPartnersList(partners: viewModel.partners, bottomBar: tabBar)
-            }
-        }.background(TabBarAccessor { tabbar in
-            self.tabBar = tabbar
-        })
+                VerticalPartnersList(partners: viewModel.partners)
     }
 }
 
 struct VerticalPartnersList: View {
     
     var partners: [Partner]
-    var bottomBar: UITabBar
     
     var body: some View{
         ScrollView(){
@@ -38,21 +30,20 @@ struct VerticalPartnersList: View {
                 ForEach(partners , id: \.self) { partner in
                     NavigationLink(destination: PartnersDetailsScreen(partner: partner)
                         .navigationBarBackButtonHidden(true)
-                        .disableBottomBar(bottomBar: bottomBar)
                     ) {
                         VerticalPartnerListItem(partner: partner)
                             .frame(width: .infinity, height: 130)
                             .padding(8)
                             .background(RoundedRectangle(cornerRadius: 5)
-                                .fill(Color.white).shadow(radius: 2, x:-1, y: 2))
+                                .fill(Color.white).shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2))
                     }
                 }
             }.padding(.top, 30).padding(.horizontal, 8)
         }.background(
             GeometryReader { geo -> Color in
-                return Color.white
+                return Color("LightGrey")
             }
-        )
+        ).ignoresSafeArea()
         .frame(width: .infinity, height: .infinity)
     }
 }
@@ -73,18 +64,19 @@ struct VerticalPartnerListItem: View {
             
             VStack(){
                 Text(partner.name)
-                    .fontWeight(.bold)
+                    .fontWeight(.medium)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .font(.system(size: 14))
+                    .font(.custom("CircularStd-Medium", size: 14))
                     .foregroundColor(.black)
                     .padding(.top, 8)
                     .padding(.leading, 8)
                 
                 Text(partner.description_)
                     .fontWeight(.medium)
+                    .multilineTextAlignment(.leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .font(.system(size: 10))
-                    .foregroundColor(.gray)
+                    .font(.custom("CircularStd-Medium", size: 10))
+                    .foregroundColor(Color("Neutral50"))
                     .padding(.top, 5)
                     .padding(.leading, 8)
                 

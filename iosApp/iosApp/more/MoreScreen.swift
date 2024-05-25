@@ -31,10 +31,14 @@ struct MoreScreen: View {
             VStack{
                 HStack(){
                     Image("menu_selected")
+                        .renderingMode(.template)
+                        .foregroundColor(Color("Primary40"))
                     Text("appbar_menu")
-                        .font(.system(size: 22, weight: .bold))
+                        .fontWeight(.bold)
+                        .font(.custom("CircularStd-Medium", size: 22))
                         .padding(.leading, 16)
-                }.frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 15).padding(.top, 16)
+                        .foregroundColor(Color("Primary40"))
+                }.frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 15).padding(.top, 16).padding(.bottom, 30)
                 
                 ForEach(MenuItems.filter({!$0.isSubMenu}), id: \.id) { menuItem in
                     VStack{
@@ -42,7 +46,7 @@ struct MoreScreen: View {
                             Divider().padding(.horizontal, 15)
                             MenuItemRow(menuItem: menuItem).background(Color.white).onTapGesture {
                                 appState.isEventsMapOpening = true
-                                navState.bottomNavSelectedTab = .mainMap
+                                navState.bottomNavSelectedTab = .event
                             }
                             Divider().padding(.horizontal, 15)
                             Dropdown(content: {
@@ -56,7 +60,8 @@ struct MoreScreen: View {
                                     NavigationLink (destination:   MyLocationMapScreen().navigationBarBackButtonHidden(true)
                                                     ,
                                                     isActive: $myLocationActive,label: {
-                                        MenuItemRow(menuItem: MenuItems.first(where: {$0.drawable == "my_location"})!).onTapGesture{
+                                        MenuItemRow(menuItem: MenuItems.first(where: {$0.drawable == "my_location"})!)
+                                            .onTapGesture{
                                             if (showOnlyWithGps()){
                                                 myLocationActive = true
                                             }else{
@@ -95,10 +100,11 @@ struct MenuItemRow : View{
     public var body: some View{
         
         HStack{
-            Image(menuItem.drawable)
-            Text(LocalizedStringKey(menuItem.label))
-                .font(.system(size: 16, weight: .bold))
-                .foregroundColor(Color("Tertiary"))
+            Image(menuItem.drawable).renderingMode(.template)
+                .foregroundColor(Color("Tertiary30")).padding(.horizontal, 5)
+            Text(LocalizedStringKey(menuItem.label)).fontWeight(.bold)
+                .font(.custom("CircularStd-Medium", size: 16))
+                .foregroundColor(Color("Tertiary30"))
                 .padding(.leading, 20)
             Spacer()
             Image(systemName: "arrow.right").foregroundColor(Color("Secondary"))
@@ -127,16 +133,16 @@ struct PubMenuContainer: View {
                 .scaledToFit()
             VStack{
                 HStack{
-                    Text(menuAd.name)
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(Color("Tertiary"))
+                    Text(menuAd.name).fontWeight(.bold)
+                        .font(.custom("CircularStd-Medium", size: 16))
+                        .foregroundColor(Color("Tertiary30"))
                     Spacer()
                 }
                 
                 HStack{
-                    Text(menuAd.subtitle)
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(Color("Tertiary"))
+                    Text(menuAd.subtitle).fontWeight(.medium)
+                        .font(.custom("CircularStd-Medium", size: 11))
+                        .foregroundColor(Color("Tertiary30"))
                     Spacer()
                 }
             }.padding(.leading, 20)

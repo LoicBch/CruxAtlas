@@ -155,11 +155,10 @@ struct BottomBar: View {
             .keepTabViewHeight(in: $tabBarHeight)
             
             NavigationView {
-                PartnersScreen()
-                    .bottomNav(enabled: .constant(false))
+                PartnersScreen().bottomNav(enabled: .constant(false))
             }
             .tag(BottomNavTab.partners)
-            .keepTabViewHeight(in: $tabBarHeight)
+            .keepTabViewHeight(in: $tabBarHeight) 
             
             NavigationView {
                 MoreScreen()
@@ -168,7 +167,8 @@ struct BottomBar: View {
             .tag(BottomNavTab.more)
             .keepTabViewHeight(in: $tabBarHeight)
             
-        }.hideTabViewBar
+        } 
+        .hideTabViewBar
             .environment(\.tabBarHeight, tabBarHeight)
             .onReceive(navState.$bottomNavSelectedTab){ selection in
                 if (selection == lastlySelectedTab && selection != .mainMap){
@@ -181,9 +181,14 @@ struct BottomBar: View {
             .sheet(isPresented: $viewModel.bottomSheetIsOpen) {
                 BottomSheetController(
                     option: viewModel.bottomOption,
-                    onClose: { viewModel.bottomSheetIsOpen = false },
-                    onActiveFilterUpdate: { appState.filterApplied = $0 },
-                    onActiveSortingUpdate: { appState.verticalSortingApplied = $0 })
+                    onClose: {
+                        viewModel.bottomSheetIsOpen = false
+                    },
+                    onActiveFilterUpdate: {
+                        appState.filterApplied = $0
+                    },
+                    onActiveSortingUpdate: {
+                        appState.verticalSortingApplied = $0 })
             }
     }
 }
@@ -196,7 +201,6 @@ func getCurrentLang() -> String {
         return UserDefaults.standard.string(forKey: "language") ?? "en"
     }
 }
-
 extension Binding {
     func onUpdate(_ closure: @escaping () -> Void) -> Binding<Value> {
         Binding(get: {

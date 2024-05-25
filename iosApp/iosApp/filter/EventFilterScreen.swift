@@ -56,8 +56,8 @@ struct FilterChosenScreen: View {
             
             HStack{
                 Text("where_do_you_want_to_go")
-//                    .fontWeight(.black)
-                    .font(.system(size: 22))
+                    .fontWeight(.bold)
+                    .font(.custom("CircularStd-Medium", size: 22))
                     .foregroundColor(Color.black)
                 Spacer()
             }.padding(.top, 60)
@@ -101,12 +101,12 @@ struct FilterSelectionScreen: View{
             
             AppTextField(onTextChange: { input in
                 
-            }).padding(.top, 22)
+            }, onBackPressed: {}).padding(.top, 22)
             
             HStack{
                 Text("last_searched")
-                    .fontWeight(.black)
-                    .font(.system(size: 14))
+                    .fontWeight(.medium)
+                    .font(.custom("CircularStd-Medium", size: 14))
                     .foregroundColor(Color.black)
                 Spacer()
             }.padding(.top, 35)
@@ -115,8 +115,8 @@ struct FilterSelectionScreen: View{
             
             HStack{
                 Text("all_countries")
-                    .fontWeight(.black)
-                    .font(.system(size: 14))
+                    .fontWeight(.medium)
+                    .font(.custom("CircularStd-Medium", size: 14))
                     .foregroundColor(Color.black)
                 Spacer()
             }.padding(.top, 35)
@@ -139,8 +139,8 @@ struct CheckboxsGroup: View{
             Image("repair")
             Text("filter_step1_option1")
                 .fontWeight(.medium)
-                .font(.system(size: 14))
-                .foregroundColor(Color("Tertiary"))
+                .font(.custom("CircularStd-Medium", size: 14))
+                .foregroundColor(Color("Primary30"))
                 .padding(.leading, 10)
             Spacer()
             Toggle("", isOn: $checkboxStates[0])
@@ -152,8 +152,8 @@ struct CheckboxsGroup: View{
             Image("dealers")
             Text("filter_step1_option2")
                 .fontWeight(.medium)
-                .font(.system(size: 14))
-                .foregroundColor(Color("Tertiary"))
+                .font(.custom("CircularStd-Medium", size: 14))
+                .foregroundColor(Color("Primary30"))
                 .padding(.leading, 10)
             Spacer()
             Toggle("", isOn: $checkboxStates[1])

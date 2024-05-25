@@ -12,8 +12,7 @@ import SwiftUI
 
 struct CheckListDetailsScreen: View {
     
-    @StateObject private var viewModel = CheckListDetailsViewModel()
-    @State private var tasksSelected: [(String, Bool)] = []
+    @ObservedObject private var viewModel = CheckListDetailsViewModel()
     var checklist: CheckList
     @Environment(\.presentationMode) var presentationMode
     
@@ -22,7 +21,7 @@ struct CheckListDetailsScreen: View {
             ScrollView(.vertical, showsIndicators: false){
                 VStack {
                     ZStack(alignment: .top){
-                        UrlImage(url: checklist.imageLink).frame(height: 100)
+                        UrlImageChecklist(url: checklist.imageLink)
                         HStack{
                             Button(action: {
                                 
@@ -31,100 +30,114 @@ struct CheckListDetailsScreen: View {
                                     presentationMode.wrappedValue.dismiss()
                                 }
                             }
-                            .frame(width: 50, height: 50)
+                            .frame(width: 32, height: 32)
                             .background(Color(red: 136, green: 175, blue: 255))
                             .cornerRadius(25)
                             .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
                             .buttonStyle(.plain)
                             
                             Spacer()
-                            Button(action: {
-                            }){
-                                Image("help")
+                            
+                            NavigationLink(destination: HelpScreen()
+                                .navigationBarBackButtonHidden(true)
+                            ) {
+                                    Image("help_round")
                             }
-                            .frame(width: 50, height: 50)
-                            .background(Color(red: 136, green: 175, blue: 255))
-                            .cornerRadius(25)
-                            .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
-                            .buttonStyle(.plain)
-                        }.padding(.top, 12)
+//                            .frame(width: 32, height: 32)
+//                            .background(Color(red: 136, green: 175, blue: 255))
+//                            .cornerRadius(25)
+//                            .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
+//                            .buttonStyle(.plain)
+                        }.padding(.top, 12).padding(.horizontal, 16)
                     }
                     
-                    HStack{
-                        Text(checklist.name)
-                            .font(.system(size: 22))
-                            .fontWeight(.bold)
-                            .foregroundColor(Color("Tertiary"))
-                            .padding(.top, 24)
-                        Spacer()
-                    }
-                    
-                    HStack{
-                        Text(getTagsStrings(tags: checklist.tags))
-                            .font(.system(size: 12))
-                            .fontWeight(.medium)
-                            .foregroundColor(Color("Primary"))
-                            .padding(.top, 12)
-                        Spacer()
-                    }
-                    
-                    HStack{
-                        Text(checklist.description_)
-                            .font(.system(size: 14))
-                            .fontWeight(.medium)
-                            .foregroundColor(Color("Tertiary"))
-                            .padding(.top, 12)
-                        Spacer()
-                    }
-                    
-                    
-                    HStack{
-                        Spacer()
-                        Text("\(viewModel.taskDoneIds.count) / \(checklist.todos.count)")
-                    }
-                    if (!tasksSelected.isEmpty){
-                        ForEach(Array(checklist.todos), id: \.self){ todo in
-                            TodoItem(todo: todo, selectedTasks: $tasksSelected).onTapGesture {
-                                if (!viewModel.taskDoneIds.contains(todo.id)){
-                                    viewModel.checkTask(taskId: todo.id, checkList: checklist)
-                                }else{
-                                    viewModel.unCheckTask(taskId: todo.id, checkList: checklist)
-                                }
+                    VStack{
+                        HStack{
+                            Text(checklist.name)
+                                .font(.custom("CircularStd-Medium", size: 22))
+                                .fontWeight(.bold)
+                                .foregroundColor(Color.black)
+                                .padding(.top, 24)
+                            Spacer()
+                        }
+                        
+                        HStack{
+                            Text(getTagsStrings(tags: checklist.tags))
+                                .font(.custom("CircularStd-Medium", size: 12))
+                                .fontWeight(.medium)
+                                .foregroundColor(Color("Primary"))
+                                .padding(.top, 12)
+                            Spacer()
+                        }
+                        
+                        HStack{
+                            Text(checklist.description_)
+                                .font(.custom("CircularStd-Medium", size: 14))
+                                .fontWeight(.medium)
+                                .foregroundColor(Color("Neutral20"))
+                                .padding(.top, 12)
+                            Spacer()
+                        }
+                        
+                        
+                        HStack{
+                            Spacer()
+                            Text("\(viewModel.taskElements.filter({$0.isChecked}).count) / \(checklist.todos.count)")
+                                .font(.custom("CircularStd-Medium", size: 12))
+                                .fontWeight(.medium)
+                                .foregroundColor(Color("Primary"))
+                                .padding(.top, 25).padding(.trailing, 12)
+                        }
+                        if (!viewModel.taskElements.isEmpty){
+                            ForEach(viewModel.taskElements, id: \.self){ task in
+                                TodoItem(isChecked: task.isChecked, selectedTasks: $viewModel.taskElements, task: task, onSelect: {
+                                    if (task.isChecked){
+                                        viewModel.unCheckTask(taskId: task.taskId, checkList: checklist)
+                                    }else{
+                                        viewModel.checkTask(taskId: task.taskId, checkList: checklist)
+                                    }
+                                })
                             }
                         }
-                    }
-                }.onAppear {
-                    tasksSelected = checklist.todos.map({
-                        return ($0.id, false)
-                    })
-                }.padding(.horizontal, 17)
+                    }.padding(.horizontal, 17)
+                }
                 
                 
                 Spacer()
                 
                 AppButton(action: {
                     viewModel.clearAll(checkList: checklist)
-                }, title: "clear", isEnable: true)
+                }, title: "clear_all", isEnable: true).padding(.top, 35)
                 
             }.frame(height: .infinity)
+        }.onAppear(){
+            viewModel.setup(checkList: checklist)
         }
     }
 }
 
 struct TodoItem: View {
+     
     
-    var todo: Todo
-    @Binding var selectedTasks: [(String, Bool)]
+    @State var isChecked: Bool
+    @Binding var selectedTasks: [CheckboxItem]
+    var task: CheckboxItem
+    var onSelect: () -> Void
+    
     
     public var body: some View{
         VStack{
             Divider()
             HStack{
-                Text(todo.name)
+                Text(task.title)
+                    .font(.custom("CircularStd-Medium", size: 14))
+                    .foregroundColor(Color("Tertiary30"))
+                    .fontWeight(.medium)
                 Spacer()
-                Toggle("", isOn: $selectedTasks.first(where: {
-                    $0.0.wrappedValue == todo.id
-                })!.1)
+                
+                Toggle("", isOn: $isChecked).onChange(of: isChecked){ value in
+                        onSelect()
+                }
                 .toggleStyle(CheckBoxAppStyle())
             }
         }

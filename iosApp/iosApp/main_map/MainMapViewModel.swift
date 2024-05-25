@@ -16,8 +16,9 @@ extension MainMapScreen {
     @MainActor class MainMapViewModel : ObservableObject {
         
         init(){
-            showDealers(location: Globals.geoLoc().lastKnownLocation)
+            showDealers(location: Globals.geoLoc().lastKnownLocation, SetZoomToSeeAllPlace: false)
             getAds()
+            initFilter()
         }
         
         @Published var mapRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: Globals.geoLoc().lastKnownLocation.latitude, longitude: Globals.geoLoc().lastKnownLocation.longitude), span: MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2))
@@ -38,27 +39,54 @@ extension MainMapScreen {
         @Published var searchHereButtonIsShowing = false
         @Published var currentPlaceSelectedId = ""
         @Published var mapMovedByCode = false
+        @Published var isFilterApplied = Filter(category: FilterType.unselectedDealer, filterId: "", isSelected: false)
+        @Published var isSortingApplied = false
         
         
-        func showDealers(location: Location){
+        func showDealers(location: Location, SetZoomToSeeAllPlace: Bool){
             isLoading = true
             searchHereButtonIsShowing = false
             updateSource = UpdateSource.aroundMe
             Task.init {
                 do {
                     let res = try await RFetchDealersAtLocationUseCase().execute(location : location)!
-                    dealers = res
+                    dealers = try await RSortDealer().execute(sortOption: SortOption.distFromYou, dealersToSort: res)!
                     dealersSorted = res
                     placeSearched = ""
                     self.markers = dealers.map({ (dealer:Dealer) -> MarkerAnnotation in
                         MarkerAnnotation(coordinate: CLLocationCoordinate2D(latitude: dealer.latitude, longitude: dealer.longitude), idPlaceLinked: dealer.id, selected: false)
                     })
-                    updateMapRegion(latitude: location.latitude, longitude: location.longitude, zoom: mapRegion.span)
+                    
                     isLoading = false
                 } catch {
                     isLoading = false
                     // handle error
                 }
+            
+            if (SetZoomToSeeAllPlace){
+                 
+                
+                var minLat: Double = 90
+                var maxLat: Double = -90
+                var minLon: Double = 180
+                var maxLon: Double = -180
+                
+                for marker in markers {
+                    minLat = min(minLat, marker.coordinate.latitude)
+                    maxLat = max(maxLat, marker.coordinate.latitude)
+                    minLon = min(minLon, marker.coordinate.longitude)
+                    maxLon = max(maxLon, marker.coordinate.longitude)
+                }
+                
+                let span = MKCoordinateSpan(
+                    latitudeDelta: abs(maxLat - minLat) * 1.8,
+                    longitudeDelta: abs(maxLon - minLon) * 1.8
+                )
+                
+                updateMapRegion(latitude: (minLat + maxLat) / 2, longitude: (minLon + maxLon) / 2, zoom: span)
+            }else{
+                updateMapRegion(latitude: location.latitude, longitude: location.longitude, zoom: mapRegion.span)
+            }
             }
         }
         
@@ -67,14 +95,14 @@ extension MainMapScreen {
             Task.init {
                 do {
                     let res = try await RFetchEvents().execute()!
-                    events = res
-                    eventsSorted = res
+                    events = try await RSortEvents().execute(sortOption: SortOption.distFromYou, eventsToSort: res)!
                     searchHereButtonIsShowing = false
                     self.markers = events.map({ (event:Event) -> MarkerAnnotation in
                         MarkerAnnotation(coordinate: CLLocationCoordinate2D(latitude: event.latitude, longitude: event.longitude), idPlaceLinked: event.id, selected: false)
                     })
                     
                     updateSource = UpdateSource.events
+                    eventsSorted = res
                     isLoading = false
                     mapRegion = self.markers.getRegion()
                     updateMapRegion(latitude: mapRegion.center.latitude, longitude: mapRegion.center.longitude, zoom: mapRegion.span)
@@ -120,16 +148,21 @@ extension MainMapScreen {
             }
         }
         
-        func onSortingOptionSelected(sortingOption : SortOption){
+        func onSortingOptionSelected(sortingOption : SortingOption){
             isLoading = true
             Task.init {
                 do {
                     if (updateSource == UpdateSource.events){
-                        eventsSorted = try await RSortEvents().execute(sortOption: sortingOption, eventsToSort: events)!
+                        eventsSorted = try await RSortEvents().execute(sortOption: sortingOption.getSortDomain(), eventsToSort: events)!
+                        KMMPreference(context: NSObject()).put(key: "sorting_events", value___: sortingOption.rawValue)
+                        isLoading = false
                     } else {
-                        dealersSorted = try await RSortDealer().execute(sortOption: sortingOption, dealersToSort: dealers)!
+                        dealersSorted = try await RSortDealer().execute(sortOption: sortingOption.getSortDomain(), dealersToSort: dealers)!
+                        KMMPreference(context: NSObject()).put(key: "sorting_dealers", value___: sortingOption.rawValue)
+                        isLoading = false
                     }
                 } catch {
+                    isLoading = false
                     // handle error
                 }
             }
@@ -206,6 +239,28 @@ extension MainMapScreen {
             }
         }
         
+        func initFilter(){
+            Task.init {
+                let completeFilterHistoric = try await RGetFiltersSaved().execute()
+                let dealerFilterHistoric = completeFilterHistoric?.filter({$0.category != FilterType.countries}) ?? []
+                let uniqueDealerFilterHistoric = Dictionary(grouping: dealerFilterHistoric, by: { $0.filterName })
+                    .compactMap { $0.value.first }
+                if (!uniqueDealerFilterHistoric.isEmpty && !dealerFilterHistoric.isEmpty){
+                    if let dealerFilterSelectedd = dealerFilterHistoric.first(where: { $0.isSelected}) {
+                        isFilterApplied = dealerFilterSelectedd
+                    } else {
+                        isFilterApplied = Filter(category: FilterType.unselectedDealer, filterId: "", isSelected: false)
+                    }
+                }
+                if (KMMPreference(context: NSObject()).getString(key: "sorting_dealers") == ""){
+                    isSortingApplied = true
+                }
+            }
+        }
+        
+        func unSelectFilterView(){
+            isFilterApplied = Filter(category: FilterType.unselectedDealer, filterId: "", isSelected: false)
+        }
         
         func updateMapRegion(latitude: CGFloat, longitude: CGFloat, zoom: MKCoordinateSpan ){
             mapMovedByCode = true

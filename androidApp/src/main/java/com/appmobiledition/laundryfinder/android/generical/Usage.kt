@@ -1,4 +1,8 @@
 package com.appmobiledition.laundryfinder.android.generical
 
-class Usage {
+import androidx.compose.runtime.Composable
+
+@Composable
+fun Usage() {
+
 }

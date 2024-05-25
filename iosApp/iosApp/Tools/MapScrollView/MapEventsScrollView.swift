@@ -55,8 +55,11 @@ struct MapEventsScrollView<Content: View>: UIViewRepresentable {
     }
     
     func scrollToWhereId(id: String, scrollview: UIScrollView){
-        let index = events.firstIndex(where: {$0.id == id})!
-        scrollToIndex(index: index, scrollview: scrollview)
+        if let index = events.firstIndex(where: {$0.id == id}) {
+            scrollToIndex(index: index, scrollview: scrollview)
+        } else {
+            scrollToIndex(index: 0, scrollview: scrollview)
+        }
     }
     
     func scrollToWhereName(name: String, scrollView: UIScrollView){

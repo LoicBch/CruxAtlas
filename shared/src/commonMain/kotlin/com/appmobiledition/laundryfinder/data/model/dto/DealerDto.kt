@@ -34,11 +34,5 @@ data class DealerDto(
 
     @SerialName("tel")
     var phone2: String? = null,
-    var photos: List<PhotoDto> = listOf()
-)
-
-@kotlinx.serialization.Serializable
-data class PhotoDto(
-    @SerialName("photo")
-    var url: String = ""
+    var photos: List<String> = listOf()
 )

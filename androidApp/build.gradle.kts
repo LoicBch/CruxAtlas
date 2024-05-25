@@ -21,14 +21,14 @@ ksp {
 }
 
 android {
-    namespace = "com.example.camperpro.android"
+    namespace = "com.appmobiledition.laundryfinder.android"
     compileSdk = 33
     defaultConfig {
         applicationId = "com.appmobiledition.camperpro.android"
         minSdk = 24
         targetSdk = 33
-        versionCode = 2
-        versionName = "1.1"
+        versionCode = 5
+        versionName = "0.2"
     }
     buildFeatures {
         compose = true

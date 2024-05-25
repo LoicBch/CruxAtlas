@@ -54,6 +54,11 @@
 		CE72DD252A02E3AB005F118E /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE72DD242A02E3AB005F118E /* NetworkMonitor.swift */; };
 		CE7818C82912D600009C4032 /* MainMapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7818C72912D600009C4032 /* MainMapViewModel.swift */; };
 		CE7818CA2912D61C009C4032 /* MainMapScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7818C92912D61C009C4032 /* MainMapScreen.swift */; };
+		CEA0EA552A4C756000B49C24 /* test.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CEA0EA542A4C756000B49C24 /* test.ttf */; };
+		CEB375992AA096D200E09415 /* HelpScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB375982AA096D200E09415 /* HelpScreen.swift */; };
+		CEB7F4082A5EFF6C00C97BC0 /* circularstdmedium.otf in Resources */ = {isa = PBXBuildFile; fileRef = CEA0EA4B2A4C6B5C00B49C24 /* circularstdmedium.otf */; };
+		CEB7F4092A5EFF6E00C97BC0 /* circularstdblack.otf in Resources */ = {isa = PBXBuildFile; fileRef = CEA0EA522A4C6B5D00B49C24 /* circularstdblack.otf */; };
+		CEB7F40A2A5EFF7100C97BC0 /* circularstdbold.otf in Resources */ = {isa = PBXBuildFile; fileRef = CEA0EA502A4C6B5D00B49C24 /* circularstdbold.otf */; };
 		CEDCEA292A1579C9001F89F6 /* LoadingBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDCEA282A1579C9001F89F6 /* LoadingBox.swift */; };
 		CEDCEA2B2A1822EF001F89F6 /* CheckBoxAppStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDCEA2A2A1822EF001F89F6 /* CheckBoxAppStyle.swift */; };
 		CEDCEA2D2A18277F001F89F6 /* FilterButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDCEA2C2A18277F001F89F6 /* FilterButtonStyle.swift */; };
@@ -131,6 +136,11 @@
 		CE72DD242A02E3AB005F118E /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
 		CE7818C72912D600009C4032 /* MainMapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMapViewModel.swift; sourceTree = "<group>"; };
 		CE7818C92912D61C009C4032 /* MainMapScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMapScreen.swift; sourceTree = "<group>"; };
+		CEA0EA4B2A4C6B5C00B49C24 /* circularstdmedium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = circularstdmedium.otf; path = ../../../androidApp/src/main/res/font/circularstdmedium.otf; sourceTree = "<group>"; };
+		CEA0EA502A4C6B5D00B49C24 /* circularstdbold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = circularstdbold.otf; path = ../../../androidApp/src/main/res/font/circularstdbold.otf; sourceTree = "<group>"; };
+		CEA0EA522A4C6B5D00B49C24 /* circularstdblack.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = circularstdblack.otf; path = ../../../androidApp/src/main/res/font/circularstdblack.otf; sourceTree = "<group>"; };
+		CEA0EA542A4C756000B49C24 /* test.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = test.ttf; sourceTree = "<group>"; };
+		CEB375982AA096D200E09415 /* HelpScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpScreen.swift; sourceTree = "<group>"; };
 		CEDCEA282A1579C9001F89F6 /* LoadingBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingBox.swift; sourceTree = "<group>"; };
 		CEDCEA2A2A1822EF001F89F6 /* CheckBoxAppStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckBoxAppStyle.swift; sourceTree = "<group>"; };
 		CEDCEA2C2A18277F001F89F6 /* FilterButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterButtonStyle.swift; sourceTree = "<group>"; };
@@ -219,6 +229,7 @@
 		7555FF7D242A565900829871 /* iosApp */ = {
 			isa = PBXGroup;
 			children = (
+				CEB375972AA0969C00E09415 /* Help */,
 				CE0647E32A1E4769002B306F /* Navigation */,
 				CEDCEA172A152414001F89F6 /* Fonts */,
 				CEE0922F29E9C4FD00E44D02 /* Tools */,
@@ -328,9 +339,21 @@
 			path = main_map;
 			sourceTree = "<group>";
 		};
+		CEB375972AA0969C00E09415 /* Help */ = {
+			isa = PBXGroup;
+			children = (
+				CEB375982AA096D200E09415 /* HelpScreen.swift */,
+			);
+			path = Help;
+			sourceTree = "<group>";
+		};
 		CEDCEA172A152414001F89F6 /* Fonts */ = {
 			isa = PBXGroup;
 			children = (
+				CEA0EA542A4C756000B49C24 /* test.ttf */,
+				CEA0EA522A4C6B5D00B49C24 /* circularstdblack.otf */,
+				CEA0EA502A4C6B5D00B49C24 /* circularstdbold.otf */,
+				CEA0EA4B2A4C6B5C00B49C24 /* circularstdmedium.otf */,
 			);
 			path = Fonts;
 			sourceTree = "<group>";
@@ -485,9 +508,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CEB7F40A2A5EFF7100C97BC0 /* circularstdbold.otf in Resources */,
 				058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */,
 				CEE0922729E9B08400E44D02 /* Localizable.strings in Resources */,
+				CEB7F4092A5EFF6E00C97BC0 /* circularstdblack.otf in Resources */,
+				CEB7F4082A5EFF6C00C97BC0 /* circularstdmedium.otf in Resources */,
 				058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */,
+				CEA0EA552A4C756000B49C24 /* test.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -580,6 +607,7 @@
 				CE72DD0829F92E94005F118E /* CheckboxStyle.swift in Sources */,
 				CEDCEA292A1579C9001F89F6 /* LoadingBox.swift in Sources */,
 				CE317DC72A2216C200BC018B /* UiScrollViewTest.swift in Sources */,
+				CEB375992AA096D200E09415 /* HelpScreen.swift in Sources */,
 				CE72DD0429F7E734005F118E /* SizePreferenceKey.swift in Sources */,
 				CE0647E72A1E486D002B306F /* NavigationViewState.swift in Sources */,
 				CE0647ED2A1E4E94002B306F /* BottomNavTabItem.swift in Sources */,

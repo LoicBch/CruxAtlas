@@ -35,7 +35,7 @@ fun DealerDto.toVo() = Dealer(
     city,
     latitude.toDouble(),
     longitude.toDouble(),
-    photos.toVo()
+    emptyList()
 )
 
 fun EventDto.toVo() = Event(
@@ -73,7 +73,7 @@ fun PartnerDto.toVo() = Partner(
     "instagram",
     twitter,
     premium.toBool(),
-    photos.toVo()
+    emptyList()
 )
 
 @JvmName("toPartnerList")
@@ -88,18 +88,22 @@ fun Dealer.toMarker() = Marker(this.id, false, this.latitude, this.longitude)
 @JvmName("listDealersToMListMarker")
 fun List<Dealer>.toMarker() = map { it.toMarker() }
 
+@JvmName("listLaundryToMListMarker")
+fun LaundryDto.toMarker() = Marker(id!!, false, this.latitude!!.toDouble(), this.longitude!!.toDouble())
+fun List<LaundryDto>.toMarker() = map { it.toMarker() }
+
 @JvmName("toEventsVo")
 fun List<EventDto>.toVo() = map { it.toVo() }
 
-fun PhotoDto.toVo() = Photo(url)
 
 @JvmName("toPhotoVo")
-fun List<PhotoDto>.toVo() = map { it.toVo() }
 fun List<DealerDto>.toVo() = map { it.toVo() }
 
 @JvmName("toChecklistsVo")
 fun List<CheckListDto>.toVo() = map { it.toVo() }
-fun CheckListDto.toVo() = CheckList(id, name, description, imageLink, tags.split(", "), tasks.map { it.toVo() })
+fun CheckListDto.toVo() =
+    CheckList(id, name, description, imageLink, tags.split(", "), tasks.map { it.toVo() })
+
 fun TaskDto.toVo() = Todo(id, name)
 
 

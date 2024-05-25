@@ -21,6 +21,7 @@ struct BottomNavContainer: View {
                             if (item == .mainMap){
                                 appState.aroundMeClicked = true
                             }
+                            
                             navState.bottomNavSelectedTab = item
                         },
                         onLongTap: { item in

@@ -21,9 +21,9 @@ struct GlobalPopup: View{
             VStack{
                 HStack{
                     Text(LocalizedStringKey(getTitle(popupState: state)))
-//                        .fontWeight(.light)
-                        .font(.system(size: 11))
-                        .foregroundColor(Color("Tertiary"))
+                        .fontWeight(.bold)
+                        .font(.custom("CircularStd-Medium", size: 22))
+                        .foregroundColor(Color.black)
                         .padding(.top, 24)
                         .frame(alignment: .leading)
                     Spacer()
@@ -32,9 +32,9 @@ struct GlobalPopup: View{
                     }
                 }
                 Text(LocalizedStringKey(getContent(popupState:state)))
-//                    .fontWeight(.light)
-                    .font(.system(size: 11))
-                    .foregroundColor(Color("Tertiary"))
+                    .font(.custom("CircularStd-Medium", size: 16))
+                    .fontWeight(.medium)
+                    .foregroundColor(Color("Tertiary30"))
                     .padding(.top, 24)
                     .frame(alignment: .leading)
             }.padding(12)

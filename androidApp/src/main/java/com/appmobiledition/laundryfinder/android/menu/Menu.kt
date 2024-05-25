@@ -28,9 +28,6 @@ import androidx.compose.ui.unit.sp
 import com.appmobiledition.laundryfinder.android.LocalDependencyContainer
 import com.appmobiledition.laundryfinder.android.R
 import com.appmobiledition.laundryfinder.android.composables.Dropdown
-import com.appmobiledition.laundryfinder.android.destinations.CheckListsScreenDestination
-import com.appmobiledition.laundryfinder.android.destinations.SettingsMenuDestination
-import com.appmobiledition.laundryfinder.android.destinations.myLocationDestination
 import com.appmobiledition.laundryfinder.android.ui.theme.AppColor
 import com.appmobiledition.laundryfinder.android.ui.theme.Dimensions
 import com.appmobiledition.laundryfinder.domain.model.MenuLink
@@ -58,19 +55,20 @@ fun MenuScreen(
 ) {
 
     val menuItems: List<MenuItem> = listOf(
-        MenuItem(R.string.menu_events, {
-            resultNavigator.navigateBack(result = true, true)
-        }, R.drawable.events, R.string.cd_events, false), MenuItem(
-            R.string.menu_travel_checklists, {
-                navigator.navigate(CheckListsScreenDestination)
-            }, R.drawable.checklist, R.string.cd_travel_checklist, true
-        ), MenuItem(
-            R.string.menu_my_location, {
-                navigator.navigate(myLocationDestination)
-            }, R.drawable.my_location, R.string.cd_my_location, true
-        ), MenuItem(
+//        MenuItem(R.string.menu_events, {
+//            resultNavigator.navigateBack(result = true, true)
+//        }, R.drawable.events, R.string.cd_events, false), MenuItem(
+//            R.string.menu_travel_checklists, {
+//
+//            }, R.drawable.checklist, R.string.cd_travel_checklist, true
+//        ), MenuItem(
+//            R.string.menu_my_location, {
+//
+//            }, R.drawable.my_location, R.string.cd_my_location, true
+//        ),
+        MenuItem(
             R.string.menu_app_settings, {
-                navigator.navigate(SettingsMenuDestination)
+//                navigator.navigate(SettingsMenuDestination)
             }, R.drawable.settings, R.string.cd_app_settings, false
         )
     )
@@ -131,15 +129,6 @@ fun MenuScreen(
                 }
             }
 
-            Divider(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 15.dp)
-            )
-        }
-
-        Globals.menuLinks.forEach {
-            PubContainerMenu(it)
             Divider(
                 modifier = Modifier
                     .fillMaxWidth()

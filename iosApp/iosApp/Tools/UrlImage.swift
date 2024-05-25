@@ -40,6 +40,38 @@ struct UrlImagePub: View {
     }
 }
 
+struct UrlImageVerticalList: View {
+    @State private var image: UIImage? = nil
+    
+    let url: String
+    
+    var body: some View {
+        if let image = image {
+            Image(uiImage: image)
+                .resizable()
+                    .scaledToFill()
+                    .frame(width: 150, height: 150, alignment: .center)
+                    .cornerRadius(8, corners: [.topLeft, .bottomLeft])
+                    .clipped()
+        } else {
+            ProgressView()
+                .onAppear(perform: loadImage)
+        }
+    }
+    
+    func loadImage() {
+        
+        guard let url = URL(string: url) else { return }
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let data = data, let image = UIImage(data: data) {
+                DispatchQueue.main.async {
+                    self.image = image
+                }
+            }
+        }.resume()
+    }
+}
+
 struct UrlImageList: View {
     @State private var image: UIImage? = nil
     
@@ -84,6 +116,37 @@ struct UrlImageGallery: View {
                 .scaledToFill()
                 .aspectRatio(contentMode: .fill)
                 .frame(width: .infinity, height: 150)
+        } else {
+            ProgressView()
+                .onAppear(perform: loadImage)
+        }
+    }
+    
+    func loadImage() {
+        
+        guard let url = URL(string: url) else { return }
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let data = data, let image = UIImage(data: data) {
+                DispatchQueue.main.async {
+                    self.image = image
+                }
+            }
+        }.resume()
+    }
+}
+
+struct UrlImageChecklist: View {
+    @State private var image: UIImage? = nil
+    
+    let url: String
+    
+    var body: some View {
+        if let image = image {
+            Image(uiImage: image)
+                .resizable()
+                .scaledToFill()
+                .frame(width: .infinity, height: 150)
+                .clipped()
         } else {
             ProgressView()
                 .onAppear(perform: loadImage)

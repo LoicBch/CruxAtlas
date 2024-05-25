@@ -13,18 +13,33 @@ struct AppTextField: View {
     @State var text = ""
     @State var isFocused = false
     var onTextChange: (String) -> Void
+    var onBackPressed: () -> Void
     
     public var body: some View {
         
-        TextField("Search...", text: $text.onChange({text in onTextChange(text)}))
+        TextField("Tap to start typing", text: $text.onChange({text in onTextChange(text)}))
             .textFieldStyle(AppTextFieldStyle(onFocused: { isFocused = true }))
-        .overlay(
+            .overlay(
             HStack {
-                Image(systemName: isFocused ? "chevron.left" : "magnifyingglass").foregroundColor(.black).padding(.leading, 12)
+                if (isFocused){
+                    Image(systemName: "arrow.left").foregroundColor(.black).padding(.leading, 12).onTapGesture {
+    //                    self.text = ""
+    //                    onTextChange("")
+    //                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to:nil, from:nil, for:nil)
+                        onBackPressed()
+                    }
+                }else {
+                    Image("magnifying_glass").foregroundColor(.black).padding(.leading, 12).onTapGesture {
+    //                    self.text = ""
+    //                    onTextChange("")
+    //                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to:nil, from:nil, for:nil)
+                        onBackPressed()
+                    }
+                }
                 Spacer()
-                Image(systemName: "xmark.circle.fill")
+                Image(systemName: "x.circle")
                     .padding(.trailing, 12)
-                              .foregroundColor(.gray)
+                              .foregroundColor(Color("Secondary"))
                               .opacity(text.isEmpty ? 0.0 : 1.0)
                               .onTapGesture {
                                   self.text = ""
@@ -55,8 +70,8 @@ struct AppTextFieldStyle: TextFieldStyle {
             .padding(.horizontal, 40)
             .frame(height: 48)
             .cornerRadius(4)
-            .shadow(color: .gray, radius: 1)
             .frame(maxWidth: .infinity, alignment: .leading)
+            .font(.custom("CircularStd-Medium", size: 14))
             .onTapGesture {
                 onFocused()
             }

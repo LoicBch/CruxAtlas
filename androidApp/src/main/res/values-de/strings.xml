@@ -1,140 +1,149 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-<!--  Around location -->
-<string name="around_location_placeholder">Tippen Sie zum Starten der Eingabe</string>
-<string name="around_location_subtitle"> region</string>
-<string name="cd_magnifying_glass_icon">Lupe-Symbol</string>
+    <!--  Around location -->
+    <string name="around_location_placeholder">Tippen Sie zum Starten der Eingabe</string>
+    <string name="around_location_subtitle"> region</string>
+    <string name="cd_magnifying_glass_icon">Lupe-Symbol</string>
 
-<!--  Filter -->
-<string name="filters_title">Filter</string>
-<string name="search_details_subtitle">Details suchen</string>
-<string name="choose_motorhome_brand">Wählen Sie die Marke des Wohnmobils</string>
-<string name="choose_services_type">Wählen Sie den Dienstleistungstyp</string>
-<string name="choose_accessories_brand">Wählen Sie die Zubehörmarke</string>
-<string name="all_motorhome_brand">alle Wohnmobilmarken</string>
-<string name="all_services_type">alle Dienstleistungstypen</string>
-<string name="all_accessories_brand">alle Zubehörmarken</string>
-<string name="apply_filters">Filter anwenden</string>
-<string name="search_placeholder">Tippen Sie zum Starten der Eingabe</string>
-<string name="last_searched">Zuletzt gesucht</string>
-<string name="search_result">Suchergebnisse</string>
-<string name="filter_step1_title">Wie können wir Ihnen heute helfen?</string>
-<string name="filter_step2_title">Details auswählen</string>
-<string name="filter_step1_option1">"Réparer</string>
-<string name="filter_step1_option2">Offizielle Wohnmobilhändler finden</string>
-<string name="filter_step1_option3">Wohnmobilzubehör suchen</string>
-<string name="choose_country">Land auswählen</string>
-<string name="confirm_selection">Auswahl bestätigen</string>
-<string name="motorhome_brands">Wohnmobilmarken</string>
-<string name="motorhome_services">Wohnmobil-Dienstleistungen</string>
-<string name="where_do_you_want_to_go">Wohin möchten Sie gehen?</string>
-<string name="cd_filter_icon">Filter-Symbol</string>
-<string name="cd_filter_option">Öffnen und %1$s auswählen</string>
+    <!--  Filter -->
+    <string name="filters_title">Filter</string>
+    <string name="search_details_subtitle">Details suchen</string>
+    <string name="choose_motorhome_brand">Wählen Sie die Marke des Wohnmobils</string>
+    <string name="choose_services_type">Wählen Sie den Dienstleistungstyp</string>
+    <string name="choose_accessories_brand">Wählen Sie die Zubehörmarke</string>
+    <string name="all_motorhome_brand">alle Wohnmobilmarken</string>
+    <string name="all_services_type">alle Dienstleistungstypen</string>
+    <string name="all_accessories_brand">alle Zubehörmarken</string>
+    <string name="apply_filters">Filter anwenden</string>
+    <string name="search_placeholder">Tippen Sie zum Starten der Eingabe</string>
+    <string name="last_searched">Zuletzt gesucht</string>
+    <string name="search_result">Suchergebnisse</string>
+    <string name="filter_step1_title">Wie können wir Ihnen heute helfen?</string>
+    <string name="filter_step2_title">Details auswählen</string>
+    <string name="filter_step1_option1">"Réparer</string>
+    <string name="filter_step1_option2">Offizielle Wohnmobilhändler finden</string>
+    <string name="filter_step1_option3">Wohnmobilzubehör suchen</string>
+    <string name="choose_country">Land auswählen</string>
+    <string name="confirm_selection">Auswahl bestätigen</string>
+    <string name="motorhome_brands">Wohnmobilmarken</string>
+    <string name="motorhome_services">Wohnmobil-Dienstleistungen</string>
+    <string name="where_do_you_want_to_go">Wohin möchten Sie gehen?</string>
+    <string name="cd_filter_icon">Filter-Symbol</string>
+    <string name="cd_filter_option">Öffnen und %1$s auswählen</string>
 
-<!--  Global -->
-<string name="all">Alle</string>
-<string name="reset">Zurücksetzen</string>
-<string name="step">Schritt</string>
-<string name="slider_missing_network_title">Netzwerkverbindung unterbrochen</string>
-<string name="slider_missing_network_text">Bitte überprüfen Sie Ihre Internet-Einstellungen</string>
-<string name="slider_missing_gps_text">Bitte aktivieren Sie Ihr GPS</string>
-<string name="slider_missing_gps_title">GPS-Signal verloren</string>
-<string name="popup_missing_network_title">Netzwerkverbindung unterbrochen</string>
-<string name="popup_missing_gps_title">GPS-Signal verloren</string>
-<string name="popup_missing_network_text">Sie können nicht offline auf diese Funktion zugreifen</string>
-<string name="popup_missing_gps_text">you can\'t access this function without location</string>
-<string name="loading">enabled</string>
-<string name="get_offer">Begrenztes Zeitangebot erhalten!</string>
+    <!--  Global -->
+    <string name="all">Alle</string>
+    <string name="reset">Zurücksetzen</string>
+    <string name="step">Schritt</string>
+    <string name="slider_missing_network_title">Netzwerkverbindung unterbrochen</string>
+    <string name="slider_missing_network_text">Bitte überprüfen Sie Ihre Internet-Einstellungen</string>
+    <string name="slider_missing_gps_text">Bitte aktivieren Sie Ihr GPS</string>
+    <string name="slider_missing_gps_title">GPS-Signal verloren</string>
+    <string name="popup_missing_network_title">Netzwerkverbindung unterbrochen</string>
+    <string name="popup_missing_gps_title">GPS-Signal verloren</string>
+    <string name="popup_missing_network_text">Sie können nicht offline auf diese Funktion zugreifen</string>
+    <string name="popup_missing_gps_text">you can\'t access this function without location</string>
+    <string name="loading">enabled</string>
+    <string name="get_offer">Begrenztes Zeitangebot erhalten!</string>
 
-<!--  MainMap Screen -->
-<string name="appbar_around_me">In meiner Nähe</string>
-<string name="appbar_around_location">In der Nähe eines Ortes</string>
-<string name="appbar_partners">Partner</string>
-<string name="appbar_menu">Mehr</string>
-<string name="search_this_area">Diesen Bereich durchsuchen</string>
-<string name="cd_button_vertical_list">Zum Listenmodus wechseln</string>
-<string name="cd_button_filter">Zum Listenmodus wechseln</string>
-<string name="cd_button_mapstyle">Kartenlayer ändern</string>
-<string name="cd_around_me">Orte in meiner Nähe anzeigen</string>
-<string name="cd_around_location">"Bildschirm öffnen</string>
-<string name="cd_partners">Partnerbildschirm öffnen</string>
-<string name="cd_menu">Menü öffnen</string>
-<string name="cd_search_here">An diesem Ort suchen</string>
+    <!--  MainMap Screen -->
+    <string name="appbar_around_me">In meiner Nähe</string>
+    <string name="appbar_around_location">In der Nähe eines Ortes</string>
+    <string name="appbar_partners">Partner</string>
+    <string name="appbar_menu">Mehr</string>
+    <string name="search_this_area">Diesen Bereich durchsuchen</string>
+    <string name="cd_button_vertical_list">Zum Listenmodus wechseln</string>
+    <string name="cd_button_filter">Zum Listenmodus wechseln</string>
+    <string name="cd_button_mapstyle">Kartenlayer ändern</string>
+    <string name="cd_around_me">Orte in meiner Nähe anzeigen</string>
+    <string name="cd_around_location">"Bildschirm öffnen</string>
+    <string name="cd_partners">Partnerbildschirm öffnen</string>
+    <string name="cd_menu">Menü öffnen</string>
+    <string name="cd_search_here">An diesem Ort suchen</string>
 
-<!--  More -->
-<string name="menu_travel_tools">Reise-Tools</string>
-<string name="menu_events">Veranstaltungen</string>
-<string name="menu_leveler">Wasserwaage</string>
-<string name="menu_my_location">Mein Standort</string>
-<string name="menu_app_settings">App-Einstellungen</string>
-<string name="menu_travel_checklists">Reise-Checklisten</string>
-<string name="cd_travel_tools">Reise-Tools-Symbol</string>
-<string name="cd_travel_checklist">Reise-Checklisten-Symbol</string>
-<string name="cd_leveler">Wasserwaagen-Symbol</string>
-<string name="cd_events">Öffne Ereigniskarte</string>
-<string name="cd_my_location">Mein Standort-Symbol</string>
-<string name="cd_app_settings">App-Einstellungen-Symbol</string>
+    <!--  More -->
+    <string name="menu_travel_tools">Reise-Tools</string>
+    <string name="menu_events">Veranstaltungen</string>
+    <string name="menu_leveler">Wasserwaage</string>
+    <string name="menu_my_location">Mein Standort</string>
+    <string name="menu_app_settings">App-Einstellungen</string>
+    <string name="menu_travel_checklists">Reise-Checklisten</string>
+    <string name="cd_travel_tools">Reise-Tools-Symbol</string>
+    <string name="cd_travel_checklist">Reise-Checklisten-Symbol</string>
+    <string name="cd_leveler">Wasserwaagen-Symbol</string>
+    <string name="cd_events">Öffne Ereigniskarte</string>
+    <string name="cd_my_location">Mein Standort-Symbol</string>
+    <string name="cd_app_settings">App-Einstellungen-Symbol</string>
 
-<!--  Partner -->
-<string name="navigate_to_event">Zum Ereignis navigieren</string>
-<string name="cd_arrow_back">zurück gehen</string>
+    <!--  Partner -->
+    <string name="navigate_to_event">Zum Ereignis navigieren</string>
+    <string name="cd_arrow_back">zurück gehen</string>
 
-<!--  Settings -->
-<string name="measuring_system">Messsystem</string>
-<string name="language">Sprache</string>
-<string name="help">Hilfe</string>
-<string name="term_of_use">Nutzungsbedingungen</string>
-<string name="privacy_policy">Datenschutzerklärung</string>
-<string name="build">Build</string>
-<string name="version">App-Version</string>
-<string name="technical_infos">Technische Informationen</string>
-<string name="app_settings">App-Einstellungen</string>
-<string name="french">Deutsch</string>
-<string name="english">Englisch</string>
-<string name="italian">Italienisch</string>
-<string name="spanish">Spanisch</string>
-<string name="german">Französisch</string>
-<string name="meter">Meter</string>
-<string name="miles">Meilen</string>
-<string name="serv">zurück gehen</string>
+    <!--  Settings -->
+    <string name="measuring_system">Messsystem</string>
+    <string name="language">Sprache</string>
+    <string name="help">Hilfe</string>
+    <string name="term_of_use">Nutzungsbedingungen</string>
+    <string name="privacy_policy">Datenschutzerklärung</string>
+    <string name="build">Build</string>
+    <string name="version">App-Version</string>
+    <string name="technical_infos">Technische Informationen</string>
+    <string name="app_settings">App-Einstellungen</string>
+    <string name="french">Deutsch</string>
+    <string name="english">Englisch</string>
+    <string name="italian">Italienisch</string>
+    <string name="spanish">Spanisch</string>
+    <string name="german">Französisch</string>
+    <string name="meter">Meter</string>
+    <string name="miles">Meilen</string>
+    <string name="serv">zurück gehen</string>
 
-<!--  Sorting -->
-<string name="sorting">Sortierung</string>
-<string name="sort_places">Orte sortieren</string>
-<string name="none">Kein</string>
-<string name="by_distance_from_you">Nach Entfernung von Ihnen</string>
-<string name="distance_from_searched_location">Nach Entfernung vom gesuchten Ort</string>
-<string name="by_date">Nach Datum (frühestens zuerst)</string>
-<string name="apply_sorting">Sortierung anwenden</string>
-<string name="z">Lupe-Symbol</string>
+    <!--  Sorting -->
+    <string name="sorting">Sortierung</string>
+    <string name="sort_places">Orte sortieren</string>
+    <string name="none">Kein</string>
+    <string name="by_distance_from_you">Nach Entfernung von Ihnen</string>
+    <string name="distance_from_searched_location">Nach Entfernung vom gesuchten Ort</string>
+    <string name="by_date">Nach Datum (frühestens zuerst)</string>
+    <string name="apply_sorting">Sortierung anwenden</string>
+    <string name="z">Lupe-Symbol</string>
 
-<!--  Spot Sheet -->
-<string name="verified">Geprüft</string>
-<string name="overview">Überblick</string>
-<string name="details">Details</string>
-<string name="contact_info">Kontaktinformationen</string>
-<string name="phone">Telefon</string>
-<string name="website">Website</string>
-<string name="from_you">von Ihnen</string>
-<string name="view_all_services">Alle Dienstleistungen an diesem Ort anzeigen</string>
-<string name="view_all_brands">Alle Marken an diesem Ort anzeigen</string>
-<string name="navigate">Navigieren</string>
-<string name="services">Dienstleistungen</string>
-<string name="official_dealers">Offizielle Händler</string>
-<string name="accessories">Zubehör</string>
-<string name="services_subtitle">"Dies sind zusätzliche Informationen</string>
-<string name="dealers_subtitle">"Cet endroit est un concessionnaire officiel des marques répertoriées</string>
-<string name="accessories_subtitle">Diese Marken werden an diesem Ort verkauft und/oder gewartet.</string>
+    <!--  Spot Sheet -->
+    <string name="verified">Geprüft</string>
+    <string name="overview">Überblick</string>
+    <string name="details">Details</string>
+    <string name="contact_info">Kontaktinformationen</string>
+    <string name="phone">Telefon</string>
+    <string name="website">Website</string>
+    <string name="from_you">von Ihnen</string>
+    <string name="view_all_services">Alle Dienstleistungen an diesem Ort anzeigen</string>
+    <string name="view_all_brands">Alle Marken an diesem Ort anzeigen</string>
+    <string name="navigate">Navigieren</string>
+    <string name="services">Dienstleistungen</string>
+    <string name="official_dealers">Offizielle Händler</string>
+    <string name="accessories">Zubehör</string>
+    <string name="services_subtitle">"Dies sind zusätzliche Informationen</string>
+    <string name="dealers_subtitle">"Cet endroit est un concessionnaire officiel des marques répertoriées</string>
+    <string name="accessories_subtitle">Diese Marken werden an diesem Ort verkauft und/oder gewartet.</string>
 
-<!--  checkLists -->
-<string name="travel_checklists">Reise-Checklisten</string>
-<string name="clear_all">Alles löschen</string>
+    <!--  checkLists -->
+    <string name="travel_checklists">Reise-Checklisten</string>
+    <string name="clear_all">Alles löschen</string>
 
-<!--  myLocation -->
-<string name="my_location">Mein aktueller Standort</string>
-<string name="my_parking">Mein Parkplatz</string>
-<string name="park_here">Hier parken</string>
-<string name="delete">Löschen</string>
-<string name="delete_location_popup">"Do you want to permanently delete this saved location?  The action cannot be undone."</string>
+    <!--  myLocation -->
+    <string name="my_location">Mein aktueller Standort</string>
+    <string name="my_parking">Mein Parkplatz</string>
+    <string name="park_here">Hier parken</string>
+    <string name="delete">Löschen</string>
+    <string name="delete_location_popup">"Do you want to permanently delete this saved location?  The action cannot be undone."</string>
+
+    <!--  Help -->
+    <string name="need_help">Need help</string>
+    <string name="help_subtitle">Find out everything about Camper-Pro:</string>
+    <string name="faq_link">camper-pro.com/faq</string>
+    <string name="bug_report">Want to report a bug? Outdated information?</string>
+    <string name="bug_text">Send us an email and we’ll get back to you as soon as possible:
+    contact@camper-pro.com</string>
+
 </resources>

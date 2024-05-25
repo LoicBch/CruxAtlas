@@ -24,11 +24,9 @@ struct FilterButtonStyle: ButtonStyle {
                 .overlay(
                         RoundedRectangle(cornerRadius: 50)
                             .stroke(Color("Primary"), lineWidth: 2)
-                ).overlay(
-                    Image(systemName: "checkmark.circle.fill")
-                        .background(Color.white).cornerRadius(50)
-                        .foregroundColor(Color("Primary"))
-                        .offset(x: 20,y: 20)
+                )
+                .overlay(
+                    Image("active_filter").offset(x: 20,y: 20)
                 )
                 .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
         }else{

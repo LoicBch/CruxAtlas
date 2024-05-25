@@ -17,9 +17,11 @@ extension CheckListScreen {
         @Published private(set) var tagSelected: [(String, Bool)] = []
         @Published private(set) var checklistsShowed: Array<CheckList> = []
         @Published private(set) var loading = false
+        @Published private(set) var ads = [Ad]()
         
         init(){
             getChecklists()
+            getAds()
         }
         
         func selectTag(name: String){
@@ -55,6 +57,16 @@ extension CheckListScreen {
                     tags = Array(Set(res.flatMap({$0.tags}))).map({($0, false)})
                     loading = false
                 } catch {
+                    // handle error
+                }
+            }
+        }
+        
+        func getAds(){
+            Task.init {
+                do {
+                    ads = try await RFetchAds().execute()!
+                } catch { 
                     // handle error
                 }
             }

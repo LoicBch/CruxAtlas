@@ -18,8 +18,8 @@ struct DealerDetailsScreen: View {
     
     @State private var offset: CGFloat = 0
     @State private var overViewTabColor  = "Primary"
-    @State private var infosTabColor = "Tertiary"
-    @State private var contactsTabColor = "Tertiary"
+    @State private var infosTabColor = "Tertiary70"
+    @State private var contactsTabColor = "Tertiary70"
     
     @State private var tabViewHeight: CGFloat = 1300
     @State var sizeArray: [CGFloat] = [.zero, 300, 300]
@@ -30,7 +30,7 @@ struct DealerDetailsScreen: View {
     
     @Environment(\.presentationMode) var presentationMode
     
-    var underLineSize = UIScreen.main.bounds.width / 3
+    var underLineSize = (UIScreen.main.bounds.width / 3) - 18
     
     var body: some View {
         ScrollView(.vertical, showsIndicators: false){
@@ -50,14 +50,14 @@ struct DealerDetailsScreen: View {
                         
                         BadgeDealer(dealer: dealer).padding(.bottom, 10).padding(.top, headerSize)
                     }
-                    .padding(EdgeInsets(top: 0, leading: 17, bottom: 0, trailing: 17))
+                    .padding(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 }
                 
                 HStack{
                     Text("#" + dealer.id)
-                        .fontWeight(.bold)
-                        .font(.system(size: 11))
-                        .foregroundColor(Color("Tertiary"))
+                        .fontWeight(.medium)
+                        .font(.custom("CircularStd-Medium", size: 11))
+                        .foregroundColor(Color("Neutral20"))
                         .padding(.top, 24)
                         .frame(alignment: .leading)
                     Spacer()
@@ -66,8 +66,8 @@ struct DealerDetailsScreen: View {
                 
                 HStack{
                     Text(dealer.name)
-                        .fontWeight(.black)
-                        .font(.system(size: 22))
+                        .fontWeight(.bold)
+                        .font(.custom("CircularStd-Medium", size: 22))
                         .foregroundColor(Color.black)
                         .padding(.top, 12)
                         .frame(alignment: .leading)
@@ -77,30 +77,40 @@ struct DealerDetailsScreen: View {
                 
                 VStack{
                     HStack{
-                        Text("overview").onTapGesture {
+                        Text("overview")
+                            .fontWeight(.medium).frame(alignment: .leading)
+                            .onTapGesture {
                             selection = 0
                         }
+                        .font(.custom("CircularStd-Medium", size: 14))
                         .foregroundColor(Color(overViewTabColor))
+                        
                         Spacer()
-                        Text("details").onTapGesture {
+                        Text("details")
+                            .fontWeight(.medium).frame(alignment: .leading)
+                            .onTapGesture {
                             selection = 1
                         }
                         .foregroundColor(Color(infosTabColor))
+                        .font(.custom("CircularStd-Medium", size: 14))
+                        
                         Spacer()
-                        Text("contact_info").onTapGesture {
-                          selection = 2
+                        Text("contact_info").fontWeight(.medium).onTapGesture {
+                            selection = 2
                         }
                         .foregroundColor(Color(contactsTabColor))
+                        .font(.custom("CircularStd-Medium", size: 14))
+                        
                     }.padding(.horizontal, 18)
                     
                     ZStack{
                         Rectangle()
-                            .frame(width: .infinity, height: 2)
-                            .foregroundColor(.gray)
+                            .frame(width: .infinity, height: 1)
+                            .foregroundColor(Color("Tertiary70"))
                         
                         HStack{
                             Rectangle()
-                                .frame(width: underLineSize, height: 2)
+                                .frame(width: underLineSize, height: 3)
                                 .foregroundColor(Color("Primary"))
                                 .offset(x: offset)
                             Spacer()
@@ -174,32 +184,31 @@ struct DealerDetailsScreen: View {
                     case 0:
                         withAnimation { offset = 0 }
                         overViewTabColor = "Primary"
-                        contactsTabColor = "Tertiary"
-                        infosTabColor = "Tertiary"
+                        contactsTabColor = "Tertiary70"
+                        infosTabColor = "Tertiary70"
                     case 1:
                         withAnimation { offset = underLineSize }
                         infosTabColor = "Primary"
-                        contactsTabColor = "Tertiary"
-                        overViewTabColor = "Tertiary"
+                        contactsTabColor = "Tertiary70"
+                        overViewTabColor = "Tertiary70"
                     case 2:
                         withAnimation { offset = (underLineSize * 2) }
                         contactsTabColor = "Primary"
-                        infosTabColor = "Tertiary"
-                        overViewTabColor = "Tertiary"
+                        infosTabColor = "Tertiary70"
+                        overViewTabColor = "Tertiary70"
                     default:
                         overViewTabColor = "Primary"
                     }
                 })
-            
-            AppButton(action: {
-                let coordinate = CLLocationCoordinate2DMake(dealer.latitude, dealer.longitude)
-                let mapItem = MKMapItem(placemark: MKPlacemark(coordinate: coordinate, addressDictionary:nil))
-                mapItem.name = "Target location"
-                mapItem.openInMaps(launchOptions: [MKLaunchOptionsDirectionsModeKey : MKLaunchOptionsDirectionsModeDriving])
-                
-            }, title: "navigate", isEnable: true)
-            .padding(.top, 42).padding(.bottom, 25)
         }
+        AppButton(action: {
+            let coordinate = CLLocationCoordinate2DMake(dealer.latitude, dealer.longitude)
+            let mapItem = MKMapItem(placemark: MKPlacemark(coordinate: coordinate, addressDictionary:nil))
+            mapItem.name = "Target location"
+            mapItem.openInMaps(launchOptions: [MKLaunchOptionsDirectionsModeKey : MKLaunchOptionsDirectionsModeDriving])
+            
+        }, title: "navigate", isEnable: true)
+        .padding(.top, 24).padding(.bottom, 25)
     }
 }
 
@@ -220,18 +229,18 @@ struct BadgeDealer: View {
             if (!dealer.services.isEmpty){
                 Image("repair")
                     .frame(width: 16, height: 16)
-                    .padding(5)
+                    .padding(8)
                     .background(Color.white)
-                    .cornerRadius(5)
+                    .cornerRadius(8)
                     .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
             }
             
             if (!dealer.brands.isEmpty){
                 Image("dealers")
                     .frame(width: 16, height: 16)
-                    .padding(5)
+                    .padding(8)
                     .background(Color.white)
-                    .cornerRadius(5)
+                    .cornerRadius(8)
                     .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
             }
             
@@ -244,11 +253,11 @@ struct BadgeDealer: View {
                         .padding(.leading, 5)
                     
                     Text("verified")
-                        .font(.system(size: 12))
-                        .foregroundColor(Color("Primary"))
+                        .font(.custom("CircularStd-Medium", size: 12))
+                        .foregroundColor(Color("greenVerified"))
                         .padding(.trailing, 5)
                 }.background(Color.white)
-                    .cornerRadius(5)
+                    .cornerRadius(8)
                     .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
             }
         }
@@ -265,24 +274,31 @@ struct TopDealerButtons: View {
             Button(action: {
                 onClose()
             }){
-                Image("cross")
-            }.buttonStyle(AppButtonStyle())
+                Image("cross_round")
+            }
+//            .buttonStyle(AppButtonStyle())
             
             Spacer()
             
             Button(action: {
                 onShare()
             }){
-                Image("share")
+                Image("share_round")
             }
-            .buttonStyle(AppButtonStyle())
+//            .buttonStyle(AppButtonStyle())
             .padding(.trailing, 8)
             
-            Button(action: {
-                
-            }){
-                Image("help")
-            }.buttonStyle(AppButtonStyle())
+            NavigationLink(destination: HelpScreen()
+                .navigationBarBackButtonHidden(true)
+            ) {
+                    Image("help_round")
+            }
+            
+//            .padding(EdgeInsets(top: 16, leading: 18, bottom: 16, trailing: 18))
+//                .background(Color.white)
+//                .foregroundColor(.white)
+//                .cornerRadius(50)
+//                .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
         }
     }
 }
@@ -296,50 +312,50 @@ struct OverviewTab: View {
         VStack {
             if (dealer.isPremium){
                 ContactRowPremium(dealer: dealer)
-                    .padding(.top, 25)
+                    .padding(.top, 20)
             }else {
                 ContactRow(dealer: dealer)
-                    .padding(.top, 25)
+                    .padding(.top, 20)
             }
             
             HStack{
-                Image("distance")
+                Image("distance").colorMultiply(Color("Tertiary30"))
                 Text(Location(latitude: dealer.latitude, longitude: dealer.longitude).distanceFromUserLocationText())
-                    .fontWeight(.light)
-                    .font(.system(size: 12))
+                    .fontWeight(.medium)
+                    .font(.custom("CircularStd-Medium", size: 12))
                     .foregroundColor(Color.black)
-                    .padding(.trailing, 5)
+                    .padding(.trailing, 12)
                 Spacer()
             }.padding(.top, 25)
             
             HStack{
-                Image("pin_here")
+                Image("pin_here").colorMultiply(Color("Tertiary30"))
                 Text(dealer.fullLocation())
-                    .fontWeight(.light)
-                    .font(.system(size: 12))
+                    .fontWeight(.medium)
+                    .font(.custom("CircularStd-Medium", size: 12))
                     .foregroundColor(Color.black)
-                    .padding(.trailing, 5)
+                    .padding(.trailing, 12)
                 Spacer()
-            }.padding(.top, 16)
+            }.padding(.top, 12)
             
             HStack{
-                Image("my_location")
+                Image("my_location").colorMultiply(Color("Tertiary30"))
                 Text(dealer.fullGeolocalisation)
-                    .fontWeight(.light)
-                    .font(.system(size: 12))
+                    .fontWeight(.medium)
+                    .font(.custom("CircularStd-Medium", size: 12))
                     .foregroundColor(Color.black)
-                    .padding(.trailing, 5)
+                    .padding(.trailing, 12)
                 Spacer()
-            }.padding(.top, 16)
-            ServicesBlock(services: Array(dealer.services.prefix(3)), onViewAll: { onViewAll() }, fullList: false)
+            }.padding(.top, 12)
+            ServicesBlock(services: Array(dealer.services.prefix(3)), onViewAll: { onViewAll() }, fullList: dealer.services.count < 3)
                 .padding(.top, 42)
-            BrandsBlock(brands: Array(dealer.brands.prefix(6)), onViewAll: { onViewAll() }, fullList: false)
+            BrandsBlock(brands: Array(dealer.brands.prefix(6)), onViewAll: { onViewAll() }, fullList: dealer.brands.count < 6)
                 .padding(.top, 42)
         }.padding(.horizontal, 18)
     }
 }
 
-struct ServicesBlock: View{
+struct ServicesBlock: View {
     
     var services: [String]
     var onViewAll: () -> Void
@@ -349,7 +365,7 @@ struct ServicesBlock: View{
         VStack{
             HStack {
                 Text("services")
-                    .font(.system(size: 16))
+                    .font(.custom("CircularStd-Medium", size: 16))
                     .foregroundColor(Color.black)
                 Spacer()
             }.padding(.bottom, 8)
@@ -357,7 +373,7 @@ struct ServicesBlock: View{
             HStack {
                 Text("This is additional information we can add.")
                     .fontWeight(.medium)
-                    .font(.system(size: 12))
+                    .font(.custom("CircularStd-Medium", size: 12))
                     .foregroundColor(Color.black)
                 Spacer()
             }
@@ -370,8 +386,8 @@ struct ServicesBlock: View{
                 HStack{
                     Text(service)
                         .fontWeight(.medium)
-                        .font(.system(size: 14))
-                        .foregroundColor(Color("Tertiary"))
+                        .font(.custom("CircularStd-Medium", size: 14))
+                        .foregroundColor(Color("Tertiary40"))
                         .padding(.top, 6)
                     Spacer()
                 }
@@ -380,7 +396,7 @@ struct ServicesBlock: View{
             if(!fullList){
                 HStack {
                     Text("view_all_services")
-                        .font(.system(size: 14))
+                        .font(.custom("CircularStd-Medium", size: 14))
                         .foregroundColor(Color("Secondary"))
                     Spacer()
                     Image(systemName: "arrow.right")
@@ -403,14 +419,14 @@ struct BrandsBlock: View{
         VStack{
             HStack {
                 Text("official_dealers")
-                    .font(.system(size: 16))
+                    .font(.custom("CircularStd-Medium", size: 16))
                     .foregroundColor(Color.black)
                 Spacer()
             }.padding(.bottom, 8)
             HStack {
                 Text("This is additional information we can add.")
                     .fontWeight(.medium)
-                    .font(.system(size: 12))
+                    .font(.custom("CircularStd-Medium", size: 12))
                     .foregroundColor(Color.black)
                 Spacer()
             }
@@ -428,8 +444,8 @@ struct BrandsBlock: View{
                                 .fontWeight(.medium)
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 5)
-                                .font(.system(size: 14))
-                                .foregroundColor(Color("Tertiary"))
+                                .font(.custom("CircularStd-Medium", size: 14))
+                                .foregroundColor(Color("Tertiary40"))
                                 .padding(.trailing, 6)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 5)
@@ -442,13 +458,16 @@ struct BrandsBlock: View{
                 
             }else {
                 HStack{
-                    ForEach(brands, id: \.self){ brand in
+                    ForEach(brands, id: \.self){ brandIndex in
+                        
+                        var brand = Globals.filters().brands.first(where: { $0.first?.lowercased == brandIndex })?.second as! String
+                        
                         Text(brand)
                             .fontWeight(.medium)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 5)
-                            .font(.system(size: 14))
-                            .foregroundColor(Color("Tertiary"))
+                            .font(.custom("CircularStd-Medium", size: 14))
+                            .foregroundColor(Color("Tertiary40"))
                             .padding(.trailing, 6)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 5).stroke(Color("unSelectedFilter"), lineWidth: 1)
@@ -461,7 +480,7 @@ struct BrandsBlock: View{
             if (!fullList){
                 HStack {
                     Text("view_all_brands")
-                        .font(.system(size: 14))
+                        .font(.custom("CircularStd-Medium", size: 14))
                         .foregroundColor(Color("Secondary"))
                     Spacer()
                     Image(systemName: "arrow.right")
@@ -489,9 +508,9 @@ struct ContactRow: View {
                     HStack{
                         Image("website")
                         Text(dealer.website)
-                            .fontWeight(.medium)
-                            .padding(.leading, 8)
-                            .font(.system(size: 12))
+                            .fontWeight(.medium).frame(alignment: .leading)
+                            .padding(.leading, 4)
+                            .font(.custom("CircularStd-Medium", size: 12))
                             .foregroundColor(Color("Secondary"))
                     }
                     .padding(.horizontal, 10)
@@ -513,8 +532,8 @@ struct ContactRow: View {
                         Image("phone")
                         Text(dealer.phone)
                             .fontWeight(.medium)
-                            .padding(.leading, 8)
-                            .font(.system(size: 12))
+                            .padding(.leading, 4)
+                            .font(.custom("CircularStd-Medium", size: 12))
                             .foregroundColor(Color("Secondary"))
                     }
                     .padding(.horizontal, 10)
@@ -669,17 +688,23 @@ struct ContactTab: View {
         VStack{
             
             HStack{
-                Image("pin_here")
-                Text(dealer.fullLocation).padding(.leading, 14)
+                Image("pin_here_square")
+                Text(dealer.fullLocation)
+                    .fontWeight(.medium).frame(alignment: .leading)
+                    .padding(.leading, 14)
+                    .font(.custom("CircularStd-Medium", size: 12))
+                    .foregroundColor(Color.black)
                 Spacer()
-            }.padding(.top, 24)
+            }.padding(.top, 24).padding(.bottom, 16)
             Divider()
             
             HStack{
-                Image("my_location")
+                Image("my_location_square")
+                    .renderingMode(.template)
+                    .foregroundColor(Color("Secondary"))
                 Text(dealer.fullLocation)
-                    .fontWeight(.medium)
-                    .font(.system(size: 12))
+                    .fontWeight(.medium).frame(alignment: .leading)
+                    .font(.custom("CircularStd-Medium", size: 12))
                     .foregroundColor(Color.black)
                     .padding(.leading, 14)
                 
@@ -689,10 +714,10 @@ struct ContactTab: View {
             
             if (!dealer.website.isEmpty){
                 HStack{
-                    Image("website")
+                    Image("website_square")
                     Text(dealer.website)
-                        .fontWeight(.medium)
-                        .font(.system(size: 12))
+                        .fontWeight(.medium).frame(alignment: .leading)
+                        .font(.custom("CircularStd-Medium", size: 12))
                         .foregroundColor(Color.black)
                         .padding(.leading, 14)
                     Spacer()
@@ -704,10 +729,12 @@ struct ContactTab: View {
             
             if (!dealer.email.isEmpty){
                 HStack{
-                    Image("mail")
+                    Image("mail_square")
+                        .renderingMode(.template)
+                        .foregroundColor(Color("Secondary"))
                     Text(dealer.email)
-                        .fontWeight(.medium)
-                        .font(.system(size: 12))
+                        .fontWeight(.medium).frame(alignment: .leading)
+                        .font(.custom("CircularStd-Medium", size: 12))
                         .foregroundColor(Color.black)
                         .padding(.leading, 14)
                     Spacer()
@@ -719,10 +746,12 @@ struct ContactTab: View {
             
             if (!dealer.phone.isEmpty){
                 HStack{
-                    Image("phone")
+                    Image("phone_square")
+                        .renderingMode(.template)
+                        .foregroundColor(Color("Secondary"))
                     Text(dealer.phone)
-                        .fontWeight(.medium)
-                        .font(.system(size: 12))
+                        .fontWeight(.medium).frame(alignment: .leading)
+                        .font(.custom("CircularStd-Medium", size: 12))
                         .foregroundColor(Color.black)
                         .padding(.leading, 14)
                     Spacer()
@@ -738,10 +767,12 @@ struct ContactTab: View {
             if(dealer.isPremium){
                 if (!dealer.facebook.isEmpty){
                     HStack{
-                        Image("facebook")
+                        Image("facebook_square")
+                            .renderingMode(.template)
+                            .foregroundColor(Color("Secondary"))
                         Text(dealer.facebook)
-                            .fontWeight(.medium)
-                            .font(.system(size: 12))
+                            .fontWeight(.medium).frame(alignment: .leading)
+                            .font(.custom("CircularStd-Medium", size: 12))
                             .foregroundColor(Color.black)
                             .padding(.leading, 14)
                         Spacer()
@@ -753,10 +784,12 @@ struct ContactTab: View {
                 
                 if (!dealer.twitter.isEmpty){
                     HStack{
-                        Image("twitter")
+                        Image("twitter_square")
+                            .renderingMode(.template)
+                            .foregroundColor(Color("Secondary"))
                         Text(dealer.twitter)
-                            .fontWeight(.medium)
-                            .font(.system(size: 12))
+                            .fontWeight(.medium).frame(alignment: .leading)
+                            .font(.custom("CircularStd-Medium", size: 12))
                             .foregroundColor(Color.black)
                             .padding(.leading, 14)
                         Spacer()
@@ -768,10 +801,12 @@ struct ContactTab: View {
                 
                 if (!dealer.youtube.isEmpty){
                     HStack{
-                        Image("youtube")
+                        Image("youtube_square")
+                            .renderingMode(.template)
+                            .foregroundColor(Color("Secondary"))
                         Text(dealer.youtube)
-                            .fontWeight(.medium)
-                            .font(.system(size: 12))
+                            .fontWeight(.medium).frame(alignment: .leading)
+                            .font(.custom("CircularStd-Medium", size: 12))
                             .foregroundColor(Color.black)
                             .padding(.leading, 14)
                         Spacer()

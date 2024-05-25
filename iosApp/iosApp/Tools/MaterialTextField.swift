@@ -19,7 +19,7 @@ struct MaterialTextField: View{
             HStack{
                 Text(buttonLabel)
                     .fontWeight(.medium)
-                    .font(.system(size: 16))
+                    .font(.custom("CircularStd-Medium", size: 16))
                     .padding(.leading, 10)
                     .foregroundColor(Color("Primary"))
                 Spacer()

@@ -25,7 +25,6 @@ import com.appmobiledition.laundryfinder.android.di.AppDependencyContainer
 import com.appmobiledition.laundryfinder.android.home.HomeScreen
 import com.appmobiledition.laundryfinder.android.onBoarding.SplashScreen
 import com.appmobiledition.laundryfinder.android.onBoarding.SplashScreenViewModel
-import com.appmobiledition.laundryfinder.domain.usecases.SetupApp
 import com.appmobiledition.laundryfinder.utils.LanguageManager
 import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.getViewModel
@@ -57,6 +56,7 @@ fun MyApplicationTheme(
             fontFamily = FontFamily.Default, fontWeight = FontWeight.Normal, fontSize = 16.sp
         )
     )
+
     val shapes = Shapes(
         small = RoundedCornerShape(4.dp),
         medium = RoundedCornerShape(4.dp),
@@ -94,11 +94,11 @@ class MainActivity : ComponentActivity() {
 
             composable(route = SplashScreenDestination.route) {
                 val context = LocalContext.current
-                val setupApp: SetupApp by inject()
-                val languageManager: LanguageManager by inject { parametersOf(context) }
+//                val setupApp: SetupApp by inject()
+//                val languageManager: LanguageManager by inject { parametersOf(context) }
                 SplashScreen(
                     navController = navController,
-                    SplashScreenViewModel(setupApp, languageManager)
+                    SplashScreenViewModel()
                 )
             }
 

@@ -18,19 +18,12 @@ struct HistoricSearchList: View{
     
     public var body: some View{
         VStack{
-        HStack{
-            Text("last_searched")
-//                .fontWeight(.medium)
-                .font(.system(size: 12))
-                .foregroundColor(Color.gray)
-                .padding(.top, 20)
-            Spacer()
-        }
-        Divider()
             ForEach(filterSearchs, id: \.filterId){ filter in
-                LastSearchItem(filter: filter, onDeleteSearch: {onDeleteSearch(filter)}).onTapGesture {
-                    onSelectSearch(filter.filterName)
-                }
+                if (filter.filterName != ""){
+                    LastSearchItem(filter: filter, onDeleteSearch: {onDeleteSearch(filter)}).onTapGesture {
+                        onSelectSearch(filter.filterName)
+                    }
+                } 
             }
         }
     }
@@ -46,12 +39,12 @@ struct LastSearchItem: View{
             Image("historic")
             Text(filter.filterName)
                 .fontWeight(.medium)
-                .font(.system(size: 16))
-                .foregroundColor(Color("Tertiary"))
+                .font(.custom("CircularStd-Medium", size: 16))
+                .foregroundColor(Color("Primary30"))
             Spacer()
             Image(systemName: "xmark.circle").onTapGesture {
                 onDeleteSearch()
-            }
+            }.foregroundColor(Color("Secondary"))
         }.frame(height: 40)
     }
 }

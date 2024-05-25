@@ -44,14 +44,14 @@ struct RadioButton: View {
         size: CGFloat = 20,
         color: Color = Color("Primary"),
         textSize: CGFloat = 14
-        ) {
+        ) { 
         self.id = id
         self.image = image
         self.size = size
-        self.color = color
         self.textSize = textSize
         self.selectedID = selectedID
         self.callback = callback
+        self.color = self.selectedID == self.id ? Color("Primary") : Color("Tertiary30")
     }
 
     var body: some View {
@@ -59,7 +59,7 @@ struct RadioButton: View {
             self.callback(self.id)
         }) {
             HStack(alignment: .center, spacing: 10) {
-                Image(image)
+                Image(image).renderingMode(.template).foregroundColor(self.color)
                 Text(LocalizedStringKey(id))
                     .font(Font.system(size: textSize))
                     .padding(.leading, 8)
@@ -70,7 +70,7 @@ struct RadioButton: View {
                     .aspectRatio(contentMode: .fit)
                     .frame(width: self.size, height: self.size)
                     .modifier(ColorInvert())
-            }.foregroundColor(self.color)
+            }.foregroundColor(self.color).padding(.vertical, 5)
         }
         .foregroundColor(self.color)
     }

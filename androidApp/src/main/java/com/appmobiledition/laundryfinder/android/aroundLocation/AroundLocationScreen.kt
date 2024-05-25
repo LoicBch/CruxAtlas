@@ -22,7 +22,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.appmobiledition.laundryfinder.android.R
 import com.appmobiledition.laundryfinder.android.composables.SearchField
 import com.appmobiledition.laundryfinder.android.composables.collectAsStateWithLifecycleImmutable
 import com.appmobiledition.laundryfinder.android.filter.LastSearchItem
@@ -30,6 +29,7 @@ import com.appmobiledition.laundryfinder.android.ui.theme.AppColor
 import com.appmobiledition.laundryfinder.domain.model.Place
 import com.appmobiledition.laundryfinder.domain.model.Search
 import com.appmobiledition.laundryfinder.utils.Constants
+import com.appmobiledition.laundryfinder.android.R
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import kotlinx.coroutines.flow.StateFlow

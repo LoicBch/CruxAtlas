@@ -2,16 +2,14 @@ package com.appmobiledition.laundryfinder.android.onBoarding
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.appmobiledition.laundryfinder.data.ResultWrapper
-import com.appmobiledition.laundryfinder.domain.usecases.SetupApp
 import com.appmobiledition.laundryfinder.utils.Globals
 import com.appmobiledition.laundryfinder.utils.LanguageManager
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class SplashScreenViewModel(
-    private val setupApp: SetupApp,
-    private val languageManager: LanguageManager
+//    private val setupApp: SetupApp,
+//    private val languageManager: LanguageManager
 ) : ViewModel() {
 
     var gpsLocationIsAsked = MutableStateFlow(false)
@@ -27,14 +25,15 @@ class SplashScreenViewModel(
     fun initApp() {
         setDeviceConstants()
         viewModelScope.launch {
-            when (setupApp.invoke()) {
-                is ResultWrapper.Failure -> {
-                }
-
-                is ResultWrapper.Success -> {
-                    globalsVarsAreSet.update { true }
-                }
-            }
+            globalsVarsAreSet.update { true }
+//            when (setupApp.invoke()) {
+//                is ResultWrapper.Failure -> {
+//                }
+//
+//                is ResultWrapper.Success -> {
+//                    globalsVarsAreSet.update { true }
+//                }
+//            }
         }
     }
 
@@ -44,8 +43,8 @@ class SplashScreenViewModel(
 
     private fun setDeviceConstants() {
         Globals.geoLoc.appLanguage = "FR"
-        Globals.geoLoc.deviceLanguage = languageManager.getDeviceLanguage()
-        Globals.geoLoc.deviceCountry = languageManager.getDeviceCountry()
+//        Globals.geoLoc.deviceLanguage = languageManager.getDeviceLanguage()
+//        Globals.geoLoc.deviceCountry = languageManager.getDeviceCountry()
     }
 
 }

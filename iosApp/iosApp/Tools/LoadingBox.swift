@@ -15,8 +15,6 @@ struct LoadingBox: View {
     
     public var body: some View{
         VStack {
-//            Spacer()
-//            HStack{
                 Spacer()
                 VStack{
                     Image("logo")
@@ -25,20 +23,17 @@ struct LoadingBox: View {
                     HStack{
                         Text("loading")
                             .fontWeight(.medium)
-                            .font(.system(size: 16))
-                            .foregroundColor(Color("Tertiary"))
+                            .font(.custom("CircularStd-Medium", size: 16))
+                            .foregroundColor(Color("OnPrimaryContainer"))
                             .frame(alignment: .leading)
                         ProgressView().padding(.leading, 16)
                             .progressViewStyle(CircularProgressViewStyle())
                     }
                     .padding(.top, 20)
-                }.padding(24)
-                    .background(RoundedRectangle(cornerRadius: 25)
-                        .fill(Color.white)).shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2)
-                    .padding(16)
+                }.padding(32)
+                    .background(RoundedRectangle(cornerRadius: 20)
+                        .fill(Color.white).shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 2))
                 Spacer()
             }
-//            Spacer()
-//        }.background(Color("ClearGrey")).padding(.bottom, 72)
     }
 }

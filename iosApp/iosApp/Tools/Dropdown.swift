@@ -19,9 +19,9 @@ struct Dropdown<Content: View>: View{
         VStack {
             HStack{
                 if isExpanded {
-                    Image("tools_selected")
+                    Image("tools_selected").padding(.horizontal, 5)
                 }else {
-                    Image("tools")
+                    Image("tools").padding(.horizontal, 5)
                 }
                 
                 Text(LocalizedStringKey(title)).fontWeight(.bold).padding(.leading, 20).foregroundColor(isExpanded ? Color("Primary") : Color("Tertiary"))

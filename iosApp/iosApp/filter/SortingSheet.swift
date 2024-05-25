@@ -33,8 +33,7 @@ struct SortingSheet: View {
             
             HStack{
                 Text("sort_places")
-                //                    .fontWeight(.black)
-                    .font(.system(size: 14))
+                    .font(.custom("CircularStd-Medium", size: 14))
                     .foregroundColor(Color.black)
                 Spacer()
             }.padding(.top, 35).padding(.horizontal, 16)
@@ -42,13 +41,28 @@ struct SortingSheet: View {
             
             SortingRadioGroup(items: updateSource.getFilterOption(), selectedId: $sortingOptionSelected) { selected in
                 sortingOptionSelected = selected
-                let option = SortingOption(rawValue: selected)
-            }.padding(.horizontal, 16).onAppear{
+            }.padding(.horizontal, 16).onAppear {
                 print(updateSource)
                 print(updateSource.getFilterOption())
             }
             Spacer()
-            AppButton(action: { onSortingApplied(SortingOption(rawValue: sortingOptionSelected)!); onClose() }, title: "apply_sorting", isEnable: true).padding(.bottom, 16)
+            AppButton(action: {
+                print("SORTING SHEET \(sortingOptionSelected)")
+                onSortingApplied(SortingOption(rawValue: sortingOptionSelected)!)
+                onClose()
+            }, title: "apply_sorting", isEnable: true).padding(.bottom, 16)
+        }.onAppear(){
+            if (updateSource == UpdateSource.events){
+                let sortingOptionName = KMMPreference(context: NSObject()).getString(key: "dealer_events")
+                if (sortingOptionName != nil){
+                    sortingOptionSelected = sortingOptionName!
+                }
+            }else{
+                let sortingOptionName = KMMPreference(context: NSObject()).getString(key: "sorting_dealers")
+                if (sortingOptionName != nil){
+                    sortingOptionSelected = sortingOptionName!
+                }
+            }
         }
     }
 } 
@@ -58,6 +72,11 @@ enum SortingOption: String {
     case byDistFromMe = "by_distance_from_you"
     case byDistFromLastSearch = "distance_from_searched_location"
     case byDate = "by_date"
+    
+    init?(string: String) {
+            guard let value = SortingOption(rawValue: string) else { return nil }
+            self = value
+        }
 }
 
 extension UpdateSource {
@@ -90,9 +109,9 @@ extension SortingOption: CaseIterable {
     func getIcon() -> String {
         switch self {
         case SortingOption.byDate: return "events"
-        case SortingOption.byDistFromLastSearch: return "distance"
-        case SortingOption.byDistFromMe: return "distance"
-        case SortingOption.none: return "xmark.circle"
+        case SortingOption.byDistFromLastSearch: return "distance_square"
+        case SortingOption.byDistFromMe: return "distance_square"
+        case SortingOption.none: return "circle_cross_square"
         default: return "";
         }
     }

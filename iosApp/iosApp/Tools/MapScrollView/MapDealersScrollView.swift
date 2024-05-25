@@ -10,8 +10,7 @@ struct MapDealersScrollView<Content: View>: UIViewRepresentable {
     
     var onDecelerating: (String) -> Void
     var onDraggingStoped: (String) -> Void
-    
-    
+     
     init(dealers : Binding<[Dealer]>, itemIdToScrollTo: Binding<String> , @ViewBuilder content: @escaping () -> Content, onDraggingStoped: @escaping (String) -> Void,
          onDecelerating: @escaping (String) -> Void){
         self.content = content
@@ -35,6 +34,7 @@ struct MapDealersScrollView<Content: View>: UIViewRepresentable {
             contentView.view.heightAnchor.constraint(equalTo: scrollView.frameLayoutGuide.heightAnchor)
         ])
         contentView.view?.backgroundColor = UIColor(.clear)
+        scrollView.contentOffset = CGPoint(x: 0, y: 0)
         return scrollView
     }
     
@@ -49,7 +49,7 @@ struct MapDealersScrollView<Content: View>: UIViewRepresentable {
             uiView.contentViewController = UIHostingController(rootView: contentView)
             return
         }
-                
+        
         hosting.rootView = contentView
         uiView.updateView()
     }
@@ -109,6 +109,7 @@ struct MapDealersScrollView<Content: View>: UIViewRepresentable {
                 let item = parent.getVisibleItemFromOffset(offset: scrollView.contentOffset.x, direction: currentDirection)
                 parent.scrollToWhereId(id: item.id, scrollview: scrollView)
                 parent.onDraggingStoped(item.id)
+                print("TESTO \(scrollView.contentOffset)")
             }
         }
         
@@ -117,6 +118,7 @@ struct MapDealersScrollView<Content: View>: UIViewRepresentable {
                 let item = parent.getVisibleItemFromOffset(offset: scrollView.contentOffset.x, direction: currentDirection)
                 parent.scrollToWhereId(id: item.id, scrollview: scrollView)
                 parent.onDecelerating(item.id)
+                print("TESTO \(scrollView.contentOffset)")
             }
         }
         

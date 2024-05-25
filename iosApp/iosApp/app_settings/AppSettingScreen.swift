@@ -34,9 +34,9 @@ struct AppSettingScreen: View {
                         presentationMode.wrappedValue.dismiss()
                     }
                     Spacer()
-                    Text("app_settings")
+                    Text("app_settings").font(.custom("CircularStd-Medium", size: 16)).fontWeight(.medium).foregroundColor(Color("Tertiary10"))
                     Spacer()
-                    Image(systemName: "")
+                    Image(systemName: "arrow.left").opacity(0)
                 }.padding(.leading, 15).padding(.top, 12)
                 Divider().padding(.horizontal, 15).padding(.top, 44)
                 NavigationView(){
@@ -112,9 +112,9 @@ struct SettingItemRow: View {
     
     public var body: some View{
         HStack{
-            Text(LocalizedStringKey(settingItem.label))
-                .font(.system(size: 16, weight: .bold))
-                .foregroundColor(Color("Tertiary"))
+            Text(LocalizedStringKey(settingItem.label)).fontWeight(.bold)
+                .font(.custom("CircularStd-Medium", size: 16))
+                .foregroundColor(Color("Tertiary30"))
             Spacer()
             Image(systemName: "arrow.right").foregroundColor(Color("Secondary"))
         }
@@ -136,17 +136,18 @@ struct BuildInfosRow: View {
             
             VStack{
                 HStack{
-                    Text("technical_infos").font(.system(size: 16, weight: .medium))
+                    Text("technical_infos")
+                        .font(.custom("CircularStd-Medium", size: 16)).fontWeight(.medium).foregroundColor(Color("Tertiary30"))
                     Spacer()
                 }
                 HStack{
                     let txt = NSLocalizedString("version", comment: "default")
-                    Text("\(txt): \(version)").font(.system(size: 16, weight: .medium))
+                    Text("\(txt): \(version)").font(.custom("CircularStd-Medium", size: 16)).fontWeight(.medium).foregroundColor(Color("Tertiary30"))
                     Spacer()
                 }
                 HStack{
                     let txt = NSLocalizedString("build", comment: "default")
-                    Text("\(txt): \(buildVersion)").font(.system(size: 16, weight: .medium))
+                    Text("\(txt): \(buildVersion)").font(.custom("CircularStd-Medium", size: 16)).fontWeight(.medium).foregroundColor(Color("Tertiary30"))
                     Spacer()
                 }
             }
@@ -167,7 +168,7 @@ struct LanguagePopup: View {
                 Spacer()
                 VStack{
                     ForEach(languages, id: \.self){ language in
-                        Text(LocalizedStringKey(language)).padding(.vertical, 10).onTapGesture {
+                        Text(LocalizedStringKey(language)).font(.custom("CircularStd-Medium", size: 16)).fontWeight(.medium).foregroundColor(Color("Tertiary30")).padding(.vertical, 10).onTapGesture {
                             onLanguageSelected(language)
                         }
                     }
@@ -194,7 +195,7 @@ struct LanguagePopup: View {
         public var body: some View{
             VStack{
                 ForEach(metrics, id: \.self){ metric in
-                    Text(LocalizedStringKey(metric)).onTapGesture {
+                    Text(LocalizedStringKey(metric)).font(.custom("CircularStd-Medium", size: 16)).fontWeight(.medium).foregroundColor(Color("Tertiary30")).onTapGesture {
                         onSelectMetric(metric)
                     }
                 }.frame(width: .infinity)

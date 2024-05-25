@@ -1,3 +1,11 @@
 package com.appmobiledition.laundryfinder.android.generical
 
-data class `Default Object`()
+import android.location.Location
+
+
+data class DefaultObject(
+    val id: Int,
+    val name: String,
+    val location: Location
+)
+

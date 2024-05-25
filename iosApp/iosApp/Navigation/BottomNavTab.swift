@@ -13,6 +13,7 @@ enum BottomNavTab: Identifiable {
     case aroundLocation
     case partners
     case more
+    case event
     
     var id: Int {
         switch self {
@@ -23,6 +24,8 @@ enum BottomNavTab: Identifiable {
         case .partners:
             return 2
         case .more:
+            return 3
+        case .event:
             return 3
         }
     }
@@ -37,6 +40,8 @@ enum BottomNavTab: Identifiable {
             return "appbar_partners"
         case .more:
             return "appbar_menu"
+        case .event:
+            return ""
         }
     }
     
@@ -50,6 +55,8 @@ enum BottomNavTab: Identifiable {
             return isSelected ? "partners_selected" : "partners"
         case .more:
             return isSelected ? "menu_selected" : "menu"
+        case .event:
+            return ""
         }
     }
 } 

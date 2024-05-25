@@ -22,25 +22,29 @@ struct AroundLocationScreen: View {
             HStack(){
                 Image("around_location_selected")
                 Text("appbar_around_location")
-                .font(.system(size: 22, weight: .bold))
-                .padding(.leading, 16)
+                    .fontWeight(.bold)
+                .font(.custom("CircularStd-Medium", size: 22))
+                .padding(.leading, 12)
             }.frame(maxWidth: .infinity, alignment: .leading).padding(.top, 16)
             
             Text("around_location_subtitle")
-                .font(.system(size: 12, weight: .medium))
-                .foregroundColor(Color("NeutralText"))
+                .font(.custom("CircularStd-Medium", size: 12))
+                .fontWeight(.medium)
+                .foregroundColor(Color("Neutral50"))
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.top, 16)
             
             AppTextField(onTextChange: {
                 viewModel.onUserSearch(search: $0)
+            }, onBackPressed: {
+                navState.bottomNavSelectedTab = .mainMap
             })
             
             if (viewModel.suggestionList.isEmpty){
                 Text("last_searched")
-                    .font(.system(size: 14, weight: .medium))
-                    .fontWeight(.bold)
-                    .foregroundColor(Color("Tertiary"))
+                    .font(.custom("CircularStd-Medium", size: 14))
+                    .fontWeight(.medium)
+                    .foregroundColor(Color.black)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.top, 54)
                 
@@ -111,8 +115,10 @@ struct HistoricItem: View {
         HStack(){
             Image("historic")
                 .renderingMode(.template)
-                .foregroundColor(Color("Primary"))
-            Text(search).font(.system(size: 16, weight: .medium)).foregroundColor(Color.gray)
+                .foregroundColor(Color("Primary70"))
+            Text(search).font(.custom("CircularStd-Medium", size: 16))
+                .fontWeight(.medium)
+                .foregroundColor(Color("Primary30"))
             Spacer()
             Image(systemName: "xmark.circle")
                 .renderingMode(.template)
@@ -138,7 +144,9 @@ struct SuggestionList: View {
             LazyVStack{
                 ForEach(places , id: \.self) { place in
                     HStack(){
-                        Text(place.name).font(.system(size: 16, weight: .medium)).foregroundColor(Color.gray)
+                        Text(place.name).font(.custom("CircularStd-Medium", size: 16))
+                            .fontWeight(.medium)
+                            .foregroundColor(Color("Primary30"))
                         Spacer()
                     }
                     .frame(width: .infinity, height: 48)

@@ -23,7 +23,10 @@ struct CustomTabView: View {
 
     @ViewBuilder
     private func navItem(item: BottomNavTabItem, props: Props) -> some View {
-        let isSelected = item.type == props.selectedNavBarTab
+        
+//        Impossible a defactoriser..
+        var isSelected = item.type == props.selectedNavBarTab || props.selectedNavBarTab == BottomNavTab.event && item.type == BottomNavTab.more
+        
 
         HStack(alignment: .bottom, spacing: 0) {
             Spacer()
@@ -73,7 +76,7 @@ extension CustomTabView {
         }
 
         struct Label {
-            static let color = Color("Tertiary")
+            static let color = Color("Tertiary70")
             static let accentColor = Color("Primary")
             static let font: Font = Font.system(size: 12).bold()
             static let paddingBottom: CGFloat = 1

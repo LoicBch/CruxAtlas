@@ -20,7 +20,7 @@ struct EventDetailsScreen: View {
         ScrollView{
             VStack{
                 ZStack{
-                    if (!event.photos.isEmpty){
+                    if (event.photos.count > 0){
                         ImageCarouselView(images: event.photos)
                     }
                     
@@ -31,8 +31,8 @@ struct EventDetailsScreen: View {
                 
                 HStack{
                     Text(event.name)
-                        .fontWeight(.black)
-                        .font(.system(size: 22))
+                        .fontWeight(.bold)
+                        .font(.custom("CircularStd-Medium", size: 22))
                         .foregroundColor(Color.black)
                         .padding(.top, 24)
                         .frame(alignment: .leading)
@@ -43,8 +43,8 @@ struct EventDetailsScreen: View {
                 HStack{
                     Text(event.descriptionEn)
                         .fontWeight(.medium)
-                        .font(.system(size: 14))
-                        .foregroundColor(Color("Tertiary"))
+                        .font(.custom("CircularStd-Medium", size: 14))
+                        .foregroundColor(Color("Neutral20"))
                         .padding(.top, 12)
                         .frame(alignment: .leading)
                     Spacer()
@@ -54,6 +54,8 @@ struct EventDetailsScreen: View {
                 
                 InfosList(event: event)
                  
+                Spacer()
+                
                 AppButton(action: {
                     
                     let coordinate = CLLocationCoordinate2DMake(event.latitude, event.longitude)
@@ -75,58 +77,63 @@ struct InfosList: View {
     
     var body: some View {
         HStack{
-            Image("events")
+            Image("events").renderingMode(.template).resizable().frame(width: 20, height: 20)
+                .foregroundColor(Color("Secondary"))
             Text("\(event.dateBegin) - \(event.dateEnd)")
                 .fontWeight(.medium)
-                .font(.system(size: 12))
+                .font(.custom("CircularStd-Medium", size: 12))
                 .foregroundColor(Color.black)
                 .padding(.leading, 14)
             Spacer()
-        }.padding(.top, 24)
+        }.padding(.vertical, 16)
         Divider()
         
         HStack{
-            Image("website")
+            Image("website_square").renderingMode(.template)
+                .foregroundColor(Color("Secondary"))
             Text(event.website)
                 .fontWeight(.medium)
-                .font(.system(size: 12))
+                .font(.custom("CircularStd-Medium", size: 12))
                 .foregroundColor(Color.black)
                 .padding(.leading, 14)
             Spacer()
-        }.padding(.top, 24)
+        }.padding(.vertical, 16)
         Divider()
         
         HStack{
-            Image("pin_here")
+            Image("pin_here_square").renderingMode(.template)
+                .foregroundColor(Color("Secondary"))
             Text(event.fullLocation)
                 .fontWeight(.medium)
-                .font(.system(size: 12))
+                .font(.custom("CircularStd-Medium", size: 12))
                 .foregroundColor(Color.black)
                 .padding(.leading, 14)
             Spacer()
-        }.padding(.top, 24)
+        }.padding(.vertical, 16)
         Divider()
         
         HStack{
-            Image("my_location")
+            Image("my_location_square").renderingMode(.template)
+                .foregroundColor(Color("Secondary"))
             Text(event.fullGeolocation())
                 .fontWeight(.medium)
-                .font(.system(size: 12))
+                .font(.custom("CircularStd-Medium", size: 12))
                 .foregroundColor(Color.black)
                 .padding(.leading, 14)
             Spacer()
-        }.padding(.top, 24)
+        }.padding(.vertical, 16)
         Divider()
         
         HStack{
-            Image("distance")
+            Image("distance_square").renderingMode(.template)
+                .foregroundColor(Color("Secondary"))
             Text("\(Location(latitude: event.latitude, longitude: event.longitude).distanceFromUserLocationText()) from you")
                 .fontWeight(.medium)
-                .font(.system(size: 12))
+                .font(.custom("CircularStd-Medium", size: 12))
                 .foregroundColor(Color.black)
                 .padding(.leading, 14)
             Spacer()
-        }.padding(.top, 24)
+        }.padding(.vertical, 16)
         Divider()
     }
 }

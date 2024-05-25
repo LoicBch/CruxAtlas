@@ -11,7 +11,6 @@ import shared
 import SwiftUI
 
 struct DealerFilterScreen: View {
-    
     @State var isSelectingOption = false
     @State var categorySelectedId = ""
     @StateObject var viewModel: DealerFilterViewModel = DealerFilterViewModel()
@@ -29,25 +28,30 @@ struct DealerFilterScreen: View {
                         },
                         onFilterOptionSelected: {viewModel.onFilterOptionSelected(filterName: $0)},
                         dealerFilterUsed: viewModel.dealerFiltersUsed,
-                        onSearchDelete: {viewModel.deleteFilter(filter: $0)}, onClose: onClose
+                        onSearchDelete: {viewModel.deleteFilter(filter: $0)}, onClose: { isSelectingOption = false }
                     )
                 }
             }else{
                 filtersCategories(
-                    categorySelectedId: $categorySelectedId, onChooseOptionsTap: { isSelectingOption = true },
+                    buttonLabel: $viewModel.unselectedButtonLabel, categorySelectedId: $viewModel.categorySelectedId, onChooseOptionsTap: { isSelectingOption = true },
                     onCategorySelected: { category in
                         viewModel.onFilterCategorySelected(category: category)
                     },
-                    dealerFiltersUsed: viewModel.dealerFiltersUsed,
+                    dealerFiltersUsed: $viewModel.dealerFiltersUsed,
                     onDealerOptionSelected: { viewModel.onFilterOptionSelected(filterName: $0) },
                     onFilterDelete: { viewModel.deleteFilter(filter: $0) },
                     onApplyFilter: {
                         onClose()
                         viewModel.applyFilter()
                     },
-                    filterDealerSelected: $viewModel.dealerFilterSelected
+                    isApplyEnable: true,
+                    filterDealerSelected: $viewModel.dealerFilterSelected, onCloseSheet: {
+                        onClose()
+                    }
                 ).onReceive(viewModel.$filterApplied){
-                    onFilterApplied($0)
+                    if ($0.filterId != "-1"){
+                        onFilterApplied($0)
+                    }
                 }
             }
     }
@@ -73,14 +77,27 @@ struct filtersOptions: View{
                 Spacer()
                 Text(getTitleLabel(for:categorySelected))
                 Spacer()
-            }.padding(.top, 12)
+                Image(systemName: "xmark").opacity(0)
+            }.padding(.top, 15)
             
             AppTextField(onTextChange: { input in
                 self.input = input
+            }, onBackPressed: {
+                onClose()
             }).padding(.top, 22)
             
             
             if (input.isEmpty){
+                HStack{
+                    Text("last_searched")
+                        .font(.custom("CircularStd-Medium", size: 14))
+                        .fontWeight(.medium)
+                        .foregroundColor(Color.black)
+                        .padding(.top, 20)
+                    Spacer()
+                }
+                Divider()
+
                 HistoricSearchList(filterSearchs: dealerFilterUsed, onSelectSearch: { filterName in
                     onFilterOptionSelected(filterName)
                 }, onDeleteSearch: { filter in
@@ -90,9 +107,9 @@ struct filtersOptions: View{
             
             HStack{
                 Text(getHistoricLabel(for:categorySelected))
-                    .fontWeight(.black)
-                    .font(.system(size: 14))
-                    .foregroundColor(Color.black)
+                    .fontWeight(.medium)
+                    .font(.custom("CircularStd-Medium", size: 16))
+                    .foregroundColor(Color("Primary30"))
                 Spacer()
             }.padding(.top, 35)
             Divider()
@@ -143,9 +160,9 @@ struct filtersOptions: View{
         print(category)
         switch category {
         case .service:
-            return "service"
+            return "Services"
         case .brand:
-            return "brand"
+            return "Motorhome brands"
         default:
             return ""
         }
@@ -177,8 +194,8 @@ struct ResultList: View {
             VStack{
                 ForEach(results, id: \.self){ result in
                     HStack(alignment: .center){
-                        Image(systemName: "magnifyingglass")
-                        Text(result)
+                        Image(systemName: "magnifyingglass").renderingMode(.template).foregroundColor(Color("Primary70"))
+                        Text(result).font(.custom("CircularStd-Medium", size: 16)).fontWeight(.medium).foregroundColor(Color("Primary30"))
                         Spacer()
                     }.frame(width: .infinity, height: 48).onTapGesture {
                         onItemClick(result)
@@ -201,17 +218,17 @@ struct FilterSelectionBox: View{
             HStack{
                 Text(buttonLabel)
                     .fontWeight(.medium)
-                    .font(.system(size: 16))
-                    .foregroundColor(Color("Tertiary"))
+                    .font(.custom("CircularStd-Medium", size: 16))
+                    .foregroundColor(Color("Tertiary30"))
                     .padding(.leading, 10)
                 Spacer()
-                Image(systemName: "arrow.up.and.down")
+                Image("interchange")
                     .padding(.trailing, 10)
             }
             .padding(.vertical, 15)
             .overlay(
                 RoundedRectangle(cornerRadius: 5)
-                    .stroke(Color("Tertiary"), lineWidth: 2)
+                    .strokeBorder(Color("Tertiary"), lineWidth: 2)
             ).onTapGesture {
                 onTap()
             }
@@ -244,15 +261,17 @@ func filterTypeToRadioButton(filter: Filter) -> String {
 
 struct filtersCategories: View{
     
-    @State var buttonLabel = ""
+    @Binding var buttonLabel: String
     @Binding var categorySelectedId: String
     var onChooseOptionsTap: ()->Void
     var onCategorySelected: (FilterType)->Void
-    var dealerFiltersUsed: [Filter]
+    @Binding var dealerFiltersUsed: [Filter]
     var onDealerOptionSelected: (String)->Void
     var onFilterDelete: (Filter)->Void
     var onApplyFilter: ()->Void
+    var isApplyEnable: Bool
     @Binding var filterDealerSelected: Filter
+    var onCloseSheet: ()->Void
      
     
     public var body: some View{
@@ -260,7 +279,7 @@ struct filtersCategories: View{
             ScrollView(.vertical, showsIndicators: false){
                 HStack{
                     Image(systemName: "xmark").onTapGesture {
-                        
+                        onCloseSheet()
                     }
                     Spacer()
                     Text("filters_title")
@@ -271,18 +290,18 @@ struct filtersCategories: View{
                 }.padding(.top, 12)
                 
                 HStack{
-                    Text("step_1")
+                    Text("STEP 1")
                         .fontWeight(.medium)
-                        .font(.system(size: 12))
-                        .foregroundColor(Color.gray)
+                        .font(.custom("CircularStd-Medium", size: 12))
+                        .foregroundColor(Color("Variant"))
                         .padding(.top, 60)
                     Spacer()
                 }
                 
                 HStack{
                     Text("filter_step1_title")
-                        .fontWeight(.black)
-                        .font(.system(size: 22))
+                        .fontWeight(.bold)
+                        .font(.custom("CircularStd-Medium", size: 22))
                         .foregroundColor(Color.black)
                     Spacer()
                 }.padding(.top, 8)
@@ -296,18 +315,18 @@ struct filtersCategories: View{
                 if(filterDealerSelected.category != FilterType.unselectedDealer){
                     
                     HStack{
-                        Text("step_2")
+                        Text("STEP 2")
                             .fontWeight(.medium)
-                            .font(.system(size: 12))
-                            .foregroundColor(Color.gray)
+                            .font(.custom("CircularStd-Medium", size: 12))
+                            .foregroundColor(Color("Variant"))
                             .padding(.top, 60)
                         Spacer()
                     }
                     
                     HStack{
                         Text("filter_step2_title")
-                            .fontWeight(.black)
-                            .font(.system(size: 22))
+                            .fontWeight(.bold)
+                            .font(.custom("CircularStd-Medium", size: 22))
                             .foregroundColor(Color.black)
                         Spacer()
                     }.padding(.top, 8)
@@ -322,6 +341,15 @@ struct filtersCategories: View{
                         FilterSelectionBox(buttonLabel: $buttonLabel, onTap: {
                             onChooseOptionsTap()
                         }).padding(.top, 15)
+                    }
+                    
+                    HStack{
+                        Text("last_searched")
+                            .font(.custom("CircularStd-Medium", size: 14))
+                            .fontWeight(.medium)
+                            .foregroundColor( Color("Variant"))
+                            .padding(.top, 20)
+                        Spacer()
                     }
                     
                     HistoricSearchList(filterSearchs: dealerFiltersUsed, onSelectSearch: { filterName in
@@ -344,20 +372,26 @@ struct filtersCategories: View{
             }
             .onChange(of: filterDealerSelected.category) { categorySelected in
                 if (filterDealerSelected.filterId != ""){
+                    print("FILTER: A")
                     buttonLabel = filterDealerSelected.filterName
                     categorySelectedId = filterTypeToRadioButton(filter: filterDealerSelected)
                 }else{
+                    print("FILTER: B")
                     switch(categorySelected){
                     case FilterType.service:
-                        buttonLabel = "services"
+                        buttonLabel = "Services"
                         categorySelectedId = "Repair, upgrade or buy motorhome"
                     case FilterType.brand:
-                        buttonLabel = "brands"
+                        buttonLabel = "Brands"
                         categorySelectedId = "Find official motorhome dealers"
                     default:
                         buttonLabel = ""
                         categorySelectedId = ""
                     }
+                }
+            }.onChange(of: filterDealerSelected.filterName){ filterName in
+                if (filterName != ""){
+                    buttonLabel = filterName
                 }
             }
         Spacer()

@@ -8,13 +8,13 @@ import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
 
-class CamperProApp : Application() {
+class LaundryFinderApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
         startKoin {
             androidLogger(level = Level.DEBUG)
-            androidContext(this@CamperProApp)
+            androidContext(this@LaundryFinderApp)
             modules(sharedModule() + platformModule())
         }
     }

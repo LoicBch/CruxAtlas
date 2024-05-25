@@ -157,7 +157,6 @@ fun getTextColor(
     currentBackStack: State<NavBackStackEntry?>
 ): Color {
     Log.d("BOTTOM", isEvent.value.toString())
-    // TODO: Tranquille.. a refacto
 
     return if (isEvent.value) {
         if (destination.direction.route == MenuScreenDestination.route && currentBackStack.value?.destination?.route == MainMapDestination.route) {
@@ -238,13 +237,13 @@ BottomBarDestination(
         label = R.string.appbar_around_location,
         contentDescription = R.string.cd_around_location
     ),
-    Partners(
-        direction = PartnersScreenDestination,
-        iconSelected = R.drawable.partners_selected,
-        iconUnselected = R.drawable.partners,
-        label = R.string.appbar_partners,
-        contentDescription = R.string.cd_partners
-    ),
+//    Partners(
+//        direction = AroundLocationScreenDestination,
+//        iconSelected = R.drawable.partners_selected,
+//        iconUnselected = R.drawable.partners,
+//        label = R.string.appbar_partners,
+//        contentDescription = R.string.cd_partners
+//    ),
     Menu(
         direction = MenuScreenDestination,
         iconSelected = R.drawable.menu_selected,

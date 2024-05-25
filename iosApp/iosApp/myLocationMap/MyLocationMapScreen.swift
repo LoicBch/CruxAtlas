@@ -24,8 +24,11 @@ struct MyLocationMapScreen: View {
                     presentationMode.wrappedValue.dismiss()
                 }.padding(.leading, 20)
                 Spacer()
-                Text("menu_my_location")
+                Text("menu_my_location").font(.custom("CircularStd-Medium", size: 16)).fontWeight(.medium).foregroundColor(Color.black)
                 Spacer()
+                Image(systemName: "arrow.left")
+                    .padding(.leading, 20)
+                    .opacity(0)
             }.padding(.top, 12)
             ZStack{
                 MyLocationMap(currentLocation: $viewModel.currentLocation, parkingLocation: $viewModel.parkingLocation,
@@ -75,24 +78,28 @@ struct popupConfirm: View {
     public var body: some View {
         VStack{
             HStack{
-                Image(systemName: "xmark").onTapGesture {
+                Image(systemName: "arrow.left").onTapGesture {
                     onExit()
                 }
                 Spacer()
-                Text("are_you_sure")
-                    .font(.system(size: 16))
+                Text("Are you sure")
+                    .font(.custom("CircularStd-Medium", size: 16))
+                    .fontWeight(.medium)
                     .foregroundColor(Color.black)
                 Spacer()
+                Image(systemName: "xmark").opacity(0)
             }
-            Text("delete_location_popup")
+            Text("delete_location_popup").font(.custom("CircularStd-Medium", size: 12)).fontWeight(.medium).foregroundColor(Color("Tertiary50"))
                 .padding(.top, 14)
             
             Button(action: {
                 onDelete()
             }){
                 Spacer()
+                Image(systemName:"trash").renderingMode(.template).foregroundColor(Color.white)
                 Text("delete")
-                    .font(.system(size: 16))
+                    .font(.custom("CircularStd-Medium", size: 14))
+                    .fontWeight(.medium)
                     .foregroundColor(Color.white)
                     .padding(.vertical, 16)
                 Spacer()
@@ -122,47 +129,49 @@ struct parkingMarkerBox: View {
             HStack{
                 Text("my_parking")
                     .fontWeight(.medium)
-                    .font(.system(size: 16))
-                    .foregroundColor(Color("Tertiary"))
+                    .font(.custom("CircularStd-Medium", size: 16))
+                    .foregroundColor(Color("Tertiary10"))
                 Spacer()
-                Image(systemName: "trash.fill").onTapGesture {
+                Image(systemName: "trash.fill").renderingMode(.template).foregroundColor(Color("Tertiary30"))
+                    .onTapGesture {
                     onDeleteParkingLocation()
-                }
-                Image("share").onTapGesture {
+                }.padding(.trailing, 10)
+                Image("share").renderingMode(.template).foregroundColor(Color("Tertiary30"))
+                    .onTapGesture {
                     share(shared: "\(parkingLocation.address)\n\n \(parkingLocation.gpsDeciTxt)\n\(parkingLocation.gpsDmsTxt)")
                 }
             }
             
             HStack{
-                Image("distance")
+                Image("distance").renderingMode(.template).foregroundColor(Color("Tertiary50"))
                 Text(Location(latitude: parkingLocation.lat, longitude: parkingLocation.lon).distanceFromUserLocationText())
                     .fontWeight(.medium)
-                    .font(.system(size: 12))
-                    .foregroundColor(Color("Tertiary"))
+                    .font(.custom("CircularStd-Medium", size: 12))
+                    .foregroundColor(Color("Tertiary50"))
                 Spacer()
             }.padding(.top, 10)
             
             HStack{
-                Image("pin_here")
+                Image("pin_here").renderingMode(.template).foregroundColor(Color("Tertiary50"))
                 Text(parkingLocation.address)
                     .fontWeight(.medium)
-                    .font(.system(size: 12))
-                    .foregroundColor(Color("Tertiary"))
+                    .font(.custom("CircularStd-Medium", size: 12))
+                    .foregroundColor(Color("Tertiary50"))
                 Spacer()
             }.padding(.top, 8)
             
             HStack{
-                Image("my_location")
+                Image("my_location").renderingMode(.template).foregroundColor(Color("Tertiary50"))
                 Text("\(parkingLocation.gpsDeciTxt) (lat, lng) \n \(parkingLocation.gpsDmsTxt) (lat, lng)")
                     .fontWeight(.medium)
-                    .font(.system(size: 12))
-                    .foregroundColor(Color("Tertiary"))
+                    .font(.custom("CircularStd-Medium", size: 12))
+                    .foregroundColor(Color("Tertiary50"))
                 Spacer()
             }.padding(.top, 8)
             
-            AppButton(action: {
+            AppIconButton(action: {
                 onNavigate()
-            }, title: "navigate", isEnable: true).padding(.top, 16)
+            }, title: "navigate", icon: "my_location", isEnable: true).padding(.top, 16)
         }
         .padding(12)
         .background(Color.white)
@@ -182,35 +191,36 @@ struct currentLocationMarkerBox: View {
             HStack{
                 Text("my_location")
                     .fontWeight(.medium)
-                    .font(.system(size: 16))
-                    .foregroundColor(Color("Tertiary"))
+                    .font(.custom("CircularStd-Medium", size: 16))
+                    .foregroundColor(Color("Tertiary10"))
                 Spacer()
-                Image("share").onTapGesture {
+                Image("share").renderingMode(.template).foregroundColor(Color("Tertiary30"))
+                    .onTapGesture {
                     share(shared: "\(currentPosInfos.address)\n\n \(currentPosInfos.gpsDeciTxt)\n\(currentPosInfos.gpsDmsTxt)" )
                 }
             }
             
             HStack{
-                Image("pin_here")
+                Image("pin_here").renderingMode(.template).foregroundColor(Color("Tertiary50"))
                 Text(currentPosInfos.address)
                     .fontWeight(.medium)
-                    .font(.system(size: 12))
-                    .foregroundColor(Color("Tertiary"))
+                    .font(.custom("CircularStd-Medium", size: 12))
+                    .foregroundColor(Color("Tertiary50"))
                 Spacer()
             }.padding(.top, 10)
             
             HStack{
-                Image("my_location")
+                Image("my_location").renderingMode(.template).foregroundColor(Color("Tertiary50"))
                 Text("\(currentPosInfos.gpsDeciTxt) (lat, lng) \n \(currentPosInfos.gpsDmsTxt) (lat, lng)")
                     .fontWeight(.medium)
-                    .font(.system(size: 12))
-                    .foregroundColor(Color("Tertiary"))
+                    .font(.custom("CircularStd-Medium", size: 12))
+                    .foregroundColor(Color("Tertiary50"))
                 Spacer()
             }.padding(.top, 8)
             
-            AppButton(action: {
+            AppIconButton(action: {
                 onParkHere()
-            }, title: "park_here", isEnable: true).padding(.top, 16)
+            }, title: "park_here", icon: "parking", isEnable: true).padding(.top, 16)
         }
         .padding(12)
         .background(Color.white)

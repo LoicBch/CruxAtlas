@@ -1,7 +1,7 @@
 
 //Around location
 "around_location_placeholder" = "Tap to start typing";
-"around_location_subtitle" = "Search for location: address";
+"around_location_subtitle" = "Search for location: address, city, region, country";
 "cd_magnifying_glass_icon" = "magnifying glass icon";
 
 //Filter
@@ -86,13 +86,14 @@
 "privacy_policy" = "Privacy policy";
 "build" = "Build";
 "version" = "App version";
-"technical_infos" = "Technical infos";
+"technical_infos" = "Technical info";
 "app_settings" = "App settings";
 "french" = "French";
 "english" = "English";
 "italian" = "Italian";
 "spanish" = "Spanish";
 "german" = "German";
+"dutch" = "Dutch";
 "meter" = "meter";
 "miles" = "miles";
 "serv" = "go back";
@@ -111,7 +112,7 @@
 "verified" = "Verified";
 "overview" = "Overview";
 "details" = "Details";
-"contact_info" = "Contacts info";
+"contact_info" = "Contact info";
 "phone" = "Phone";
 "website" = "Website";
 "from_you" = "from you";
@@ -135,3 +136,10 @@
 "park_here" = "Park here";
 "delete" = "Delete";
 "delete_location_popup" = "Do you want to permanently delete this saved location? The action cannot be undone.";
+
+//Help
+"need_help" = "Need help";
+"help_subtitle" = "Find out everything about Camper-Pro:";
+"faq_link" = "camper-pro.com/faq";
+"bug_report" = "Want to report a bug? Outdated information?";
+"bug_text" = "Send us an email and we’ll get back to you as soon as possible: contact@camper-pro.com";

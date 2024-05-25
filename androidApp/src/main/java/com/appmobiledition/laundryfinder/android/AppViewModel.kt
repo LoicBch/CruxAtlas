@@ -15,7 +15,6 @@ import com.appmobiledition.laundryfinder.domain.model.composition.Filter
 import com.appmobiledition.laundryfinder.domain.model.composition.UpdateSource
 import com.appmobiledition.laundryfinder.domain.model.composition.filterName
 import com.appmobiledition.laundryfinder.domain.model.composition.getIdFromFilterName
-import com.appmobiledition.laundryfinder.domain.usecases.*
 import com.appmobiledition.laundryfinder.managers.location.LocationManager
 import com.appmobiledition.laundryfinder.utils.*
 import kotlinx.coroutines.channels.Channel
@@ -25,14 +24,7 @@ import kotlinx.coroutines.launch
 // TODO: make a viewmodel specific to bottomSheetScreen and keep this viewModel for commons data
 // todo same for filters and search
 @OptIn(ExperimentalMaterialApi::class)
-class AppViewModel(
-    private val addSearchUsecase: AddSearch,
-    private val deleteSearchUsecase: DeleteSearch,
-    private val getAllSearchForACategory: GetAllSearchForACategory,
-    private val applyPlacesFilters: ApplyPlacesFilters,
-    private val deleteFilter: DeleteFilter,
-    private val getFiltersSaved: GetFiltersSaved,
-) : ViewModel() {
+class AppViewModel() : ViewModel() {
 
     val bottomSheetIsShowing = ModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden, isSkipHalfExpanded = true
@@ -97,9 +89,9 @@ class AppViewModel(
     }
 
     fun showGlobalSlider(state: GlobalSliderState) {
-        val newList = globalSlider.value.toMutableList()
-        newList.add(state)
-        _globalSlider.update { newList }
+//        val newList = globalSlider.value.toMutableList()
+//        newList.add(state)
+//        _globalSlider.update { newList }
     }
 
     fun onAroundMeClick() {
@@ -130,23 +122,23 @@ class AppViewModel(
 
     fun removeFilter(filter: Filter) {
 
-        when (filter.category) {
-            FilterType.COUNTRIES -> {
-                _filtersEventUsed.update {
-                    _filtersEventUsed.value.toMutableList().apply { remove(filter) }
-                }
-            }
-            FilterType.UNSELECTED_DEALER -> {}
-            FilterType.UNSELECTED_EVENT -> {}
-            else -> {
-                _filtersDealerUsed.update {
-                    _filtersDealerUsed.value.toMutableList().apply { remove(filter) }
-                }
-            }
-        }
+//        when (filter.category) {
+//            FilterType.COUNTRIES -> {
+//                _filtersEventUsed.update {
+//                    _filtersEventUsed.value.toMutableList().apply { remove(filter) }
+//                }
+//            }
+//            FilterType.UNSELECTED_DEALER -> {}
+//            FilterType.UNSELECTED_EVENT -> {}
+//            else -> {
+//                _filtersDealerUsed.update {
+//                    _filtersDealerUsed.value.toMutableList().apply { remove(filter) }
+//                }
+//            }
+//        }
 
         viewModelScope.launch {
-            deleteFilter(filter)
+//            deleteFilter(filter)
         }
     }
 
@@ -159,12 +151,12 @@ class AppViewModel(
         }
 
         viewModelScope.launch {
-            applyPlacesFilters(
-                Filter(
-                    _filterDealerSelected.value.category, _filterDealerSelected.value.filterId, true
-                )
-            )
-            filtersAppliedChannel.send(_filterEventSelected.value.category)
+//            applyPlacesFilters(
+//                Filter(
+//                    _filterDealerSelected.value.category, _filterDealerSelected.value.filterId, true
+//                )
+//            )
+//            filtersAppliedChannel.send(_filterEventSelected.value.category)
         }
     }
 
@@ -185,38 +177,38 @@ class AppViewModel(
         }
 
         viewModelScope.launch {
-            applyPlacesFilters(
-                Filter(
-                    _filterEventSelected.value.category, _filterEventSelected.value.filterId, true
-                )
-            )
+//            applyPlacesFilters(
+//                Filter(
+//                    _filterEventSelected.value.category, _filterEventSelected.value.filterId, true
+//                )
+//            )
             filtersAppliedChannel.send(FilterType.COUNTRIES)
         }
     }
 
     fun getFilter() {
         viewModelScope.launch {
-            when (val result = getFiltersSaved()) {
-                is ResultWrapper.Failure -> {
-
-                }
-                is ResultWrapper.Success -> {
-                    val dealerFilters =
-                        result.value!!.filter { it.category != FilterType.COUNTRIES }
-                    val eventFilters = result.value!!.filter { it.category == FilterType.COUNTRIES }
-
-                    if (dealerFilters.any { it.isSelected }) {
-                        _filterDealerSelected.update { result.value!!.first { it.isSelected } }
-                    }
-
-                    if (eventFilters.any { it.isSelected }) {
-                        _filterEventSelected.update { result.value!!.first { it.isSelected } }
-                    }
-
-                    _filtersDealerUsed.update { dealerFilters.filter { !it.isSelected } }
-                    _filtersEventUsed.update { eventFilters.filter { !it.isSelected } }
-                }
-            }
+//            when (val result = getFiltersSaved()) {
+//                is ResultWrapper.Failure -> {
+//
+//                }
+//                is ResultWrapper.Success -> {
+//                    val dealerFilters =
+//                        result.value!!.filter { it.category != FilterType.COUNTRIES }
+//                    val eventFilters = result.value!!.filter { it.category == FilterType.COUNTRIES }
+//
+//                    if (dealerFilters.any { it.isSelected }) {
+//                        _filterDealerSelected.update { result.value!!.first { it.isSelected } }
+//                    }
+//
+//                    if (eventFilters.any { it.isSelected }) {
+//                        _filterEventSelected.update { result.value!!.first { it.isSelected } }
+//                    }
+//
+//                    _filtersDealerUsed.update { dealerFilters.filter { !it.isSelected } }
+//                    _filtersEventUsed.update { eventFilters.filter { !it.isSelected } }
+//                }
+//            }
         }
     }
 
@@ -240,22 +232,22 @@ class AppViewModel(
 
     fun addSearch(search: Search) {
         viewModelScope.launch {
-            addSearchUsecase(search)
+//            addSearchUsecase(search)
         }
     }
 
     fun deleteSearch(search: Search) {
         viewModelScope.launch {
-            deleteSearchUsecase(search)
+//            deleteSearchUsecase(search)
         }
     }
 
     fun getSearchesOfCategory(searchCategory: String) {
         viewModelScope.launch {
-            when (val res = getAllSearchForACategory(searchCategory)) {
-                is ResultWrapper.Failure -> TODO()
-                is ResultWrapper.Success -> historicSearches.update { res.value!!.toMutableList() }
-            }
+//            when (val res = getAllSearchForACategory(searchCategory)) {
+//                is ResultWrapper.Failure -> TODO()
+//                is ResultWrapper.Success -> historicSearches.update { res.value!!.toMutableList() }
+//            }
         }
     }
 

@@ -46,6 +46,7 @@ public class MapUiScrollView: UIScrollView {
  
         backgroundColor = .clear
         contentView.backgroundColor = .clear
+//        contentView.backgroundColor = .red
         addSubview(contentView)
         contentView.sizeToFit()
         contentView.translatesAutoresizingMaskIntoConstraints = false

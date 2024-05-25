@@ -4,9 +4,11 @@ import com.appmobiledition.laundryfinder.data.datasources.local.dao.FilterDao
 import com.appmobiledition.laundryfinder.data.model.dto.FilterDto
 import com.appmobiledition.laundryfinder.database.CamperproDatabase
 import com.appmobiledition.laundryfinder.utils.FilterType
+
 import toDto
 
 class FilterDaoDelight(db: CamperproDatabase) : FilterDao {
+
 
     private val queries = db.filterEntityQueries
 

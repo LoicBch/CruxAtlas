@@ -1,5 +1,6 @@
 package com.appmobiledition.laundryfinder.utils
 
+import com.appmobiledition.laundryfinder.data.model.dto.LaundryDto
 import com.appmobiledition.laundryfinder.domain.model.Event
 import com.appmobiledition.laundryfinder.domain.model.Dealer
 import kotlin.math.floor
@@ -16,6 +17,14 @@ fun Double.toDMS(): String {
 
 
 //Faire un objet location et mettre cette extension sur location
+//val LaundryDto.fullLocation get() = "$ville, $code_postal"
+val LaundryDto.fullLocation get() = "test"
+val LaundryDto.fullGeolocalisation
+    get() = "$latitude, $longitude (lat, lng)\nN ${
+        latitude!!.toDouble()
+            .toDMS()
+    }, E ${longitude!!.toDouble().toDMS()}"
+
 val Dealer.fullLocation get() = "$address, $city, $postalCode"
 val Dealer.fullGeolocalisation
     get() =
