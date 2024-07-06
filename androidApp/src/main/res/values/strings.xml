@@ -8,7 +8,7 @@
 
     <!--  Filter -->
     <string name="unity_viewer">Open 3D Viewer</string>
-    <string name="app_name">Climbing</string>
+    <string name="app_name">ClimbingApp</string>
     <string name="filters_title">Filter</string>
     <string name="search_details_subtitle">Search details</string>
     <string name="choose_motorhome_brand">Choose motorhome brand</string>

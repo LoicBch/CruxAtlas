@@ -4,7 +4,7 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.appmobiledition.laundryfinder.android",
+  "applicationId": "com.horionDev.laundryfinder.android",
   "variantName": "release",
   "elements": [
     {

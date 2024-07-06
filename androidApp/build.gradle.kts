@@ -21,10 +21,10 @@ ksp {
 }
 
 android {
-    namespace = "com.appmobiledition.laundryfinder.android"
+    namespace = "com.horionDev.climbingapp.android"
     compileSdk = 33
     defaultConfig {
-        applicationId = "com.appmobiledition.camperpro.android"
+        applicationId = "com.horionDev.climbingapp.android"
         minSdk = 24
         targetSdk = 33
         versionCode = 5

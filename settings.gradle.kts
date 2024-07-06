@@ -13,6 +13,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Camperpro"
+rootProject.name = "ClimbingApp"
 include(":androidApp")
 include(":shared")

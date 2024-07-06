@@ -92,14 +92,14 @@ kotlin {
 
 
 sqldelight {
-    database("CamperproDatabase") {
-        packageName = "com.appmobiledition.laundryfinder.database"
+    database("Database") {
+        packageName = "com.horionDev.climbingapp.database"
         sourceFolders = listOf("sqldelight")
     }
 }
 
 android {
-    namespace = "com.appmobiledition.laundryfinder"
+    namespace = "com.horionDev.climbingapp"
     compileSdk = 33
     defaultConfig {
         minSdk = 24
