@@ -11,6 +11,9 @@ import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.result.ActivityResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
 
 val Context.hasLocationPermission
     get() = ContextCompat.checkSelfPermission(
@@ -69,4 +72,16 @@ fun Context.share(
     }
     val shareIntent = Intent.createChooser(sendIntent, null)
     shareContent.launch(shareIntent)
+}
+
+fun Context.createImageFile(): File {
+    // Create an image file name
+    val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+    val imageFileName = "JPEG_" + timeStamp + "_"
+    val image = File.createTempFile(
+        imageFileName, /* prefix */
+        ".jpg", /* suffix */
+        externalCacheDir      /* directory */
+    )
+    return image
 }

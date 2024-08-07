@@ -12,11 +12,13 @@ import com.horionDev.climbingapp.domain.model.Dealer
 import com.horionDev.climbingapp.domain.model.Event
 import com.horionDev.climbingapp.domain.model.Place
 import com.horionDev.climbingapp.domain.model.composition.Location
-import com.horionDev.climbingapp.domain.model.composition.Marker
+import com.horionDev.climbingapp.domain.model.composition.AppMarker
 import com.horionDev.climbingapp.domain.model.composition.UpdateSource
 import com.horionDev.climbingapp.utils.SortOption
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.horionDev.climbingapp.domain.model.entities.Crag
+import com.horionDev.climbingapp.domain.model.entities.ceuse
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import toMarker
@@ -35,9 +37,9 @@ class MainMapViewModel(
 
     private var previousSelectedMarkerIndex = 0
 
-    private var markers = mutableStateListOf<Marker>()
+    private var markers = mutableStateListOf<AppMarker>()
     private val _markers = MutableStateFlow(markers)
-    val markersFlow: StateFlow<List<Marker>> get() = _markers
+    val markersFlow: StateFlow<List<AppMarker>> get() = _markers
 
     fun selectMarker(index: Int) {
         markers[previousSelectedMarkerIndex] =
@@ -59,7 +61,7 @@ class MainMapViewModel(
 
     val events = savedStateHandle.getStateFlow("events", emptyList<Event>())
     val dealers = savedStateHandle.getStateFlow("dealers", emptyList<Dealer>())
-    val laundry = savedStateHandle.getStateFlow("laundry", emptyList<LaundryDto>())
+    val laundry = savedStateHandle.getStateFlow("laundry", emptyList<Crag>())
 
     val eventsSorted = savedStateHandle.getStateFlow("eventsSorted", emptyList<Event>())
     val dealersSorted = savedStateHandle.getStateFlow("dealersSorted", emptyList<LaundryDto>())
@@ -68,29 +70,15 @@ class MainMapViewModel(
     val event = _event.asSharedFlow()
 
     private val climbingRoutesFrance = listOf(
-        LaundryDto(0.toString(), "Climbing spot 0", "Address 0", "Phone 0", "Email 0", "Website 0", "Paris", "75000", "FR", "user_id", "created_at", "Website 0",  48.8566.toString(), 2.3522.toString()),
-        LaundryDto(1.toString(), "Climbing spot 1", "Address 1", "Phone 1", "Email 1", "Website 1", "Berlin", "10117", "DE", "user_id", "created_at", "Website 1", 52.5200.toString(), 13.4050.toString()),
-        LaundryDto(2.toString(), "Climbing spot 2", "Address 2", "Phone 2", "Email 2", "Website 2", "Stuttgart", "70173", "DE", "user_id", "created_at", "Website 2", 49.4170.toString(), 8.6830.toString()),
-        LaundryDto(3.toString(), "Climbing spot 3", "Address 3", "Phone 3", "Email 3", "Website 3", "Dresden", "01067", "DE", "user_id", "created_at", "Website 3", 51.0500.toString(), 13.7330.toString()),
-        LaundryDto(4.toString(), "Climbing spot 4", "Address 4", "Phone 4", "Email 4", "Website 4", "Frankfurt", "60311", "DE", "user_id", "created_at", "Website 4", 50.1100.toString(), 8.6800.toString()),
-        LaundryDto(5.toString(), "Climbing spot 5", "Address 5", "Phone 5", "Email 5", "Website 5", "Leipzig", "04103", "DE", "user_id", "created_at", "Website 5", 51.3400.toString(), 12.3700.toString()),
-        LaundryDto(6.toString(), "Climbing spot 6", "Address 6", "Phone 6", "Email 6", "Website 6", "Munich", "80331", "DE", "user_id", "created_at", "Website 6", 48.7800.toString(), 9.1900.toString()),
-        LaundryDto(7.toString(), "Climbing spot 7", "Address 7", "Phone 7", "Email 7", "Website 7", "Hamburg", "20095", "DE", "user_id", "created_at", "Website 7", 53.5500.toString(), 10.0000.toString()),
-        LaundryDto(8.toString(), "Climbing spot 8", "Address 8", "Phone 8", "Email 8", "Website 8", "Cologne", "50667", "DE", "user_id", "created_at", "Website 8", 50.9350.toString(), 6.9600.toString()),
-        LaundryDto(9.toString(), "Climbing spot 9", "Address 9", "Phone 9", "Email 9", "Website 9", "Nuremberg", "90402", "DE", "user_id", "created_at", "Website 9", 51.5000.toString(), 7.4670.toString()),
-        LaundryDto(10.toString(), "Climbing spot 10", "Address 10", "Phone 10", "Email 10", "Website 10", "Dusseldorf", "40210", "DE", "user_id", "created_at", "Website 10",  48.1370.toString(), 11.5760.toString()),
-        LaundryDto(11.toString(), "Climbing spot 11", "Address 11", "Phone 11", "Email 11", "Website 11", "Bremen", "28195", "DE", "user_id", "created_at", "Website 11",  52.2290.toString(), 21.0120.toString()),
-        LaundryDto(12.toString(), "Climbing spot 12", "Address 12", "Phone 12", "Email 12", "Website 12", "Hannover", "30159", "DE", "user_id", "created_at", "Website 12", 54.7340.toString(), 9.4420.toString()),
-        LaundryDto(13.toString(), "Climbing spot 13", "Address 13", "Phone 13", "Email 13", "Website 13", "Dortmund", "44135", "DE", "user_id", "created_at", "Website 13",  49.8950.toString(), 10.9220.toString()),
-        LaundryDto(14.toString(), "Climbing spot 14", "Address 14", "Phone 14", "Email 14", "Website 14", "Essen", "45127", "DE", "user_id", "created_at", "Website 14", 50.7750.toString(), 7.1950.toString()))
-
+        ceuse, ceuse
+    )
     init {
         savedStateHandle["updateSource"] = UpdateSource.AROUND_ME
         markers.clear()
         markers.addAll(climbingRoutesFrance.toMarker().toList())
         savedStateHandle["laundry"] = climbingRoutesFrance.toList()
         savedStateHandle["dealersSorted"] = climbingRoutesFrance.toList()
-//        showLaundry(Location(0.0, 0.0))
+//        showLaundry(Location(0.0, 0.0))231
     }
 
     val state = combine(
@@ -116,7 +104,7 @@ class MainMapViewModel(
         savedStateHandle["verticalListIsShowing"] = !verticalListIsShowing.value
     }
 
-    private fun updateMapRegion(markers: List<Marker>) {
+    private fun updateMapRegion(markers: List<AppMarker>) {
         var minLat = 90.0
         var maxLat = -90.0
         var minLon = 180.0

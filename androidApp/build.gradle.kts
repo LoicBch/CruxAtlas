@@ -22,11 +22,11 @@ ksp {
 
 android {
     namespace = "com.horionDev.climbingapp.android"
-    compileSdk = 33
+    compileSdk = 34
     defaultConfig {
         applicationId = "com.horionDev.climbingapp.android"
         minSdk = 24
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 5
         versionName = "0.2"
     }
@@ -52,45 +52,27 @@ dependencies {
     implementation(project(":shared"))
     implementation(files("libs/launcher-debug.aar"))
     implementation(files("libs/unityLibrary-debug.aar"))
-
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1")
+    implementation("androidx.compose.ui:ui:1.3.1")
+    implementation("androidx.compose.ui:ui-tooling:1.3.1")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.3.1")
+    implementation("androidx.compose.foundation:foundation:1.3.1")
+    implementation("androidx.compose.material:material:1.3.1")
+    implementation("androidx.activity:activity-compose:1.6.1")
+    implementation("androidx.compose.runtime:runtime:1.6.8")
+    implementation("io.github.raamcosta.compose-destinations:animations-core:1.7.27-beta")
+    implementation("com.google.accompanist:accompanist-pager:0.28.0")
+    implementation("com.airbnb.android:lottie-compose:5.2.0")
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("com.github.skydoves:landscapist-glide:2.1.0")
+    implementation("com.google.android.gms:play-services-maps:18.1.0")
+    implementation("com.google.maps.android:maps-compose:2.5.3")
+    implementation("io.insert-koin:koin-core:3.2.2")
+    implementation("io.insert-koin:koin-android:3.3.0")
+    implementation("io.insert-koin:koin-androidx-compose:3.3.0")
+    ksp("io.github.raamcosta.compose-destinations:ksp:1.7.27-beta")
     implementation("com.google.android.gms:play-services-location:21.0.1")
-
-    //Dependency injection
-    with(Deps.Koin) {
-        implementation(core)
-        implementation(android)
-        implementation(compose)
-    }
-
-
     implementation("androidx.startup:startup-runtime:1.1.1")
-
-    //Google maps
-    with(Deps.Maps) {
-        implementation(compose)
-        implementation(playService)
-    }
-
-    //Animation
-    implementation(Deps.Lottie.compose)
-
-    //Persistence
-    implementation(Deps.preferences)
-
-    //Compose
-    with(Deps.Compose) {
-        implementation(viewmodel)
-        implementation(core)
-        implementation(uiTooling)
-        implementation(uiToolingPreview)
-        implementation(foundation)
-        implementation(material)
-        implementation(activity)
-        implementation(navigationObjectArgs)
-        implementation(accompanist)
-        ksp(navigationObjectArgsKsp)
-    }
-
-    //Image
-    implementation(Deps.landscapist)
+    implementation("com.himanshoe:charty:2.0.0-alpha01")
+//    implementation("com.patrykandpatrick.vico:compose:2.0.0-alpha.22")
 }

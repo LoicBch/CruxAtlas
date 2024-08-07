@@ -41,7 +41,7 @@ class SplashScreenViewModel(
     }
 
     private fun setDeviceConstants() {
-        Globals.geoLoc.appLanguage = "FR"
+        Globals.GeoLoc.appLanguage = "FR"
 //        Globals.geoLoc.deviceLanguage = languageManager.getDeviceLanguage()
 //        Globals.geoLoc.deviceCountry = languageManager.getDeviceCountry()
     }

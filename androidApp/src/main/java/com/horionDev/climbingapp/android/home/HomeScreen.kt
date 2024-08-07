@@ -27,8 +27,6 @@ import com.horionDev.climbingapp.utils.*
 import com.ramcosta.composedestinations.DestinationsNavHost
 import kotlinx.coroutines.flow.*
 
-// TODO: dep injection for locationcClient and NetworkClient / disposableEffect not optimize
-
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreen(navController: NavHostController = rememberNavController()) {
@@ -47,15 +45,15 @@ fun HomeScreen(navController: NavHostController = rememberNavController()) {
             appViewModel.removeGpsMissingNotification()
             val lat = it.coordinates.latitude
             val long = it.coordinates.longitude
-            Globals.geoLoc.lastKnownLocation = Location(lat, long)
+            Globals.GeoLoc.lastKnownLocation = Location(lat, long)
 
             if (!appViewModel.locationIsObserved.value) {
                 appViewModel.onLocationObserveStarted()
             }
         }.onLocationUnavailable(this) {
             if (!appViewModel.locationIsObserved.value) {
-                Globals.geoLoc.lastKnownLocation = Constants.DEFAULT_LOCATION
-                Globals.geoLoc.lastSearchedLocation = Constants.DEFAULT_LOCATION
+                Globals.GeoLoc.lastKnownLocation = Constants.DEFAULT_LOCATION
+                Globals.GeoLoc.lastSearchedLocation = Constants.DEFAULT_LOCATION
                 appViewModel.onLocationObserveStarted()
             }
             appViewModel.showGlobalSlider(GlobalSliderState.GPS_MISSING)

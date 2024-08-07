@@ -240,14 +240,14 @@ BottomBarDestination(
         direction = NewsFeedScreenDestination,
         iconSelected = R.drawable.home_selected,
         iconUnselected = R.drawable.home,
-        label = R.string.appbar_around_me,
+        label = R.string.appbar_home,
         contentDescription = R.string.cd_around_me
     ),
     Explore(
         direction = MainMapDestination,
         iconSelected = R.drawable.explore_selected,
         iconUnselected = R.drawable.explore,
-        label = R.string.appbar_around_location,
+        label = R.string.appbar_explore,
         contentDescription = R.string.cd_around_location
     ),
 

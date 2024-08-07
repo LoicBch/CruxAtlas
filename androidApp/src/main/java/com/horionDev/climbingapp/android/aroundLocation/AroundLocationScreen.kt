@@ -86,7 +86,7 @@ fun AroundLocationScreen(
             )
 
             Text(
-                text = stringResource(id = R.string.appbar_around_location),
+                text = stringResource(id = R.string.search),
                 fontWeight = FontWeight.W700,
                 fontSize = 22.sp,
                 modifier = Modifier
@@ -97,7 +97,7 @@ fun AroundLocationScreen(
 
         Text(
             modifier = Modifier.padding(top = 16.dp),
-            text = stringResource(id = R.string.around_location_subtitle),
+            text = stringResource(id = R.string.around_location_subtitlee),
             fontFamily = FontFamily(Font(R.font.circularstdmedium)),
             fontWeight = FontWeight(450),
             fontSize = 12.sp,

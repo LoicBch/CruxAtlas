@@ -15,9 +15,9 @@ import io.ktor.http.*
 import toPlaces
 
 fun URLBuilder.addAppContext() {
-    parameters.append("ctx_country", Globals.geoLoc.deviceCountry)
-    parameters.append("ctx_language", Globals.geoLoc.deviceLanguage)
-    parameters.append("ctx_app_language", Globals.geoLoc.appLanguage)
+    parameters.append("ctx_country", Globals.GeoLoc.deviceCountry)
+    parameters.append("ctx_language", Globals.GeoLoc.deviceLanguage)
+    parameters.append("ctx_app_language", Globals.GeoLoc.appLanguage)
 }
 
 class CamperProApi(private var client: HttpClient) : Api {

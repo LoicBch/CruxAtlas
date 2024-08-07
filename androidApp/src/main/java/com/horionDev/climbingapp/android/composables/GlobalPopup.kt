@@ -52,6 +52,7 @@ fun GlobalPopup(modifier: Modifier, state: GlobalPopupState, onExit: () -> Unit)
                         GlobalPopupState.NETWORK_MISSING -> stringResource(id = R.string.popup_missing_network_title)
                         GlobalPopupState.GPS_MISSING -> stringResource(id = R.string.popup_missing_gps_title)
                         GlobalPopupState.HID -> ""
+                        GlobalPopupState.CUSTOM -> stringResource(id = R.string.popup_missing_gps_title)
                     },
                     fontWeight = FontWeight.W700, fontFamily = FontFamily(Font(R.font.circularstdmedium)),
                     fontSize = 22.sp,
@@ -70,6 +71,8 @@ fun GlobalPopup(modifier: Modifier, state: GlobalPopupState, onExit: () -> Unit)
                     GlobalPopupState.NETWORK_MISSING -> stringResource(id = R.string.popup_missing_network_text)
                     GlobalPopupState.GPS_MISSING -> stringResource(id = R.string.popup_missing_gps_text)
                     GlobalPopupState.HID -> ""
+                    GlobalPopupState.CUSTOM -> stringResource(id = R.string.popup_missing_gps_title)
+
                 },
                 modifier = Modifier.padding(top = 5.dp, bottom = 20.dp),
                 fontWeight = FontWeight(450), fontFamily = FontFamily(Font(R.font.circularstdmedium)),
@@ -81,6 +84,6 @@ fun GlobalPopup(modifier: Modifier, state: GlobalPopupState, onExit: () -> Unit)
     }
 }
 
-enum class GlobalPopupState {
-    HID, NETWORK_MISSING, GPS_MISSING
+enum class GlobalPopupState(var title: String? = null, var content: String? = null) {
+    HID, NETWORK_MISSING, GPS_MISSING, CUSTOM("title", "content");
 }

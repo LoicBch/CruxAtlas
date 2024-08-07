@@ -28,28 +28,19 @@ kotlin {
         val commonMain by getting {
             dependencies {
 
-                //Local
-                implementation(Deps.SqlDelight.runtime)
+                // Ktor
+                implementation("io.ktor:ktor-client-core:2.1.3")
+                implementation("io.ktor:ktor-client-cio:2.0.0")
+                implementation("io.ktor:ktor-client-content-negotiation:2.1.3")
+                implementation("io.ktor:ktor-client-serialization:2.0.0")
+                implementation("io.ktor:ktor-client-logging:2.1.3")
+                implementation("io.ktor:ktor-serialization-kotlinx-json:2.1.3")
 
-                //Dependency injection
-                implementation(Deps.Koin.core)
 
-                //Networking
-                with(Deps.Ktor) {
-                    implementation(core)
-                    implementation(clientCio)
-                    implementation(contentNegociation)
-                    implementation(serializationCore)
-                    implementation(serializationJson)
-                    implementation(logging)
-                }
-
-                //                Logging
-                implementation(Deps.napier)
-
-                //Parsing
-                implementation(Deps.Kotlinx.serializationJson)
-
+                // SqlDelight
+                implementation("com.squareup.sqldelight:runtime:1.5.4")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
+                implementation("io.insert-koin:koin-core:3.2.2")
                 implementation("com.google.android.gms:play-services-location:21.0.1")
             }
         }
@@ -60,7 +51,7 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                implementation(Deps.SqlDelight.androidDriver)
+                implementation("com.squareup.sqldelight:android-driver:1.5.4")
             }
         }
         val androidTest by getting
@@ -69,9 +60,8 @@ kotlin {
         val iosSimulatorArm64Main by getting
         val iosMain by creating {
             dependencies {
-                implementation(Deps.SqlDelight.nativeDriver)
-                implementation(Deps.Ktor.darwin)
-                implementation(Deps.landscapist)
+                implementation("io.ktor:ktor-client-darwin:2.1.3")
+                implementation("com.squareup.sqldelight:native-driver:1.5.4")
             }
             dependsOn(commonMain)
             iosX64Main.dependsOn(this)
@@ -100,10 +90,10 @@ sqldelight {
 
 android {
     namespace = "com.horionDev.climbingapp"
-    compileSdk = 33
+    compileSdk = 34
     defaultConfig {
         minSdk = 24
-        targetSdk = 33
+        targetSdk = 34
     }
 }
 

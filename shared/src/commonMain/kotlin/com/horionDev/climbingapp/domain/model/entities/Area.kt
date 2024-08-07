@@ -7,4 +7,5 @@ data class Area (
     val name : String,
     val description : String,
     val boundingBox : BoundingBox,
+    val crags: List<Crag>
 )

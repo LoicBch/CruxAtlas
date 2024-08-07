@@ -7,7 +7,7 @@ import kotlinx.coroutines.Job
 // TODO: replace by class with dependecy injection if this get to messy, (spoiler : it will)
 
 object Globals {
-    object geoLoc {
+    object GeoLoc {
         var lastKnownLocation: Location = Constants.DEFAULT_LOCATION
         var lastSearchedLocation: Location = Constants.DEFAULT_LOCATION
         var RADIUS_AROUND_LIMIT = 100

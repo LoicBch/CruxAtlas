@@ -27,7 +27,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.horionDev.climbingapp.android.LocalDependencyContainer
+import com.horionDev.climbingapp.android.addSpot.AddSpotLocationScreen
 import com.horionDev.climbingapp.android.composables.Dropdown
+import com.horionDev.climbingapp.android.destinations.AddSpotLocationScreenDestination
+import com.horionDev.climbingapp.android.destinations.AddSpotTypeScreenDestination
+//import com.horionDev.climbingapp.android.destinations.AddSpotLocationDestination
 import com.horionDev.climbingapp.android.destinations.SettingsMenuDestination
 import com.horionDev.climbingapp.android.ui.theme.AppColor
 import com.horionDev.climbingapp.android.ui.theme.Dimensions
@@ -61,11 +65,22 @@ fun MenuScreen(
 //            R.string.menu_travel_checklists, {
 //
 //            }, R.drawable.checklist, R.string.cd_travel_checklist, true
-//        ), MenuItem(
-//            R.string.menu_my_location, {
-//
-//            }, R.drawable.my_location, R.string.cd_my_location, true
 //        ),
+        MenuItem(
+            R.string.add_location, {
+                navigator.navigate(AddSpotTypeScreenDestination())
+            }, R.drawable.my_location, R.string.cd_my_location, false
+        ),
+//        MenuItem(
+//            R.string.menu_account, {
+//                navigator.navigate(LoginScreenDestination)
+//            }, R.drawable.user, R.string.cd_my_location, false
+//        ),
+        MenuItem(
+            R.string.menu_account, {
+
+            }, R.drawable.download, R.string.dowloaded, false
+        ),
         MenuItem(
             R.string.menu_app_settings, {
                 navigator.navigate(SettingsMenuDestination)

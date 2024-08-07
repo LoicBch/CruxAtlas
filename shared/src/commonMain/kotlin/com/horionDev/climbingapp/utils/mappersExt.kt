@@ -6,7 +6,8 @@ import com.horionDev.climbingapp.domain.model.*
 import com.horionDev.climbingapp.domain.model.composition.Filter
 import com.horionDev.climbingapp.domain.model.composition.Location
 import com.horionDev.climbingapp.domain.model.composition.LocationInfos
-import com.horionDev.climbingapp.domain.model.composition.Marker
+import com.horionDev.climbingapp.domain.model.composition.AppMarker
+import com.horionDev.climbingapp.domain.model.entities.Crag
 import com.horionDev.climbingapp.utils.Constants
 import com.horionDev.climbingapp.utils.FilterType
 import com.horionDev.climbingapp.utils.toBool
@@ -79,23 +80,24 @@ fun PartnerDto.toVo() = Partner(
 @JvmName("toPartnerList")
 fun List<PartnerDto>.toVo() = this.map { it.toVo() }
 
-fun Event.toMarker() = Marker(this.id, false, this.latitude, this.longitude)
+fun Event.toMarker() = AppMarker(this.id, false, this.latitude, this.longitude)
 
 @JvmName("listEventsToMListMarker")
 fun List<Event>.toMarker() = map { it.toMarker() }
-fun Dealer.toMarker() = Marker(this.id, false, this.latitude, this.longitude)
+fun Dealer.toMarker() = AppMarker(this.id, false, this.latitude, this.longitude)
 
 @JvmName("listDealersToMListMarker")
 fun List<Dealer>.toMarker() = map { it.toMarker() }
 
 @JvmName("listLaundryToMListMarker")
-fun LaundryDto.toMarker() = Marker(id!!, false, this.latitude!!.toDouble(), this.longitude!!.toDouble())
+fun LaundryDto.toMarker() = AppMarker(id!!, false, this.latitude!!.toDouble(), this.longitude!!.toDouble())
 fun List<LaundryDto>.toMarker() = map { it.toMarker() }
 
 @JvmName("listClimbingToListMarker")
-fun Laundry.toMarker() = Marker(id.toString(), false, this.latitude, this.longitude)
+fun Crag.toMarker() = AppMarker(id.toString(), false, this.latitude, this.longitude)
 @JvmName("listClimbingToListMark")
-fun List<Laundry>.toMarker() = map { it.toMarker() }
+fun List<Crag>.toMarker() = map { it.toMarker() }
+
 
 @JvmName("toEventsVo")
 fun List<EventDto>.toVo() = map { it.toVo() }

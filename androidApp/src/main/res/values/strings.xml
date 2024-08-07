@@ -4,11 +4,18 @@
     <!--  Around location -->
     <string name="around_location_placeholder">Tap to start typing</string>
     <string name="around_location_subtitle">"Search for location: address</string>
+    <string name="around_location_subtitlee">"Search for city, crag, routes …</string>
     <string name="cd_magnifying_glass_icon">magnifying glass icon</string>
 
-    <!--  Filter -->
+    <!--  To Add -->
     <string name="unity_viewer">Open 3D Viewer</string>
     <string name="app_name">ClimbingApp</string>
+    <string name="general">General</string>
+    <string name="approach">Approach</string>
+    <string name="topos">Topos</string>
+    <string name="favorite">Favorite</string>
+    <string name="view_in_3D">View in 3D</string>
+
     <string name="filters_title">Filter</string>
     <string name="search_details_subtitle">Search details</string>
     <string name="choose_motorhome_brand">Choose motorhome brand</string>
@@ -50,8 +57,10 @@
     <string name="get_offer">Get time-limited offer!</string>
 
     <!--  MainMap Screen -->
-    <string name="appbar_around_me">Around me</string>
-    <string name="appbar_around_location">Around a place</string>
+    <string name="appbar_home">Home</string>
+    <string name="appbar_explore">Explore</string>
+    <string name="search">Search places</string>
+    <string name="appbar_around_location">Around location</string>
     <string name="appbar_partners">Partners</string>
     <string name="appbar_menu">More</string>
     <string name="search_this_area">Search this area</string>
@@ -147,5 +156,24 @@
     <string name="bug_report">Want to report a bug? Outdated information?</string>
     <string name="bug_text">Send us an email and we’ll get back to you as soon as possible:
     contact@camper-pro.com</string>
+    <string name="login">Sign in</string>
+    <string name="explore">Start exploring</string>
+    <string name="menu_account">Downloaded assets</string>
+    <string name="add_location">Add a spot</string>
+    <string name="password">password</string>
+    <string name="username">username</string>
+    <string name="dowloaded">Downloaded 3D Assets</string>
+    <string name="email">Email</string>
+    <string name="sectorMissing">A sector is missing ? Help community by adding it</string>
+    <string name="addSector">Add sector</string>
+    <string name="addRoute">Add route</string>
+    <string name="routeMissing">A route is missing ? help the community by adding it</string>
+    <string name="help_add_data">add data</string>
+    <string name="no_seasons">This crag has no information about seasons</string>
+    <string name="no_infos">This place has no informations</string>
+    <string name="remove">remove</string>
+    <string name="add_photo_from_camera">Add from camera</string>
+    <string name="add_photo_from_gallery">add from gallery</string>
+    <string name="finish_spot_creation_photo">finish</string>
 
 </resources>
