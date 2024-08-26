@@ -63,7 +63,7 @@ fun SettingsMenu(navigator: DestinationsNavigator) {
                            Pair(stringResource(id = R.string.language)) {
                                languagePopupIsShown.value = true
                            },
-                           Pair(stringResource(id = R.string.help)) {  },
+                           Pair(stringResource(id = R.string.help)) { },
                            Pair(stringResource(id = R.string.term_of_use)) {
 
                            },

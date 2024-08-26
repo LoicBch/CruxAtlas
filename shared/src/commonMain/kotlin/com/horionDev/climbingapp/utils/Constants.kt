@@ -14,6 +14,12 @@ object Constants {
         const val GEOCODING = "geocoding.php"
     }
 
+    object Preferences {
+        const val USER_ID = "user_id"
+        const val SESSION_TOKEN = "session_token"
+        const val intNotSavedInPreferences = -1
+    }
+
     object PreferencesKey {
         const val LAST_SETUP_TIMESTAMP = "LAST_SETUP_TIMESTAMP"
         const val METRIC = "METRIC"
@@ -31,7 +37,7 @@ object Constants {
     const val GPS_UPDATE_INTERVAL = 10000L
     const val SUGGESTION_START_LENGTH = 3
     const val WEBSERVICE_VERSION = "v4"
-    const val BASE_URL = "https://camper-pro.com/services/$WEBSERVICE_VERSION/"
+    const val BASE_URL = "http://192.168.1.115:8080/"
     const val A_PROPOS_URL = "https://www.camper-pro.com/apropos"
     const val HELP_URL = "https://camper-pro.com/404"
     const val PRIVACY_POLICY_URL = "https://www.camper-pro.com/cgv"

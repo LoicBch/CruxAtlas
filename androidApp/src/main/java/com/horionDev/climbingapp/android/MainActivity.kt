@@ -33,7 +33,7 @@ val LocalDependencyContainer = compositionLocalOf<AppDependencyContainer> {
 
 @Composable
 fun MyApplicationTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit
+    darkTheme: Boolean = false, content: @Composable () -> Unit
 ) {
     val colors = if (darkTheme) {
         darkColors(

@@ -7,7 +7,12 @@ import com.horionDev.climbingapp.domain.model.composition.Filter
 import com.horionDev.climbingapp.domain.model.composition.Location
 import com.horionDev.climbingapp.domain.model.composition.LocationInfos
 import com.horionDev.climbingapp.domain.model.composition.AppMarker
+import com.horionDev.climbingapp.domain.model.entities.Area
 import com.horionDev.climbingapp.domain.model.entities.Crag
+import com.horionDev.climbingapp.domain.model.entities.Route
+import com.horionDev.climbingapp.domain.model.entities.RouteGrade
+import com.horionDev.climbingapp.domain.model.entities.Sector
+import com.horionDev.climbingapp.domain.model.entities.User
 import com.horionDev.climbingapp.utils.Constants
 import com.horionDev.climbingapp.utils.FilterType
 import com.horionDev.climbingapp.utils.toBool
@@ -16,6 +21,59 @@ import database.LocationSearchEntity
 import database.SearchEntity
 import kotlin.jvm.JvmName
 
+@JvmName(name = "userDtoListToVo")
+fun List<UserDto>.toVo() = map { it.toVo() }
+fun UserDto.toVo() = User(
+    id,
+    username,
+    password,
+    email,
+    "U",
+    isSubscribe
+)
+
+@JvmName(name = "cragDtoListToVo")
+fun List<CragDto>.toVo() = map { it.toVo() }
+fun CragDto.toVo() = Crag(
+    id,
+    name,
+    description,
+    areaId,
+    emptyList(),
+    latitude,
+    longitude,
+    thumbnailImageUrl
+)
+
+@JvmName(name = "sectorDtoListToVo")
+fun List<SectorDto>.toVo() = map { it.toVo() }
+fun SectorDto.toVo() = Sector(
+    id,
+    name,
+    description = "",
+    cragId
+)
+
+@JvmName(name = "areaDtoListToVo")
+fun List<AreaDto>.toVo() = map { it.toVo() }
+fun AreaDto.toVo() = Area(
+    id,
+    name
+)
+
+@JvmName(name = "routeDtoListToVo")
+fun List<RouteDto>.toVo() = map { it.toVo() }
+fun RouteDto.toVo() = Route(
+    id,
+    name,
+    description = "",
+    RouteGrade.valueOf(grade),
+    cragId.toString(),
+    sectorId.toString()
+)
+
+
+//----------------------------------------------------------
 //Data to domain layer
 fun DealerDto.toVo() = Dealer(
     id,

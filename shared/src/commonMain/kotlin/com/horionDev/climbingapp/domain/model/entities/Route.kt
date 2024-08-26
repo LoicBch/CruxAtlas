@@ -11,6 +11,7 @@ data class Route(
     val description: String = "",
     val grade: RouteGrade,
     val area: String = "",
+    val sector: String = "",
     val image: String = ""
 ): CommonParcelable
 

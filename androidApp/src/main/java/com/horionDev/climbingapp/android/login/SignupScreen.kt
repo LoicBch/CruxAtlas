@@ -7,10 +7,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
@@ -29,25 +27,25 @@ import org.koin.androidx.compose.getViewModel
 
 @Destination
 @Composable
-//viewModel: SignupViewModel = getViewModel()
-fun SignupScreen(navigator: DestinationsNavigator) {
 
-//    val signupIsValid by viewModel.signupIsValid.collectAsState()
-//    val signupIsComplete by viewModel.signupIsComplete.collectAsState()
+fun SignupScreen(navigator: DestinationsNavigator, viewModel: SignupViewModel = getViewModel()) {
 
-//    if (signupIsComplete) {
-//        Popup(onDismissRequest = {
-//            navigator.popBackStack()
-//        }) {
-//            Text(text = "test")
-//        }
-//    }
+    val signupIsValid by viewModel.signupIsValid.collectAsState()
+    val signupIsComplete by viewModel.signupIsComplete.collectAsState()
 
-//    LaunchedEffect(key1 = signupIsComplete) {
-//        if (signupIsComplete) {
-//            navigator.popBackStack()
-//        }
-//    }
+    if (signupIsComplete) {
+        Popup(onDismissRequest = {
+            navigator.popBackStack()
+        }) {
+            Text(text = "test")
+        }
+    }
+
+    LaunchedEffect(key1 = signupIsComplete) {
+        if (signupIsComplete) {
+            navigator.popBackStack()
+        }
+    }
 
     Box(Modifier.fillMaxSize()) {
         Row(modifier = Modifier.fillMaxSize()) {
@@ -69,13 +67,13 @@ fun SignupScreen(navigator: DestinationsNavigator) {
             TextFieldAnimate(
                 modifier = Modifier.padding(top = 40.dp), placeHolder = R.string.username
             ) {
-//                viewModel.controlUsername(it.text)
+                viewModel.controlUsername(it.text)
             }
 
             TextFieldAnimate(
                 modifier = Modifier.padding(top = 15.dp), placeHolder = R.string.email
             ) {
-//                viewModel.controlMail(it.text)
+                viewModel.controlMail(it.text)
             }
 
             TextFieldAnimate(
@@ -83,19 +81,15 @@ fun SignupScreen(navigator: DestinationsNavigator) {
                 placeHolder = R.string.password,
                 asteriskVisible = true
             ) {
-//                viewModel.controlPass(it.text)
+                viewModel.controlPass(it.text)
             }
 
             Button(
                 modifier = Modifier.padding(top = 40.dp),
                 onClick = {
-//                    viewModel.signup()
-                          },
-//                enabled = signupIsValid,
-                enabled = true,
-                colors = ButtonDefaults.buttonColors(
-//                    containerColor = if (signupIsValid) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.tertiary
-                )
+                    viewModel.signup()
+                },
+                enabled = signupIsValid
             ) {
                 Text(text = "Signup !")
             }

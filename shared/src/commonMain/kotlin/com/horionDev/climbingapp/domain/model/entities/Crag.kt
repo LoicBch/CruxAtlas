@@ -14,11 +14,11 @@ data class Crag(
     val sectors: List<Sector> = emptyList(),
     val latitude: Double = 44.51,
     val longitude: Double = 5.93,
-    val boundingBox: BoundingBox = BoundingBox(0.0, 0.0, 0.0, 0.0),
     val image: String = "",
     val orientation: String? = "South",
     val altitude: String? = "2016m",
-    val approachLenght: String? = "30min"
+    val approachLenght: String? = "30min",
+    val boundingBox: BoundingBox = BoundingBox(0.0, 0.0, 0.0, 0.0),
 ) : CommonParcelable
 
 val demiLuneRoutes = listOf(

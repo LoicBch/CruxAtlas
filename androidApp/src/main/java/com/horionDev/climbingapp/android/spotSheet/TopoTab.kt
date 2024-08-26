@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.horionDev.climbingapp.android.R
@@ -156,9 +157,11 @@ fun SectorRow(sector: Sector, onSectorClick: (Sector) -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = sector.name)
-        Text(text = "${RouteGrade.values()[sector.routes.minOf { it.grade.ordinal }].displayValue} to ${RouteGrade.values()[sector.routes.maxOf { it.grade.ordinal }].displayValue}")
-        Text(text = sector.routes.size.toString())
+        Text(modifier = Modifier.weight(4.5f), text = sector.name)
+        Text(modifier = Modifier.weight(2f), text = "${RouteGrade.values()[sector.routes.minOf {
+            it.grade.ordinal }].displayValue} to ${RouteGrade.values()[sector.routes.maxOf { it.grade.ordinal }].displayValue}")
+        Text(modifier = Modifier.weight(2.5f), text = sector.routes.size.toString(), textAlign =
+        TextAlign.End)
     }
     Divider()
 }

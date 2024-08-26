@@ -1,5 +1,6 @@
 package com.horionDev.climbingapp.android.mainmap
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -19,20 +20,14 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.horionDev.climbingapp.domain.model.entities.Crag
 import com.horionDev.climbingapp.domain.model.entities.ceuse
+import com.horionDev.climbingapp.domain.repositories.CragRepository
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import toMarker
 
-// pour reduir la taille des bundles on peut garder les lieux query dans une list et utiliser des list d'id pour les autre list dont on a besoin comme la vertical list ou les autres
-
 class MainMapViewModel(
     private val savedStateHandle: SavedStateHandle,
-    //    private val fetchDealersAtLocationUseCase: FetchDealersAtLocationUseCase,
-    //    private val fetchEvents: FetchEvents,
-    //    private val fetchAds: FetchAds,
-    //    private val sortDealer: SortDealer,
-    //    private val sortEvents: SortEvents
-    private val api: Api
+    private val crags: CragRepository
 ) : ViewModel() {
 
     private var previousSelectedMarkerIndex = 0
@@ -63,7 +58,6 @@ class MainMapViewModel(
     val dealers = savedStateHandle.getStateFlow("dealers", emptyList<Dealer>())
     val laundry = savedStateHandle.getStateFlow("laundry", emptyList<Crag>())
 
-    val eventsSorted = savedStateHandle.getStateFlow("eventsSorted", emptyList<Event>())
     val dealersSorted = savedStateHandle.getStateFlow("dealersSorted", emptyList<LaundryDto>())
 
     private val _event = MutableSharedFlow<MainMapEvent>()
@@ -72,13 +66,13 @@ class MainMapViewModel(
     private val climbingRoutesFrance = listOf(
         ceuse, ceuse
     )
+
     init {
         savedStateHandle["updateSource"] = UpdateSource.AROUND_ME
         markers.clear()
         markers.addAll(climbingRoutesFrance.toMarker().toList())
         savedStateHandle["laundry"] = climbingRoutesFrance.toList()
         savedStateHandle["dealersSorted"] = climbingRoutesFrance.toList()
-//        showLaundry(Location(0.0, 0.0))231
     }
 
     val state = combine(
@@ -127,136 +121,28 @@ class MainMapViewModel(
         }
     }
 
-    fun showLaundry(location: Location) {
-        viewModelScope.launch {
-            savedStateHandle["loading"] = true
-            when (val laundries = api.getLaudry(location.latitude, location.longitude)) {
-                is ResultWrapper.Failure.HttpError -> {}
-                ResultWrapper.Failure.NetworkError -> {
-                }
 
-                is ResultWrapper.Failure -> {
-
-                }
-
-                is ResultWrapper.Success -> {
-                    savedStateHandle["updateSource"] = UpdateSource.AROUND_ME
-                    markers.clear()
-                    markers.addAll(laundries.value!!.toMarker().toList())
-                    savedStateHandle["laundry"] = laundries.value!!.toList()
-                    savedStateHandle["dealersSorted"] = laundries.value!!.toList()
-                    savedStateHandle["placeSearched"] = ""
-                    savedStateHandle["loading"] = false
-                }
-            }
-        }
-    }
-
-    fun showSpots(location: Location, seeAllMarkers: Boolean = false) {
+    fun showCrags(location: Location, seeAllMarkers: Boolean = false) {
         savedStateHandle["loading"] = true
         viewModelScope.launch {
-            //            when (val call = fetchDealersAtLocationUseCase(location)) {
-            //                is ResultWrapper.Failure -> {
-            //                    savedStateHandle["loading"] = false
-            //                }
-            //                is ResultWrapper.Success -> {
-            //                    Log.d("BOTTOM", "showSpots: ")
-            //                    val spots = call.value
-            //                    savedStateHandle["updateSource"] = UpdateSource.AROUND_ME
-            //                    markers.clear()
-            //                    markers.addAll(spots!!.toMarker().toList())
-            //                    savedStateHandle["dealers"] = spots.toList()
-            //                    savedStateHandle["dealersSorted"] = spots.toList()
-            //                    savedStateHandle["placeSearched"] = ""
-            //                    if (seeAllMarkers) {
-            //                        updateMapRegion(markers)
-            //                    }
-            //                    savedStateHandle["loading"] = false
-            //                }
-            //        }
-        }
-    }
-
-    fun showEvents(seeAllMarkers: Boolean = false) {
-        savedStateHandle["loading"] = true
-        viewModelScope.launch {
-            //            when (val call = fetchEvents()) {
-            //                is ResultWrapper.Failure -> {
-            //                    savedStateHandle["loading"] = false
-            //                }
-            //                is ResultWrapper.Success -> {
-            //
-            //                    savedStateHandle["updateSource"] = UpdateSource.EVENTS
-            //                    markers.clear()
-            //                    markers.addAll(call.value!!.toMarker().toList())
-            //                    savedStateHandle["events"] = call.value
-            //                    savedStateHandle["eventsSorted"] = call.value
-            //                    savedStateHandle["loading"] = false
-            //                }
-            //            }
-        }
-    }
-
-    fun showSpotsAroundPlace(place: Place) {
-        savedStateHandle["loading"] = true
-        viewModelScope.launch {
-            when (val laundries =
-                api.getLaudry(place.location.latitude, place.location.longitude)) {
+            when (val call = crags.getCragsAroundPosition(location.latitude, location.longitude)) {
                 is ResultWrapper.Failure -> {
                     savedStateHandle["loading"] = false
                 }
 
                 is ResultWrapper.Success -> {
+                    Log.d("BOTTOM", "showSpots: ")
+                    val spots = call.value
                     savedStateHandle["updateSource"] = UpdateSource.AROUND_ME
                     markers.clear()
-                    markers.addAll(laundries.value!!.toMarker().toList())
-                    savedStateHandle["laundry"] = laundries.value!!.toList()
-                    savedStateHandle["dealersSorted"] = laundries.value!!.toList()
+                    markers.addAll(spots!!.toMarker().toList())
+                    savedStateHandle["dealers"] = spots.toList()
                     savedStateHandle["placeSearched"] = ""
+                    if (seeAllMarkers) {
+                        updateMapRegion(markers)
+                    }
                     savedStateHandle["loading"] = false
                 }
-            }
-        }
-    }
-
-    fun getAds() {
-        savedStateHandle["loading"] = true
-        viewModelScope.launch {
-            //            when (val call = fetchAds()) {
-            //                is ResultWrapper.Failure -> {
-            //                    savedStateHandle["loading"] = false
-            //                }
-            //                is ResultWrapper.Success -> {
-            //                    savedStateHandle["loading"] = false
-            //                    savedStateHandle["ads"] = call.value
-            //                }
-            //            }
-        }
-    }
-
-    fun onSortingOptionSelected(sortOption: SortOption) {
-
-        viewModelScope.launch {
-            if (updateSource.value == UpdateSource.EVENTS) {
-                //                when (val res = sortEvents(sortOption, events.value)) {
-                //                    is ResultWrapper.Failure -> {
-                //                        savedStateHandle["loading"] = false
-                //                    }
-                //                    is ResultWrapper.Success -> {
-                //                        savedStateHandle["eventsSorted"] = res.value
-                //                        savedStateHandle["loading"] = false
-                //                    }
-                //                }
-            } else {
-                //                when (val res = sortDealer(sortOption, dealers.value)) {
-                //                    is ResultWrapper.Failure -> {
-                //                        savedStateHandle["loading"] = false
-                //                    }
-                //                    is ResultWrapper.Success -> {
-                //                        savedStateHandle["dealersSorted"] = res.value
-                //                        savedStateHandle["loading"] = false
-                //                    }
-                //                }
             }
         }
     }

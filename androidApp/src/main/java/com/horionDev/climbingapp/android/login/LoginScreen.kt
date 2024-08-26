@@ -12,12 +12,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -33,45 +36,46 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.horionDev.climbingapp.android.LocalDependencyContainer
 import com.horionDev.climbingapp.android.R
 import com.horionDev.climbingapp.android.destinations.SignupScreenDestination
 import com.horionDev.climbingapp.android.ui.theme.AppColor
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import org.koin.androidx.compose.getViewModel
 
 @Destination
 @Composable
 fun LoginScreen(
     navigator: DestinationsNavigator,
-    //    viewModel: LoginScreenViewModel = getViewModel()
+    viewModel: LoginScreenViewModel = getViewModel()
 ) {
-    //    val loginIsValid by viewModel.loginValid.collectAsState()
-    //    val loginIsComplete by viewModel.loginIsComplete.collectAsState()
-    //    val loginFailed by viewModel.loginFailed.collectAsState()
-    //    val appViewModel = LocalDependencyContainer.current.appViewModel
+    val loginIsValid by viewModel.loginValid.collectAsState()
+    val loginIsComplete by viewModel.loginIsComplete.collectAsState()
+    val loginFailed by viewModel.loginFailed.collectAsState()
+    val appViewModel = LocalDependencyContainer.current.appViewModel
     val uriHandler = LocalUriHandler.current
 
 
-    //    LaunchedEffect(loginIsComplete) {
-    //        if (loginIsComplete) {
-    //            appViewModel.updateLoginState(true)
-    //            navigator.popBackStack()
-    //        }
-    //    }
+    LaunchedEffect(loginIsComplete) {
+        if (loginIsComplete) {
+            navigator.popBackStack()
+        }
+    }
 
-    //    LaunchedEffect(true) {
-    //        viewModel.event.collect {
-    //            when (it) {
-    //                LoginScreenViewModel.LoginScreenEvent.HideLoading -> appViewModel.onLoadingChange(
-    //                    false
-    //                )
-    //
-    //                LoginScreenViewModel.LoginScreenEvent.ShowLoading -> appViewModel.onLoadingChange(
-    //                    true
-    //                )
-    //            }
-    //        }
-    //    }
+    LaunchedEffect(true) {
+        viewModel.event.collect {
+            when (it) {
+                LoginScreenViewModel.LoginScreenEvent.HideLoading -> appViewModel.onLoadingChange(
+                    false
+                )
+
+                LoginScreenViewModel.LoginScreenEvent.ShowLoading -> appViewModel.onLoadingChange(
+                    true
+                )
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -94,7 +98,7 @@ fun LoginScreen(
         TextFieldAnimate(
             modifier = Modifier.padding(top = 40.dp), placeHolder = R.string.username
         ) {
-            //            viewModel.controlUsername(it.text)
+            viewModel.controlUsername(it.text)
         }
 
         TextFieldAnimate(
@@ -102,27 +106,22 @@ fun LoginScreen(
             asteriskVisible = true,
             placeHolder = R.string.password
         ) {
-            //            viewModel.controlPass(it.text)
+            viewModel.controlPass(it.text)
         }
 
-
-        //        if (loginFailed) {
-        //            Text(
-        //                modifier = Modifier.padding(vertical = 5.dp),
-        //                text = "Username or password incorrect", color = MaterialTheme.colorScheme.error,
-        //                style = MaterialTheme.typography.labelLarge
-        //            )
-        //        }
+        if (loginFailed) {
+            Text(
+                modifier = Modifier.padding(vertical = 5.dp),
+                text = "Username or password incorrect", color = AppColor.Primary30
+            )
+        }
 
         Button(
             modifier = Modifier.padding(top = 40.dp),
             onClick = {
-                //                viewModel.login()
+                viewModel.login()
             },
-            //            enabled = loginIsValid,
-            colors = ButtonDefaults.buttonColors(
-                //                containerColor = if (loginIsValid) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.tertiary
-            )
+            enabled = loginIsValid
         ) {
             Text(text = "Login")
         }
@@ -153,7 +152,7 @@ fun TextFieldAnimate(
     }
 
     LaunchedEffect(true) {
-        if (initialContent != null ) {
+        if (initialContent != null) {
             textState.value = TextFieldValue(initialContent)
         }
     }
@@ -163,29 +162,29 @@ fun TextFieldAnimate(
             boxIsFocused.value = it.isFocused
         }
         .fillMaxWidth(),
-                      visualTransformation = if (asteriskVisible) PasswordVisualTransformation() else VisualTransformation.None,
-                      maxLines = 1,
-                      trailingIcon = {
-                          if (textState.value.text.isNotEmpty()) {
-                              Icon(
-                                  modifier = Modifier.clickable {
-                                      textState.value = TextFieldValue("")
-                                  },
-                                  imageVector = Icons.Outlined.Close,
-                                  contentDescription = "",
-                                  tint = AppColor.Primary30
-                              )
-                          }
-                      },
-                      placeholder = {
-                          Text(
-                              text = stringResource(placeHolder)
-                          )
-                      },
-                      value = textState.value,
-                      onValueChange = { textFieldValue ->
-                          textState.value = textFieldValue
-                          onUserSearch(textFieldValue)
-                      }
+        visualTransformation = if (asteriskVisible) PasswordVisualTransformation() else VisualTransformation.None,
+        maxLines = 1,
+        trailingIcon = {
+            if (textState.value.text.isNotEmpty()) {
+                Icon(
+                    modifier = Modifier.clickable {
+                        textState.value = TextFieldValue("")
+                    },
+                    imageVector = Icons.Outlined.Close,
+                    contentDescription = "",
+                    tint = AppColor.Primary30
+                )
+            }
+        },
+        placeholder = {
+            Text(
+                text = stringResource(placeHolder)
+            )
+        },
+        value = textState.value,
+        onValueChange = { textFieldValue ->
+            textState.value = textFieldValue
+            onUserSearch(textFieldValue)
+        }
     )
 }

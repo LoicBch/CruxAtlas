@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.horionDev.climbingapp.android.R
 import com.horionDev.climbingapp.android.composables.AppButton
+import com.horionDev.climbingapp.android.destinations.AddSpotPhotoScreenDestination
 import com.horionDev.climbingapp.android.login.TextFieldAnimate
 import com.horionDev.climbingapp.domain.model.entities.Crag
 import com.ramcosta.composedestinations.annotation.Destination

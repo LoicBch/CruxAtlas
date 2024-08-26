@@ -11,10 +11,11 @@ import io.ktor.utils.io.errors.*
 import kotlinx.serialization.SerializationException
 
 sealed class ResultWrapper<out T, out E> {
-    data class Success<T>(val value: T?, val comment: String? = null) : ResultWrapper<T, Nothing>()
+    data class Success<T>(val value: T, val comment: String? = null) : ResultWrapper<T, Nothing>()
     sealed class Failure<E> : ResultWrapper<Nothing, E>() {
         data class HttpError<E>(val code: Int, val errorBody: E?) : Failure<E>()
         data class SerializationError(val message: ErrorMessage) : Failure<Nothing>()
+        data class UnknownError(val message: String) : Failure<Nothing>()
         object NetworkError : Failure<Nothing>()
     }
 }
@@ -107,12 +108,14 @@ fun ResultWrapper.Failure<*>.message() = when (this) {
     is ResultWrapper.Failure.HttpError<*> -> if (this.errorBody is ErrorMessage) this.errorBody.message else "An http error occurred"
     is ResultWrapper.Failure.SerializationError -> "a serialization error occurred"
     is ResultWrapper.Failure.NetworkError -> "a network error occurred"
+    is ResultWrapper.Failure.UnknownError -> TODO()
 }
 
 fun ResultWrapper.Failure<*>.code() = when (this) {
     is ResultWrapper.Failure.HttpError<*> -> this.code
     is ResultWrapper.Failure.SerializationError -> 0
     is ResultWrapper.Failure.NetworkError -> 0
+    is ResultWrapper.Failure.UnknownError -> TODO()
 }
 
 fun <T, E, U> ResultWrapper<T, E>.map(
