@@ -26,6 +26,7 @@ import com.horionDev.climbingapp.managers.location.LocationManager
 import com.horionDev.climbingapp.utils.*
 import com.ramcosta.composedestinations.DestinationsNavHost
 import kotlinx.coroutines.flow.*
+import org.koin.androidx.compose.getViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -60,7 +61,6 @@ fun HomeScreen(navController: NavHostController = rememberNavController()) {
         }.startLocationUpdating()
         appViewModel.onLocationObserveStarted()
 
-        // TODO: Use Network Manager for  that
         NetworkConnectivityObserver(context).observe().onEach {
             Globals.network.status = it
 

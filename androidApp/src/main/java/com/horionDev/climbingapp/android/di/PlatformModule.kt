@@ -4,7 +4,13 @@ import com.horionDev.climbingapp.android.AppViewModel
 import com.horionDev.climbingapp.android.aroundLocation.AroundLocationViewModel
 import com.horionDev.climbingapp.android.mainmap.MainMapViewModel
 import com.horionDev.climbingapp.android.onBoarding.SplashScreenViewModel
+import com.horionDev.climbingapp.android.newsFeed.NewsFeedViewModel
+import com.horionDev.climbingapp.android.login.LoginScreenViewModel
+import com.horionDev.climbingapp.android.login.SignupViewModel
+import com.horionDev.climbingapp.utils.KMMPreference
 import org.koin.androidx.viewmodel.dsl.viewModelOf
+import org.koin.core.context.GlobalContext.get
+import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 
@@ -15,13 +21,19 @@ val viewModelModule = module {
     viewModelOf(::MainMapViewModel)
     viewModelOf(::SplashScreenViewModel)
     viewModelOf(::AroundLocationViewModel)
+    viewModelOf(::NewsFeedViewModel)
+    viewModelOf(::LoginScreenViewModel)
+    viewModelOf(::SignupViewModel)
 }
 
 val persistenceModule = module {
-//    singleOf<Database> {
-//        Database(DatabaseDriverFactory(get().get()).createDriver())
-//    }
-//    singleOf<SearchDao> { SearchDaoDelight(get().get()) }
-//    singleOf<LocationSearchDao> { LocationSearchDaoDelight(get().get()) }
-//    singleOf<FilterDao> { FilterDaoDelight(get().get()) }
+
+    singleOf<KMMPreference> {
+        KMMPreference(get().get())
+    }
+
+//    singleOf<ProductManager> ({
+//        ProductManager(get().get())
+//    })
+
 }

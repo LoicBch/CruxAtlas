@@ -175,5 +175,6 @@
     <string name="add_photo_from_camera">Add from camera</string>
     <string name="add_photo_from_gallery">add from gallery</string>
     <string name="finish_spot_creation_photo">finish</string>
+    <string name="valid">validate</string>
 
 </resources>

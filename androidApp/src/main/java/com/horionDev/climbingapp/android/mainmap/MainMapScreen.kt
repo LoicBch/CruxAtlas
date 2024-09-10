@@ -284,7 +284,10 @@ fun MainMap(
 
         if (state.verticalListIsShowing) {
             VerticalDealersList(dealersSortedFlow = viewModel.dealersSorted,
-                                { viewModel.onSortingOptionSelected(it) }) {
+                                {
+//                                    viewModel.onSortingOptionSelected(it)
+                                })
+            {
                 //                    navigator.navigate(
                 //                        LaundryDetailScreenDestination(
                 //                            it

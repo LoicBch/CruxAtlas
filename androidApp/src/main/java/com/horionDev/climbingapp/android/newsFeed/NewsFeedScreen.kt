@@ -5,6 +5,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,10 +24,14 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -38,21 +43,22 @@ import com.horionDev.climbingapp.android.UnityParentActivity
 import com.horionDev.climbingapp.android.composables.AppButton
 import com.horionDev.climbingapp.android.composables.ImageAppButton
 import com.horionDev.climbingapp.android.destinations.LoginScreenDestination
+import com.horionDev.climbingapp.domain.model.NewsItem
 import com.horionDev.climbingapp.domain.model.entities.RouteGrade
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.glide.GlideImage
+import org.koin.androidx.compose.getViewModel
 
 @Destination
 @Composable
-fun NewsFeedScreen(navigator: DestinationsNavigator) {
-    val news = remember {
-        listOf(
-            NewsItem("Sign in", "Description 2", "https://example.com/image2.jpg"),
-            NewsItem("Welcome..", "Description 2", "https://example.com/image2.jpg"),
-            NewsItem("Latest 3D Walls Added", "Description 1", "https://example.com/image1.jpg"),
-            NewsItem("Another list", "Description 3", "https://example.com/image3.jpg")
-        )
-    }
+fun NewsFeedScreen(
+    navigator: DestinationsNavigator,
+    viewModel: NewsFeedViewModel = getViewModel()
+) {
+
+    val news by viewModel.news.collectAsState()
 
     val walls = remember {
         listOf(
@@ -68,7 +74,11 @@ fun NewsFeedScreen(navigator: DestinationsNavigator) {
             .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
-        Row(modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp)) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp)
+        ) {
             Spacer(modifier = Modifier.weight(1f))
             Text(
                 text = "Climbing App",
@@ -78,14 +88,13 @@ fun NewsFeedScreen(navigator: DestinationsNavigator) {
             Spacer(modifier = Modifier.weight(1f))
         }
         LoginCard(navigator)
-        ExploreCard()
-        WallsItemCard(walls)
-        //        AnotherListCard(walls)
 
-        //        news.forEach { newsItem ->
-        //            NewsItemCard(newsItem)
-        //            Spacer(modifier = Modifier.height(16.dp))
-        //        }
+//        ExploreCard()
+//        WallsItemCard(walls)
+        news.forEach { newsItem ->
+            NewsItemCard(newsItem)
+            Spacer(modifier = Modifier.height(16.dp))
+        }
     }
 }
 
@@ -99,6 +108,13 @@ fun NewsItemCard(newsItem: NewsItem) {
         elevation = 4.dp
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+            GlideImage(modifier = Modifier
+                .fillMaxWidth()
+                .height(80.dp),
+                imageModel = { newsItem.imageUrl }, imageOptions = ImageOptions(
+                contentScale = ContentScale.FillBounds, alignment = Alignment.Center
+            )
+            )
             Text(
                 text = newsItem.title,
                 style = MaterialTheme.typography.h6,
@@ -293,9 +309,3 @@ fun AnotherListCard(walls: List<Pair<String, String>>) {
         }
     }
 }
-
-data class NewsItem(
-    val title: String,
-    val description: String,
-    val imageUrl: String
-)

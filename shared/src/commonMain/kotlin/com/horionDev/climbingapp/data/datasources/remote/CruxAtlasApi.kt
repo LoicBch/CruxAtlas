@@ -3,7 +3,9 @@ package com.horionDev.climbingapp.data.datasources.remote
 import com.horionDev.climbingapp.data.ResultWrapper
 import com.horionDev.climbingapp.data.map
 import com.horionDev.climbingapp.data.model.ErrorMessage
+import com.horionDev.climbingapp.data.model.dto.CragDetailsDto
 import com.horionDev.climbingapp.data.model.dto.CragDto
+import com.horionDev.climbingapp.data.model.dto.NewsItemDto
 import com.horionDev.climbingapp.data.model.responses.SuggestionResponse
 import com.horionDev.climbingapp.data.safeGet
 import com.horionDev.climbingapp.data.safePost
@@ -18,6 +20,12 @@ import com.horionDev.climbingapp.utils.Constants
 import com.horionDev.climbingapp.utils.Globals
 import com.horionDev.climbingapp.utils.KMMPreference
 import com.horionDev.climbingapp.data.model.dto.UserDto
+import com.horionDev.climbingapp.data.model.dto.UserProfileDto
+import com.horionDev.climbingapp.data.model.responses.NothingResponse
+import com.horionDev.climbingapp.data.safeDelete
+import com.horionDev.climbingapp.domain.model.CragDetails
+import com.horionDev.climbingapp.domain.model.NewsItem
+import com.horionDev.climbingapp.domain.model.UserProfile
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -39,7 +47,7 @@ fun HttpRequestBuilder.addBearerToken(kmmPreference: KMMPreference) {
 
 class CruxAtlasApi(private var client: HttpClient) : Api, KoinComponent {
 
-    private val kmmPreference : KMMPreference by inject()
+    private val kmmPreference: KMMPreference by inject()
 
     override suspend fun login(authRequest: AuthRequest): ResultWrapper<AuthResponse, ErrorResponse> {
         return client.safePost<AuthResponse, ErrorResponse> {
@@ -53,12 +61,21 @@ class CruxAtlasApi(private var client: HttpClient) : Api, KoinComponent {
         username: String,
         password: String,
         email: String
-    ): ResultWrapper<AuthResponse, ErrorResponse> {
-       return client.safePost<AuthResponse, ErrorResponse> {
-           url("signup")
-           contentType(ContentType.Application.Json)
-           setBody("")
-       }
+    ): ResultWrapper<String, ErrorResponse> {
+        return client.safePost<String, ErrorResponse> {
+            url("users")
+            contentType(ContentType.Application.Json)
+            setBody(UserDto(0, username, password, email, false))
+        }
+    }
+
+    override suspend fun forgotPassword(email: String): ResultWrapper<NothingResponse, ErrorResponse> {
+        return client.safePost<NothingResponse, ErrorResponse> {
+            url("users/resetPassword")
+            url {
+                parameters.append("mail", email)
+            }
+        }
     }
 
     override suspend fun authenticate(token: String): ResultWrapper<User, ErrorResponse> {
@@ -84,26 +101,28 @@ class CruxAtlasApi(private var client: HttpClient) : Api, KoinComponent {
 //                    parameters.append("filter", filter)
 //                }
             }
-
         }.map { it.toVo() }
     }
 
-    override suspend fun getCragDetails(cragId: Int): ResultWrapper<Crag, ErrorResponse> {
-        TODO("Not yet implemented")
+    override suspend fun getNews(page: Int): ResultWrapper<List<NewsItem>, ErrorResponse> {
+        return client.safeGet<List<NewsItemDto>, ErrorResponse> {
+            url("feed")
+            url {
+                parameters.append("page", page.toString())
+            }
+        }.map { it.toVo() }
     }
 
-    override suspend fun addSpotAsFavoriteToUser(
-        userId: Int,
-        spotId: Int
-    ): ResultWrapper<List<String>, ErrorResponse> {
-        TODO("Not yet implemented")
+    override suspend fun getPublicProfile(userId: Int): ResultWrapper<UserProfile, ErrorResponse> {
+        return client.safeGet<UserProfileDto, ErrorResponse> {
+            url("users/$userId/profile")
+        }.map { it.toVo() }
     }
 
-    override suspend fun removeSpotAsFavoriteForUser(
-        userId: Int,
-        spotId: Int
-    ): ResultWrapper<List<String>, ErrorResponse> {
-        TODO("Not yet implemented")
+    override suspend fun getCragDetails(cragId: Int): ResultWrapper<CragDetails, ErrorResponse> {
+        return client.safeGet<CragDetailsDto, ErrorResponse> {
+            url("crags/$cragId/details")
+        }.map { it.toVo() }
     }
 
     override suspend fun getSpotsFavoriteByUser(userId: Int): ResultWrapper<List<Crag>, ErrorResponse> {
@@ -127,6 +146,53 @@ class CruxAtlasApi(private var client: HttpClient) : Api, KoinComponent {
         }.map {
             it.toPlaces()
         }
+    }
+
+    override suspend fun logRoute(userId: Int, cragId: Int, log: String): ResultWrapper<NothingResponse, ErrorResponse> {
+        return client.safePost<NothingResponse, ErrorResponse> {
+            url("users/$userId/log")
+            url {
+                parameters.append("log", log)
+                parameters.append("crag_id", cragId.toString())
+            }
+        }
+    }
+
+    override suspend fun fetchFavorite(userId: Int): ResultWrapper<List<String>, ErrorResponse> {
+        return client.safeGet<List<Int>, ErrorResponse> {
+            url("users/$userId/favorite")
+            url {
+                parameters.append("id", userId.toString())
+            }
+        }.map {
+            it.map { it.toString() }
+        }
+    }
+
+    override suspend fun addCragAsFavoriteToUser(
+        userId: Int,
+        cragId: Int
+    ): ResultWrapper<List<String>, ErrorResponse> {
+        return client.safePost<List<Int>, ErrorResponse> {
+            url("users/$userId/favorite")
+            url {
+                parameters.append("crag_id", cragId.toString())
+            }
+            addBearerToken(kmmPreference)
+        }.map { it.map { it.toString() } }
+    }
+
+    override suspend fun removeCragAsFavoriteForUser(
+        userId: Int,
+        cragId: Int
+    ): ResultWrapper<List<String>, ErrorResponse> {
+        return client.safeDelete<List<Int>, ErrorResponse> {
+            url("users/$userId/favorite")
+            url {
+                parameters.append("crag_id", cragId.toString())
+            }
+            addBearerToken(kmmPreference)
+        }.map { it.map { it.toString() } }
     }
 }
 

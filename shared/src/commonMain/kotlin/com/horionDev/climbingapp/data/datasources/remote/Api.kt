@@ -2,12 +2,14 @@ package com.horionDev.climbingapp.data.datasources.remote
 
 import com.horionDev.climbingapp.data.model.ErrorMessage
 import com.horionDev.climbingapp.data.ResultWrapper
-import com.horionDev.climbingapp.data.model.dto.LaundryDto
+import com.horionDev.climbingapp.data.model.responses.NothingResponse
+import com.horionDev.climbingapp.domain.model.CragDetails
+import com.horionDev.climbingapp.domain.model.NewsItem
 import com.horionDev.climbingapp.domain.model.Place
+import com.horionDev.climbingapp.domain.model.UserProfile
 import com.horionDev.climbingapp.domain.model.composition.AuthRequest
 import com.horionDev.climbingapp.domain.model.composition.AuthResponse
 import com.horionDev.climbingapp.domain.model.composition.ErrorResponse
-import com.horionDev.climbingapp.domain.model.composition.Report
 import com.horionDev.climbingapp.domain.model.entities.Crag
 import com.horionDev.climbingapp.domain.model.entities.User
 
@@ -20,26 +22,22 @@ interface Api {
         username: String,
         password: String,
         email: String
-    ): ResultWrapper<AuthResponse, ErrorResponse>
-
+    ): ResultWrapper<String, ErrorResponse>
+    suspend fun forgotPassword(email: String): ResultWrapper<NothingResponse, ErrorResponse>
     suspend fun authenticate(token: String): ResultWrapper<User, ErrorResponse>
 
     //Crag
-    suspend fun getCragDetails(cragId: Int): ResultWrapper<Crag, ErrorResponse>
+    suspend fun getCragDetails(cragId: Int): ResultWrapper<CragDetails, ErrorResponse>
     suspend fun getCragAroundLocation(
         latitude: Double,
         longitude: Double
     ): ResultWrapper<List<Crag>, ErrorResponse>
 
-    suspend fun addSpotAsFavoriteToUser(
-        userId: Int,
-        spotId: Int
-    ): ResultWrapper<List<String>, ErrorResponse>
+    suspend fun getNews(
+        page: Int
+    ): ResultWrapper<List<NewsItem>, ErrorResponse>
 
-    suspend fun removeSpotAsFavoriteForUser(
-        userId: Int,
-        spotId: Int
-    ): ResultWrapper<List<String>, ErrorResponse>
+    suspend fun getPublicProfile(userId: Int): ResultWrapper<UserProfile, ErrorResponse>
 
     suspend fun getSpotsFavoriteByUser(userId: Int): ResultWrapper<List<Crag>, ErrorResponse>
     suspend fun addSpot(crag: Crag): ResultWrapper<Crag, ErrorResponse>
@@ -47,4 +45,16 @@ interface Api {
     suspend fun getLocationSuggestions(
         input: String
     ): ResultWrapper<List<Place>, ErrorMessage>
+
+    suspend fun logRoute(userId: Int, cragId: Int, log: String): ResultWrapper<NothingResponse, ErrorResponse>
+    suspend fun fetchFavorite(userId: Int): ResultWrapper<List<String>, ErrorResponse>
+    suspend fun addCragAsFavoriteToUser(
+        userId: Int,
+        cragId: Int
+    ): ResultWrapper<List<String>, ErrorResponse>
+
+    suspend fun removeCragAsFavoriteForUser(
+        userId: Int,
+        cragId: Int
+    ): ResultWrapper<List<String>, ErrorResponse>
 }

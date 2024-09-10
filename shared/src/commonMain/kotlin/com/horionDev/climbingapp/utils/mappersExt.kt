@@ -32,6 +32,30 @@ fun UserDto.toVo() = User(
     isSubscribe
 )
 
+@JvmName(name = "cragDetailsDtoListToVo")
+fun List<CragDetailsDto>.toVo() = map { it.toVo() }
+fun CragDetailsDto.toVo() = CragDetails(
+    id
+)
+
+@JvmName(name = "userProfileDtoListToVo")
+fun List<UserProfileDto>.toVo() = map { it.toVo() }
+fun UserProfileDto.toVo() = UserProfile(
+    username,
+    email,
+    creationDate
+)
+
+@JvmName(name = "newsDtoListToVo")
+fun List<NewsItemDto>.toVo() = map { it.toVo() }
+fun NewsItemDto.toVo() = NewsItem(
+    id,
+    title,
+    description,
+    imageUrl,
+//    date
+)
+
 @JvmName(name = "cragDtoListToVo")
 fun List<CragDto>.toVo() = map { it.toVo() }
 fun CragDto.toVo() = Crag(

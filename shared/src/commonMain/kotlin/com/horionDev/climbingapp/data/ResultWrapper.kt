@@ -48,6 +48,27 @@ suspend inline fun <reified T, reified E> HttpClient.safeGet(block: HttpRequestB
     }
 }
 
+suspend inline fun <reified T, reified E> HttpClient.safeDelete(block: HttpRequestBuilder.() -> Unit): ResultWrapper<T, E> {
+    return try {
+        val response = delete { block() }
+        if (response.status.isSuccess()) {
+            ResultWrapper.Success(response.body())
+        } else {
+            val code = response.status.value
+            ResultWrapper.Failure.HttpError(code, response.body())
+        }
+    } catch (e: ClientRequestException) {
+        val code = e.response.status.value
+        ResultWrapper.Failure.HttpError(code, e.errorBody())
+    } catch (e: SerializationException) {
+        ResultWrapper.Failure.SerializationError(ErrorMessage(e.message.toString()))
+    } catch (e: IOException) {
+        ResultWrapper.Failure.NetworkError
+    } catch (e: JsonConvertException) {
+        ResultWrapper.Failure.SerializationError(ErrorMessage(e.message.toString()))
+    }
+}
+
 suspend inline fun <reified T, reified E> HttpClient.safePost(block: HttpRequestBuilder.() -> Unit): ResultWrapper<T, E> {
     return try {
         val response = post { block() }

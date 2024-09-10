@@ -5,13 +5,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.horionDev.climbingapp.data.ResultWrapper
 import com.horionDev.climbingapp.domain.model.composition.AuthRequest
+import com.horionDev.climbingapp.domain.repositories.UserRepository
 import com.horionDev.climbingapp.domain.usecases.LoginUseCase
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class LoginScreenViewModel(
     private val savedStateHandle: SavedStateHandle,
-    private val loginUseCase: LoginUseCase
+    private val loginUseCase: LoginUseCase,
+    private val users: UserRepository
 ) : ViewModel() {
 
     private val _event = MutableSharedFlow<LoginScreenEvent>()
@@ -26,6 +28,8 @@ class LoginScreenViewModel(
     private val usernameIsCorrect = savedStateHandle.getStateFlow("usernameIsCorrect", false)
     private val passIsCorrect = savedStateHandle.getStateFlow("passIsCorrect", false)
     val loginFailed = savedStateHandle.getStateFlow("loginFailed", false)
+    val newMailSendPopupActive = savedStateHandle.getStateFlow("newMailSendPopupActive", false)
+    val askForNewPass = savedStateHandle.getStateFlow("askForNewPass", false)
 
 
     val loginValid = combine(
@@ -35,6 +39,14 @@ class LoginScreenViewModel(
     }.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), false
     )
+
+    fun showNewPassPopup() {
+        savedStateHandle["askForNewPass"] = true
+    }
+
+    fun hideNewPassPopup() {
+        savedStateHandle["askForNewPass"] = false
+    }
 
     fun controlUsername(username: String) {
         if (username.isNotEmpty()) {
@@ -51,6 +63,25 @@ class LoginScreenViewModel(
             savedStateHandle["passIsCorrect"] = true
         } else {
             savedStateHandle["passIsCorrect"] = false
+        }
+    }
+
+    fun forgotPassword(mail: String) {
+        viewModelScope.launch {
+            _event.emit(LoginScreenEvent.ShowLoading)
+            when (users.forgotPassword(mail)) {
+                is ResultWrapper.Success -> {
+//                    savedStateHandle["newMailSendPopupActive"] = true
+                    hideNewPassPopup()
+                    _event.emit(LoginScreenEvent.NewPassPopupActive)
+                    _event.emit(LoginScreenEvent.HideLoading)
+                }
+
+                is ResultWrapper.Failure -> {
+                    hideNewPassPopup()
+                    _event.emit(LoginScreenEvent.HideLoading)
+                }
+            }
         }
     }
 
@@ -72,7 +103,8 @@ class LoginScreenViewModel(
     }
 
     sealed class LoginScreenEvent {
-         object ShowLoading : LoginScreenEvent()
-         object HideLoading : LoginScreenEvent()
+        object NewPassPopupActive : LoginScreenEvent()
+        object ShowLoading : LoginScreenEvent()
+        object HideLoading : LoginScreenEvent()
     }
 }

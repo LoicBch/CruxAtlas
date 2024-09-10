@@ -99,7 +99,7 @@ class AppViewModel() : ViewModel() {
     }
 
     fun onLoadingChange(isLoading: Boolean) {
-        _loading.update { isLoading }
+//        _loading.update { isLoading }
     }
 
     fun onEventDisplayedChange(isDisplayed: Boolean) {

@@ -4,8 +4,12 @@ import com.horionDev.climbingapp.data.datasources.remote.Api
 import com.horionDev.climbingapp.data.datasources.remote.CruxAtlasApi
 import com.horionDev.climbingapp.domain.repositories.UserRepository
 import com.horionDev.climbingapp.domain.repositories.CragRepository
+import com.horionDev.climbingapp.domain.repositories.NewRepository
+import com.horionDev.climbingapp.domain.repositories.RouteRepository
 import com.horionDev.climbingapp.data.repositories.Users
+import com.horionDev.climbingapp.data.repositories.Routes
 import com.horionDev.climbingapp.data.repositories.Crags
+import com.horionDev.climbingapp.data.repositories.News
 import com.horionDev.climbingapp.domain.usecases.LoginUseCase
 import com.horionDev.climbingapp.utils.Constants
 import io.ktor.client.*
@@ -45,6 +49,8 @@ val apiDependency = module {
 val repositoriesDependencies = module {
     singleOf(::Users) { bind<UserRepository>() }
     singleOf(::Crags) { bind<CragRepository>() }
+    singleOf(::News) { bind<NewRepository>() }
+    singleOf(::Routes) { bind<RouteRepository>() }
 }
 
 val useCasesDependencies = module {

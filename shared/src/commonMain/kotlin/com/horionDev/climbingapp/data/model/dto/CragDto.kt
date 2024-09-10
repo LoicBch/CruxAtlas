@@ -20,3 +20,19 @@ class CragDto(
     val approachLenght: String
 )
 
+@Serializable
+data class UserProfileDto(
+    val username: String,
+    val email: String,
+    val creationDate: String,
+)
+
+@Serializable
+data class NewsItemDto(
+    val id : Int,
+    val title: String,
+    val description: String,
+    val imageUrl: String,
+//    val date: String,
+)
+
