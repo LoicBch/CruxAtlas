@@ -37,7 +37,8 @@ object Constants {
     const val GPS_UPDATE_INTERVAL = 10000L
     const val SUGGESTION_START_LENGTH = 3
     const val WEBSERVICE_VERSION = "v4"
-    const val BASE_URL = "http://192.168.1.115:8080/"
+//    const val BASE_URL = "http://192.168.1.115:8080/"
+    const val BASE_URL = "http://185.170.58.30:8080/"
     const val A_PROPOS_URL = "https://www.camper-pro.com/apropos"
     const val HELP_URL = "https://camper-pro.com/404"
     const val PRIVACY_POLICY_URL = "https://www.camper-pro.com/cgv"

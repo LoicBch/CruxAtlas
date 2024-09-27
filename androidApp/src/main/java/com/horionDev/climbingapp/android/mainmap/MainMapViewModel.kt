@@ -58,7 +58,7 @@ class MainMapViewModel(
     val dealers = savedStateHandle.getStateFlow("dealers", emptyList<Dealer>())
     val laundry = savedStateHandle.getStateFlow("laundry", emptyList<Crag>())
 
-    val dealersSorted = savedStateHandle.getStateFlow("dealersSorted", emptyList<LaundryDto>())
+    val dealersSorted = savedStateHandle.getStateFlow("dealersSorted", emptyList<Crag>())
 
     private val _event = MutableSharedFlow<MainMapEvent>()
     val event = _event.asSharedFlow()

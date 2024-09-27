@@ -45,7 +45,7 @@ fun SearchField(
 
     TextField(modifier = modifier
         .border(
-            if (boxIsFocused.value) BorderStroke(1.dp, AppColor.BlueCamperPro)
+            if (boxIsFocused.value) BorderStroke(1.dp, AppColor.garcrux)
             else BorderStroke(0.dp, Color.Transparent), shape = RoundedCornerShape(
                 4.dp
             )
@@ -54,38 +54,38 @@ fun SearchField(
             boxIsFocused.value = it.isFocused
         }
         .fillMaxWidth(),
-              maxLines = 1,
-              leadingIcon = {
-                  Icon(modifier = Modifier.clickable { if (boxIsFocused.value) onBackPress() },
-                      imageVector = if (boxIsFocused.value) Icons.Filled.ArrowBack else Icons.Filled.Search,
-                      contentDescription = "",
-                      tint = if (boxIsFocused.value) AppColor.BlueCamperPro else Color.Unspecified
-                  )
-              },
-              trailingIcon = {
-                  if (textState.value.text.isNotEmpty()) {
-                      Icon(
-                          modifier = Modifier.clickable { textState.value = TextFieldValue("") },
-                          imageVector = Icons.Outlined.Close,
-                          contentDescription = "",
-                          tint = AppColor.Secondary
-                      )
-                  }
-              },
-              placeholder = { Text(text = stringResource(placeHolder)) },
-              value = textState.value,
-              onValueChange = { textFieldValue ->
-                  textState.value = textFieldValue
-                  onUserSearch(textFieldValue)
-              },
-              colors = TextFieldDefaults.textFieldColors(
-                  backgroundColor = if (boxIsFocused.value) Color.White else AppColor.ClearBlue,
-                  focusedIndicatorColor = Color.Transparent,
-                  unfocusedIndicatorColor = Color.Transparent,
-                  disabledIndicatorColor = Color.Transparent,
-                  placeholderColor = Color.Black
-
-              )
+        maxLines = 1,
+        leadingIcon = {
+            Icon(
+                modifier = Modifier.clickable { if (boxIsFocused.value) onBackPress() },
+                imageVector = if (boxIsFocused.value) Icons.Filled.ArrowBack else Icons.Filled.Search,
+                contentDescription = "",
+                tint = if (boxIsFocused.value) AppColor.Black else Color.Unspecified
+            )
+        },
+        trailingIcon = {
+            if (textState.value.text.isNotEmpty()) {
+                Icon(
+                    modifier = Modifier.clickable { textState.value = TextFieldValue("") },
+                    imageVector = Icons.Outlined.Close,
+                    contentDescription = "",
+                    tint = AppColor.Black
+                )
+            }
+        },
+        placeholder = { Text(text = stringResource(placeHolder)) },
+        value = textState.value,
+        onValueChange = { textFieldValue ->
+            textState.value = textFieldValue
+            onUserSearch(textFieldValue)
+        },
+        colors = TextFieldDefaults.textFieldColors(
+            backgroundColor = if (boxIsFocused.value) Color.White else AppColor.ClearBlue,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            disabledIndicatorColor = Color.Transparent,
+            placeholderColor = Color.Black
+        )
     )
 
 }
@@ -113,43 +113,44 @@ fun FilterSearchField(
             boxIsFocused.value = it.isFocused
         }
         .fillMaxWidth(),
-              maxLines = 1,
-              leadingIcon = {
-                  Icon(
-                      imageVector = if (boxIsFocused.value) Icons.Filled.ArrowBack else Icons.Filled.Search,
-                      contentDescription = "",
-                      tint = if (boxIsFocused.value) AppColor.BlueCamperPro else Color.Unspecified
-                  )
-              },
-              trailingIcon = {
-                  if (textState.value.text.isNotEmpty()) {
-                      Icon(
-                          modifier = Modifier.clickable { textState.value = TextFieldValue("") },
-                          imageVector = Icons.Outlined.Close,
-                          contentDescription = "",
-                          tint = AppColor.Secondary
-                      )
-                  }
-              },
-              placeholder = {
-                  Text(
-                      text = stringResource(placeHolder),
-                      fontWeight = FontWeight.W500, fontFamily = FontFamily(Font(R.font.circularstdmedium))
-                  )
-              },
-              value = textState.value,
-              onValueChange = { textFieldValue ->
-                  textState.value = textFieldValue
-                  onUserSearch(textFieldValue)
-              },
-              colors = TextFieldDefaults.textFieldColors(
-                  backgroundColor = if (boxIsFocused.value) Color.White else AppColor.ClearBlue,
-                  focusedIndicatorColor = Color.Transparent,
-                  unfocusedIndicatorColor = Color.Transparent,
-                  disabledIndicatorColor = Color.Transparent,
-                  placeholderColor = Color.Black
+        maxLines = 1,
+        leadingIcon = {
+            Icon(
+                imageVector = if (boxIsFocused.value) Icons.Filled.ArrowBack else Icons.Filled.Search,
+                contentDescription = "",
+                tint = if (boxIsFocused.value) AppColor.Black else Color.Unspecified
+            )
+        },
+        trailingIcon = {
+            if (textState.value.text.isNotEmpty()) {
+                Icon(
+                    modifier = Modifier.clickable { textState.value = TextFieldValue("") },
+                    imageVector = Icons.Outlined.Close,
+                    contentDescription = "",
+                    tint = AppColor.Secondary
+                )
+            }
+        },
+        placeholder = {
+            Text(
+                text = stringResource(placeHolder),
+                fontWeight = FontWeight.W500,
+                fontFamily = FontFamily(Font(R.font.circularstdmedium))
+            )
+        },
+        value = textState.value,
+        onValueChange = { textFieldValue ->
+            textState.value = textFieldValue
+            onUserSearch(textFieldValue)
+        },
+        colors = TextFieldDefaults.textFieldColors(
+            backgroundColor = if (boxIsFocused.value) Color.White else AppColor.ClearBlue,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            disabledIndicatorColor = Color.Transparent,
+            placeholderColor = Color.Black
 
-              )
+        )
     )
 
 }

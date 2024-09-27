@@ -6,6 +6,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -20,11 +21,12 @@ import com.horionDev.climbingapp.android.R
 import com.horionDev.climbingapp.android.extensions.hasLocationPermission
 import com.horionDev.climbingapp.android.ui.theme.AppColor
 import com.ramcosta.composedestinations.annotation.Destination
+import org.koin.androidx.compose.getViewModel
 
 // TODO: optimize permissions management
 @Destination
 @Composable
-fun SplashScreen(navController: NavController, viewModel: SplashScreenViewModel) {
+fun SplashScreen(navController: NavController, viewModel: SplashScreenViewModel = getViewModel()) {
 
     val setupIsComplete = viewModel.setupIsComplete.collectAsState()
     val context = LocalContext.current
@@ -35,6 +37,7 @@ fun SplashScreen(navController: NavController, viewModel: SplashScreenViewModel)
                 permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true && permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true -> {
                     viewModel.onUserRespondToLocationPermission(true)
                 }
+
                 else -> {
                     viewModel.onUserRespondToLocationPermission(false)
                 }
@@ -53,7 +56,14 @@ fun SplashScreen(navController: NavController, viewModel: SplashScreenViewModel)
             .background(color = AppColor.white), contentAlignment = Alignment
             .Center
     ) {
-        Image(painter = painterResource(id = R.drawable.logo), contentDescription = "")
+        Column(
+            Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
+        ) {
+            Image(painter = painterResource(id = R.drawable.app_logo), contentDescription = "")
+            Image(painter = painterResource(id = R.drawable.app_name), contentDescription = "")
+        }
     }
 
     LaunchedEffect(true) {

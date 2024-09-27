@@ -9,7 +9,7 @@
 
     <!--  To Add -->
     <string name="unity_viewer">Open 3D Viewer</string>
-    <string name="app_name">ClimbingApp</string>
+    <string name="app_name">Crux Atlas</string>
     <string name="general">General</string>
     <string name="approach">Approach</string>
     <string name="topos">Topos</string>
@@ -176,5 +176,6 @@
     <string name="add_photo_from_gallery">add from gallery</string>
     <string name="finish_spot_creation_photo">finish</string>
     <string name="valid">validate</string>
+    <string name="signup">Signup</string>
 
 </resources>

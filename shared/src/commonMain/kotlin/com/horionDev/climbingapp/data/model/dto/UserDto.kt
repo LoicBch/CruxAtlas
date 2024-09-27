@@ -8,5 +8,6 @@ data class UserDto(
     val username: String,
     val password: String,
     val email: String,
+    val imageUrl: String? = null,
     val isSubscribe: Boolean
 )

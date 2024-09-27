@@ -27,7 +27,7 @@ class LoginUseCase(
 //                if (visited is ResultWrapper.Success) {
 //                    user.visited = visited.value.toMutableList()
 //                }
-//                kmmPreference.put(Constants.Preferences.SESSION_TOKEN, authResponse.value.token)
+                kmmPreference.put(Constants.Preferences.SESSION_TOKEN, authResponse.value.token)
             }
             return authResponse
         } catch (throwable: Throwable) {

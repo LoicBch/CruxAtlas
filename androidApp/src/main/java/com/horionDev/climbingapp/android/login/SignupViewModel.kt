@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.horionDev.climbingapp.data.ResultWrapper
+import com.horionDev.climbingapp.data.message
 import com.horionDev.climbingapp.domain.repositories.UserRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -26,6 +27,7 @@ class SignupViewModel(
     private val usernameIsCorrect = savedStateHandle.getStateFlow("usernameIsCorrect", false)
     private val mailIsCorrect = savedStateHandle.getStateFlow("mailIsCorrect", false)
     private val passIsCorrect = savedStateHandle.getStateFlow("passIsCorrect", false)
+    val errorMessage = savedStateHandle.getStateFlow("errorMessage", "")
 
 
     val signupIsValid = combine(
@@ -66,8 +68,10 @@ class SignupViewModel(
 
     fun signup() {
         viewModelScope.launch {
-            when (users.signup(username, pass, mail)) {
-                is ResultWrapper.Failure -> {}
+            when (val result = users.signup(username, pass, mail)) {
+                is ResultWrapper.Failure -> {
+                    savedStateHandle["errorMessage"] = result.message()
+                }
                 is ResultWrapper.Success -> {
                     savedStateHandle["signupIsComplete"] = true
                 }

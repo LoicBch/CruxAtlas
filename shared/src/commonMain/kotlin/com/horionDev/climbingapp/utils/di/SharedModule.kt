@@ -13,6 +13,7 @@ import com.horionDev.climbingapp.data.repositories.News
 import com.horionDev.climbingapp.domain.usecases.LoginUseCase
 import com.horionDev.climbingapp.utils.Constants
 import io.ktor.client.*
+import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*

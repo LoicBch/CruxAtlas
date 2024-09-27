@@ -50,7 +50,6 @@ import com.horionDev.climbingapp.android.extensions.isScrollingUp
 import com.horionDev.climbingapp.android.extensions.lastVisibleItemIndex
 import com.horionDev.climbingapp.android.ui.theme.AppColor
 import com.horionDev.climbingapp.android.ui.theme.Dimensions
-import com.horionDev.climbingapp.data.model.dto.LaundryDto
 import com.horionDev.climbingapp.domain.model.*
 import com.horionDev.climbingapp.domain.model.composition.*
 import com.horionDev.climbingapp.managers.location.LocationManager
@@ -67,6 +66,7 @@ import com.horionDev.climbingapp.domain.model.entities.gradeDistributionString
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
@@ -162,56 +162,46 @@ fun MainMap(
         //        }
     }
 
-    LaunchedEffect(appViewModel.filtersApplied) { //        appViewModel.filtersApplied.collect {
-        //            if (it != FilterType.COUNTRIES) {
-        //                viewModel.showSpots(cameraPositionState.locationVo, true)
-        //            } else {
-        //                viewModel.showEvents()
-        //            }
-        //        }
+    LaunchedEffect(appViewModel.filtersApplied) {
+        appViewModel.filtersApplied.collect {
+//            viewModel.showSpots(cameraPositionState.locationVo, true)
+        }
     }
 
-    LaunchedEffect(appViewModel.loadAroundMeIsPressed) { //        appViewModel.loadAroundMeIsPressed.collect {
-        //            if (it) {
-        //                if (context.hasLocationPermission) {
-        //                    cameraPositionState.move(
-        //                        CameraUpdateFactory.newLatLng(
-        //                            LatLng(
-        //                                Globals.geoLoc.lastKnownLocation.latitude,
-        //                                Globals.geoLoc.lastKnownLocation.longitude
-        //                            )
-        //                        )
-        //                    )
-        //                    viewModel.showLaundry(Globals.geoLoc.lastKnownLocation)
-        //                }
-        //            }
-        //        }
+
+//    LaunchedEffect(appViewModel.loadAroundMeIsPressed) { //        appViewModel.loadAroundMeIsPressed.collect {
+//                    if (it) {
+//                        if (context.hasLocationPermission) {
+//                            cameraPositionState.move(
+//                                CameraUpdateFactory.newLatLng(
+//                                    LatLng(
+//                                        Globals.geoLoc.lastKnownLocation.latitude,
+//                                        Globals.geoLoc.lastKnownLocation.longitude
+//                                    )
+//                                )
+//                            )
+//                            viewModel.showLaundry(Globals.geoLoc.lastKnownLocation)
+//                        }
+//                    }
+//                }
+//    }
+
+    locationSearchRecipient.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {}
+            is NavResult.Value -> {
+                cameraPositionState.move(
+                    CameraUpdateFactory.newLatLng(
+                        LatLng(
+                            result.value.location.latitude, result.value.location.longitude
+                        )
+                    )
+                )
+//                viewModel.showSpotsAroundPlace(result.value)
+            }
+        }
     }
 
-    launchEventsSearchRecipient.onNavResult { result -> //        when (result) {
-        //            is NavResult.Canceled -> {}
-        //            is NavResult.Value -> {
-        //                viewModel.showEvents()
-        //                appViewModel.onBottomSheetContentChange(BottomSheetOption.FILTER_EVENT)
-        //            }
-        //        }
-    }
-
-    locationSearchRecipient.onNavResult { result -> //        when (result) {
-        //            is NavResult.Canceled -> {}
-        //            is NavResult.Value -> {
-        //                appViewModel.onEventDisplayedChange(false)
-        //                cameraPositionState.move(
-        //                    CameraUpdateFactory.newLatLng(
-        //                        LatLng(
-        //                            result.value.location.latitude, result.value.location.longitude
-        //                        )
-        //                    )
-        //                )
-        //                viewModel.showSpotsAroundPlace(result.value)
-        //            }
-        //        }
-    }
 
     Box {
         GoogleMap(
@@ -223,17 +213,18 @@ fun MainMap(
             cameraPositionState = cameraPositionState
         ) {
             markersState.value.forEach { marker ->
-                val markerState = MarkerState(position = LatLng(marker.latitude, marker.longitude))
+                val markerState =
+                    MarkerState(position = LatLng(marker.latitude, marker.longitude))
                 Marker(icon = if (marker.selected) { //                    BitmapDescriptorFactory.fromResource(R.drawable.marker_selected)
                     BitmapDescriptorFactory.fromResource(R.drawable.marker)
                 } else {
                     BitmapDescriptorFactory.fromResource(R.drawable.marker)
                 }, state = markerState, onClick = {
-                                        navigator.navigate(
-                                            CragSheetDestination(
-                                                laundry.value.find { it.id.toString() == marker.placeLinkedId }!!
-                                            )
-                                        )
+                    navigator.navigate(
+                        CragSheetDestination(
+                            laundry.value.find { it.id.toString() == marker.placeLinkedId }!!
+                        )
+                    )
                     true
                 })
             }
@@ -249,33 +240,33 @@ fun MainMap(
                 //                }
 
                 if (locationSearched.isNotEmpty()) LocationSearchContainer(locationSearched,
-                                                                           cameraPositionState,
-                                                                           {
-                                                                               viewModel.onCrossLocationClicked()
-                                                                           },
-                                                                           {
-                                                                               navigator.navigate(
-                                                                                   AroundLocationScreenDestination()
-                                                                               )
-                                                                           })
+                    cameraPositionState,
+                    {
+                        viewModel.onCrossLocationClicked()
+                    },
+                    {
+                        navigator.navigate(
+                            AroundLocationScreenDestination()
+                        )
+                    })
 
                 if (laundry.value.isNotEmpty()) {
                     HorizontalSpotsList(cameraPositionState = cameraPositionState,
-                                        crags = listOf(ceuse),
-                                        onItemClicked = {
-                                            navigator.navigate(
-                                                CragSheetDestination(it)
-                                            )
-                                        },
-                                        onScrollEnded = { dealer ->
-                                            viewModel.selectMarker(
-                                                markersState.value.indexOf(markersState.value
-                                                                               .find {
-                                                                                   it.placeLinkedId ==
-                                                                                           dealer.id.toString()
-                                                                               })
-                                            )
-                                        })
+                        crags = listOf(ceuse),
+                        onItemClicked = {
+                            navigator.navigate(
+                                CragSheetDestination(it)
+                            )
+                        },
+                        onScrollEnded = { dealer ->
+                            viewModel.selectMarker(
+                                markersState.value.indexOf(markersState.value
+                                    .find {
+                                        it.placeLinkedId ==
+                                                dealer.id.toString()
+                                    })
+                            )
+                        })
                 }
             }
             if (state.ads.isNotEmpty()) MainMapAdContainer(state.ads)
@@ -283,10 +274,10 @@ fun MainMap(
         }
 
         if (state.verticalListIsShowing) {
-            VerticalDealersList(dealersSortedFlow = viewModel.dealersSorted,
-                                {
+            VerticalCragsList(dealersSortedFlow = viewModel.dealersSorted,
+                {
 //                                    viewModel.onSortingOptionSelected(it)
-                                })
+                })
             {
                 //                    navigator.navigate(
                 //                        LaundryDetailScreenDestination(
@@ -298,35 +289,38 @@ fun MainMap(
 
         Column(modifier = Modifier.fillMaxSize()) {
             TopButtons(cameraPositionState = cameraPositionState,
-                       isVerticalListOpen = state.verticalListIsShowing,
-                       onListButtonClick = {
-                           viewModel.swapVerticalList()
-                       },
-                       source = updateSource,
-                       sortingDealersFlow = appViewModel.verticalListSortingOption,
-                       sortingEventsFlow = appViewModel.verticalListSortingOption,
-                       onMapPropertiesUpdated = {
-                           mapProperties = if (mapProperties.mapType == MapType.NORMAL) {
-                               mapProperties.copy(mapType = MapType.SATELLITE)
-                           } else {
-                               mapProperties.copy(mapType = MapType.NORMAL)
-                           }
-                       })
-            Spacer(modifier = Modifier.weight(1f))
-            BottomButtons(onAroundLocation = {
-                navigator.navigate(
-                    AroundLocationScreenDestination()
-                )
-            }, onAroundMe = {
-                cameraPositionState.move(
-                    CameraUpdateFactory.newLatLng(
-                        LatLng(
-                            Globals.GeoLoc.lastKnownLocation.latitude,
-                            Globals.GeoLoc.lastKnownLocation.longitude
+                isVerticalListOpen = state.verticalListIsShowing,
+                onListButtonClick = {
+                    viewModel.swapVerticalList()
+                },
+                source = updateSource,
+                sortingDealersFlow = appViewModel.verticalListSortingOption,
+                sortingEventsFlow = appViewModel.verticalListSortingOption,
+                onMapPropertiesUpdated = {
+                    mapProperties = if (mapProperties.mapType == MapType.NORMAL) {
+                        mapProperties.copy(mapType = MapType.SATELLITE)
+                    } else {
+                        mapProperties.copy(mapType = MapType.NORMAL)
+                    }
+                })
+
+            if (!state.verticalListIsShowing) {
+                Spacer(modifier = Modifier.weight(1f))
+                BottomButtons(onAroundLocation = {
+                    navigator.navigate(
+                        AroundLocationScreenDestination()
+                    )
+                }, onAroundMe = {
+                    cameraPositionState.move(
+                        CameraUpdateFactory.newLatLng(
+                            LatLng(
+                                Globals.GeoLoc.lastKnownLocation.latitude,
+                                Globals.GeoLoc.lastKnownLocation.longitude
+                            )
                         )
                     )
-                )
-            })
+                })
+            }
         }
 
         if (currentlyLoading) {
@@ -367,7 +361,8 @@ fun BottomButtons(onAroundLocation: () -> Unit, onAroundMe: () -> Unit) {
             IconButton(
                 modifier = Modifier
                     .padding(vertical = 10.dp)
-                    .background(color = Color.White, shape = RoundedCornerShape(25)), onClick = {
+                    .background(color = Color.White, shape = RoundedCornerShape(25)),
+                onClick = {
                     onAroundMe()
                 }) {
                 Image(
@@ -421,10 +416,10 @@ fun LocationSearchContainer(
         Spacer(modifier = Modifier.weight(1f))
 
         Icon(imageVector = Icons.Filled.Close,
-             contentDescription = "",
-             modifier = Modifier.clickable {
-                 onClose()
-             })
+            contentDescription = "",
+            modifier = Modifier.clickable {
+                onClose()
+            })
     }
 }
 
@@ -472,10 +467,10 @@ fun SearchHereButton(onClick: () -> Unit, cameraPositionState: CameraPositionSta
 }
 
 @Composable
-fun VerticalDealersList(
-    dealersSortedFlow: StateFlow<List<LaundryDto>>,
+fun VerticalCragsList(
+    dealersSortedFlow: StateFlow<List<Crag>>,
     onSortOptionSelected: (SortOption) -> Unit,
-    onItemClicked: (LaundryDto) -> Unit
+    onItemClicked: (Crag) -> Unit
 ) {
     val sorting = LocalDependencyContainer.current.appViewModel.verticalListSortingOption
     val dealersSorted by dealersSortedFlow.collectAsStateWithLifecycleImmutable()
@@ -545,67 +540,68 @@ fun VerticalListItem(crag: Crag) {
             modifier = Modifier.padding(bottom = 5.dp),
             fontWeight = FontWeight.W500,
             maxLines = 1,
-            fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.circularstdmedium)),
+            fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.oppinsedium)),
             text = crag.name,
         )
 
-        Text(
-            modifier = Modifier.padding(bottom = 5.dp),
-            fontWeight = FontWeight(450),
-            maxLines = 1,
-            fontSize = 12.sp,
-            fontFamily = FontFamily(Font(R.font.circularstdmedium)),
-            text = "${crag.sectors.size} sectors",
-            color = AppColor.neutralText
-        )
+        Column(verticalArrangement = Arrangement.SpaceBetween) {
+            Text(
+                modifier = Modifier.padding(bottom = 2.dp),
+                fontWeight = FontWeight(450),
+                maxLines = 1,
+                fontSize = 12.sp,
+                fontFamily = FontFamily(Font(R.font.oppinsedium)),
+                text = "${crag.sectors.size} sectors",
+                color = AppColor.neutralText
+            )
 
-        Text(
-            modifier = Modifier.padding(bottom = 5.dp),
-            fontWeight = FontWeight(450),
-            maxLines = 1,
-            fontSize = 12.sp,
-            fontFamily = FontFamily(Font(R.font.circularstdmedium)),
-            text = "${
-                crag.sectors.map { it.routes.size }
-                    .foldRight(0) { element, acc -> acc + element }
-            } routes",
-            color = AppColor.neutralText
-        )
+            Text(
+                modifier = Modifier.padding(bottom = 2.dp),
+                fontWeight = FontWeight(450),
+                maxLines = 1,
+                fontSize = 12.sp,
+                fontFamily = FontFamily(Font(R.font.oppinsedium)),
+                text = "${
+                    crag.sectors.map { it.routes.size }
+                        .foldRight(0) { element, acc -> acc + element }
+                } routes",
+                color = AppColor.neutralText
+            )
 
-        Text(
-            modifier = Modifier.padding(bottom = 5.dp),
-            fontWeight = FontWeight(450),
-            maxLines = 1,
-            fontSize = 12.sp,
-            fontFamily = FontFamily(Font(R.font.circularstdmedium)),
-            text = crag.gradeDistributionString(),
-            color = AppColor.neutralText
-        )
-
-        val context = LocalContext.current
-        val launcher =
-            rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult(),
-                                              onResult = { result -> // Traiter le résultat ici
-                                              })
-
-        AppButton(
-            isActive = true,
-            onClick = {
-                val intent = Intent(context, UnityParentActivity::class.java).putExtra(
-                    "unity",
-                    "my_unity_scene"
-                )
-                launcher.launch(intent)
-            },
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            textRes = R.string.unity_viewer
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Row {
-            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                fontWeight = FontWeight(450),
+                maxLines = 1,
+                fontSize = 12.sp,
+                fontFamily = FontFamily(Font(R.font.oppinsedium)),
+                text = crag.gradeDistributionString(),
+                color = AppColor.neutralText
+            )
         }
+
+//        val context = LocalContext.current
+//        val launcher =
+//            rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult(),
+//                onResult = { result -> // Traiter le résultat ici
+//                })
+//
+//        AppButton(
+//            isActive = true,
+//            onClick = {
+//                val intent = Intent(context, UnityParentActivity::class.java).putExtra(
+//                    "unity",
+//                    "my_unity_scene"
+//                )
+//                launcher.launch(intent)
+//            },
+//            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+//            textRes = R.string.unity_viewer
+//        )
+
+//        Spacer(modifier = Modifier.weight(1f))
+//
+//        Row {
+//            Spacer(modifier = Modifier.weight(1f))
+//        }
     }
 }
 
@@ -617,7 +613,6 @@ fun HorizontalSpotsList(
     onItemClicked: (Crag) -> Unit,
     onScrollEnded: (Crag) -> Unit
 ) {
-
     val listState = rememberLazyListState()
     val needToReposition by remember {
         derivedStateOf {
@@ -709,7 +704,6 @@ fun HorizontalSpotsList(
 @Composable
 fun HorizontalListItem(crag: Crag) {
 
-    val application = LocalContext.current.applicationContext as Application
     if (crag.image.isNotEmpty()) {
         Box {
             GlideImage(
@@ -734,67 +728,70 @@ fun HorizontalListItem(crag: Crag) {
             modifier = Modifier.padding(bottom = 5.dp),
             fontWeight = FontWeight.W500,
             maxLines = 1,
-            fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.circularstdmedium)),
+            fontSize = 14.sp, fontFamily = FontFamily(Font(R.font.oppinsedium)),
             text = crag.name,
         )
 
-        Text(
-            modifier = Modifier.padding(bottom = 5.dp),
-            fontWeight = FontWeight(450),
-            maxLines = 1,
-            fontSize = 12.sp,
-            fontFamily = FontFamily(Font(R.font.circularstdmedium)),
-            text = "${crag.sectors.size} sectors",
-            color = AppColor.neutralText
-        )
+        Column(verticalArrangement = Arrangement.SpaceBetween) {
+            Text(
+                modifier = Modifier.padding(bottom = 5.dp),
+                fontWeight = FontWeight(450),
+                maxLines = 1,
+                fontSize = 12.sp,
+                fontFamily = FontFamily(Font(R.font.oppinsedium)),
+                text = "${crag.sectors.size} sectors",
+                color = AppColor.neutralText
+            )
 
-        Text(
-            modifier = Modifier.padding(bottom = 5.dp),
-            fontWeight = FontWeight(450),
-            maxLines = 1,
-            fontSize = 12.sp,
-            fontFamily = FontFamily(Font(R.font.circularstdmedium)),
-            text = "${
-                crag.sectors.map { it.routes.size }
-                    .foldRight(0) { element, acc -> acc + element }
-            } routes",
-            color = AppColor.neutralText
-        )
+            Text(
+                modifier = Modifier.padding(bottom = 2.dp),
+                fontWeight = FontWeight(450),
+                maxLines = 1,
+                fontSize = 12.sp,
+                fontFamily = FontFamily(Font(R.font.oppinsedium)),
+                text = "${
+                    crag.sectors.map { it.routes.size }
+                        .foldRight(0) { element, acc -> acc + element }
+                } routes",
+                color = AppColor.neutralText
+            )
 
-        Text(
-            modifier = Modifier.padding(bottom = 5.dp),
-            fontWeight = FontWeight(450),
-            maxLines = 1,
-            fontSize = 12.sp,
-            fontFamily = FontFamily(Font(R.font.circularstdmedium)),
-            text = crag.gradeDistributionString(),
-            color = AppColor.neutralText
-        )
-
-        val context = LocalContext.current
-        val launcher =
-            rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult(),
-                                              onResult = { result -> // Traiter le résultat ici
-                                              })
-
-        AppButton(
-            isActive = true,
-            onClick = {
-                val intent = Intent(context, UnityParentActivity::class.java).putExtra(
-                    "unity",
-                    "my_unity_scene"
-                )
-                launcher.launch(intent)
-            },
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            textRes = R.string.unity_viewer
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Row {
-            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                modifier = Modifier.padding(bottom = 2.dp),
+                fontWeight = FontWeight(450),
+                maxLines = 1,
+                fontSize = 12.sp,
+                fontFamily = FontFamily(Font(R.font.oppinsedium)),
+                text = crag.gradeDistributionString(),
+                color = AppColor.neutralText
+            )
         }
+
+
+//        val context = LocalContext.current
+//        val launcher =
+//            rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult(),
+//                onResult = { result -> // Traiter le résultat ici
+//                })
+
+//        AppButton(
+//            isActive = true,
+//            onClick = {
+//                val intent = Intent(context, UnityParentActivity::class.java).putExtra(
+//                    "unity",
+//                    "my_unity_scene"
+//                )
+//                launcher.launch(intent)
+//            },
+//            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+//            textRes = R.string.unity_viewer
+//        )
+
+//        Spacer(modifier = Modifier.weight(1f))
+//
+//        Row {
+//            Spacer(modifier = Modifier.weight(1f))
+//        }
     }
 }
 

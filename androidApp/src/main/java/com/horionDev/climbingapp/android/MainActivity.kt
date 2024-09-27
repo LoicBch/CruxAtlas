@@ -94,8 +94,7 @@ class MainActivity : ComponentActivity() {
 //                val setupApp: SetupApp by inject()
 //                val languageManager: LanguageManager by inject { parametersOf(context) }
                 SplashScreen(
-                    navController = navController,
-                    SplashScreenViewModel()
+                    navController = navController
                 )
             }
 

@@ -29,7 +29,8 @@ fun UserDto.toVo() = User(
     password,
     email,
     "U",
-    isSubscribe
+    isSubscribe,
+    imageUrl = if (imageUrl == "") null else imageUrl
 )
 
 @JvmName(name = "cragDetailsDtoListToVo")

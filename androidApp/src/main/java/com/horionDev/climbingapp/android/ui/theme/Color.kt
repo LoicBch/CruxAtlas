@@ -48,6 +48,14 @@ object AppColor {
     val outlineText = Color(0xFFCAC4D0)
     val suggestionsLabel = Color(0xFF33417D)
 
+//    Delta crucis
+    val deltaCrucis = Color(0xFFFFFFCC)
+//    Beta crux and acrux
+    val mimosaStar = Color(0xFFD0E0FF)
+//    GarCrux
+    val garcrux = Color(0xFFF5d3ae)
+
+
     val BlueToWhite = Brush.linearGradient(
         colors = listOf(Primary, Color.White),
         start = Offset(0f, Float.POSITIVE_INFINITY),

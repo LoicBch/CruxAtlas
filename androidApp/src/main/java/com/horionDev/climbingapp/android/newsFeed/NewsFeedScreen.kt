@@ -6,35 +6,48 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.sharp.KeyboardArrowDown
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,13 +56,18 @@ import com.horionDev.climbingapp.android.UnityParentActivity
 import com.horionDev.climbingapp.android.composables.AppButton
 import com.horionDev.climbingapp.android.composables.ImageAppButton
 import com.horionDev.climbingapp.android.destinations.LoginScreenDestination
+import com.horionDev.climbingapp.android.ui.theme.AppColor
 import com.horionDev.climbingapp.domain.model.NewsItem
 import com.horionDev.climbingapp.domain.model.entities.RouteGrade
+import com.horionDev.climbingapp.utils.SessionManager
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
+import kotlinx.coroutines.launch
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 import org.koin.androidx.compose.getViewModel
+import java.io.File
 
 @Destination
 @Composable
@@ -59,7 +77,7 @@ fun NewsFeedScreen(
 ) {
 
     val news by viewModel.news.collectAsState()
-
+    val loading by viewModel.isLoading.collectAsState()
     val walls = remember {
         listOf(
             Triple("Ange", "Ceuse, France", RouteGrade.SevenA),
@@ -80,20 +98,127 @@ fun NewsFeedScreen(
                 .padding(vertical = 16.dp)
         ) {
             Spacer(modifier = Modifier.weight(1f))
-            Text(
-                text = "Climbing App",
-                style = MaterialTheme.typography.h5,
-                fontWeight = FontWeight.Bold
-            )
+            Image(painterResource(id = R.drawable.app_name), contentDescription = "")
             Spacer(modifier = Modifier.weight(1f))
         }
-        LoginCard(navigator)
+
+        if (SessionManager.isLogged()) {
+            ProfileCard()
+        } else {
+            LoginCard(navigator)
+        }
 
 //        ExploreCard()
 //        WallsItemCard(walls)
         news.forEach { newsItem ->
             NewsItemCard(newsItem)
             Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        if (loading) {
+            Row(Modifier.fillMaxWidth()) {
+                Spacer(modifier = Modifier.weight(1f))
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .size(30.dp)
+                )
+                Spacer(modifier = Modifier.weight(1f))
+            }
+        } else {
+            Row(Modifier.fillMaxWidth()) {
+                Spacer(modifier = Modifier.weight(1f))
+                IconButton(
+                    onClick = {
+                        viewModel.loadMoreNews()
+                    },
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .background(AppColor.garcrux, shape = RoundedCornerShape(10.dp))
+                ) {
+                    Icon(
+                        imageVector = Icons.Sharp.KeyboardArrowDown,
+                        contentDescription = "",
+                        tint = Color.Black
+                    )
+                }
+                Spacer(modifier = Modifier.weight(1f))
+            }
+        }
+
+    }
+}
+
+@Composable
+fun ProfileCard() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(
+                elevation = 4.dp,
+                shape = RoundedCornerShape(25),
+            )
+            .background(
+                color = Color.White,
+                shape = RoundedCornerShape(25)
+            )
+            .padding(16.dp)
+    ) {
+        Column(
+            Modifier
+                .fillMaxHeight()
+                .weight(1f),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            GlideImage(
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(CircleShape),
+                imageModel = { SessionManager.user.imageUrl ?: R.drawable.default_profile },
+                imageOptions = ImageOptions(
+                    contentScale = ContentScale.FillBounds, alignment = Alignment.Center
+                )
+            )
+            Text(
+                modifier = Modifier.padding(top = 4.dp),
+                text = SessionManager.user.username,
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp,
+                fontFamily = FontFamily(Font(R.font.oppinsedium))
+            )
+        }
+
+        Column(
+            Modifier
+                .fillMaxHeight()
+                .padding(start = 16.dp)
+                .weight(2f),
+            horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.SpaceAround
+        ) {
+            Row(Modifier) {
+                Text(
+                    text = "Ascents : 155",
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 16.sp,
+                    fontFamily = FontFamily(Font(R.font.oppinsedium))
+                )
+            }
+
+            Row(Modifier.padding(vertical = 8.dp)) {
+                Text(
+                    text = "Red point : 8A", fontWeight = FontWeight.Medium,
+                    fontSize = 16.sp,
+                    fontFamily = FontFamily(Font(R.font.oppinsedium))
+                )
+            }
+
+            Row(Modifier) {
+                Text(
+                    text = "Flashed : 7b+", fontWeight = FontWeight.Medium,
+                    fontSize = 16.sp,
+                    fontFamily = FontFamily(Font(R.font.oppinsedium))
+                )
+            }
         }
     }
 }
@@ -108,26 +233,27 @@ fun NewsItemCard(newsItem: NewsItem) {
         elevation = 4.dp
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            GlideImage(modifier = Modifier
-                .fillMaxWidth()
-                .height(80.dp),
+            GlideImage(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(80.dp),
                 imageModel = { newsItem.imageUrl }, imageOptions = ImageOptions(
-                contentScale = ContentScale.FillBounds, alignment = Alignment.Center
-            )
+                    contentScale = ContentScale.FillBounds, alignment = Alignment.Center
+                )
             )
             Text(
+                modifier = Modifier.padding(vertical = 5.dp),
                 text = newsItem.title,
                 style = MaterialTheme.typography.h6,
+                fontFamily = FontFamily(Font(R.font.oppinsedium)),
                 fontWeight = FontWeight.Bold
             )
-            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = newsItem.description,
                 style = MaterialTheme.typography.body1,
+                fontFamily = FontFamily(Font(R.font.oppinsedium)),
                 color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
             )
-            Spacer(modifier = Modifier.height(16.dp))
-            // Image à partir de l'URL
         }
     }
 }
@@ -141,14 +267,15 @@ fun LoginCard(navigator: DestinationsNavigator) {
             .padding(vertical = 8.dp),
         elevation = 4.dp
     ) {
-        Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Image(
                 modifier = Modifier.height(100.dp),
-                painter = painterResource(id = R.drawable.logo),
+                painter = painterResource(id = R.drawable.app_logo),
                 contentDescription = ""
             )
             Text(
                 modifier = Modifier.padding(vertical = 18.dp),
+                fontFamily = FontFamily(Font(R.font.oppinsedium)),
                 text = "Hi there! let's sign in to continue."
             )
             AppButton(
@@ -172,7 +299,11 @@ fun ExploreCard() {
         elevation = 4.dp
     ) {
         Column {
-            Text("Hi there! Start Exploring.", modifier = Modifier.padding(vertical = 18.dp))
+            Text(
+                "Hi there! Start Exploring.",
+                fontFamily = FontFamily(Font(R.font.oppinsedium)),
+                modifier = Modifier.padding(vertical = 18.dp)
+            )
             ImageAppButton(
                 onClick = { /* Handle login */ },
                 textRes = R.string.explore,

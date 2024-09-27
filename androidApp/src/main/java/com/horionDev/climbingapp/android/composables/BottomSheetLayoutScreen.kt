@@ -17,6 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -85,7 +87,12 @@ fun CountriesFilters(
             .padding(start = 16.dp, end = 16.dp, top = 16.dp)
     ) {
 
-        Text(text = "By countries")
+        Text(
+            text = "By countries",
+            fontWeight = FontWeight.Bold,
+            fontSize = 14.sp,
+            fontFamily = FontFamily(Font(R.font.oppinsedium))
+        )
         Divider()
 
         FlowRow(
@@ -116,7 +123,12 @@ private fun GradesFilters(
             .padding(horizontal = 16.dp)
     ) {
 
-        Text(text = "By grades")
+        Text(
+            text = "By grades",
+            fontWeight = FontWeight.Bold,
+            fontSize = 14.sp,
+            fontFamily = FontFamily(Font(R.font.oppinsedium))
+        )
         Divider()
 
         FlowRow(
@@ -157,14 +169,28 @@ private fun FilterHeader(
             Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "")
         }
         Spacer(modifier = Modifier.weight(1f))
-        Text(text = "Filters", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+        Text(
+            text = "Filters",
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp,
+            fontFamily = FontFamily(
+                Font(R.font.oppinsedium)
+            )
+        )
         Spacer(modifier = Modifier.weight(1f))
         Text(
             text = "Reset all ${checkedGrades.filter { it }.size + checkedCountries.filter { it }.size}",
-            color = AppColor.BlueCamperPro,
+            fontWeight = FontWeight.Bold,
+            fontSize = 14.sp,
+            fontFamily = FontFamily(
+                Font(R.font.oppinsedium)
+            ),
+            color = AppColor.white,
             modifier = Modifier
                 .padding(end = 10.dp)
                 .alpha(if (checkedGrades.any { it } || checkedCountries.any { it }) 1f else 0f)
+                .background(Color.Black, shape = RoundedCornerShape(5.dp))
+                .padding(6.dp)
                 .clickable { checkedGrades.replaceAll { false }; checkedCountries.replaceAll { false } }
         )
     }
@@ -181,22 +207,24 @@ fun FilterChip(
 ) {
     Row(
         modifier
+            .defaultMinSize(minWidth = 60.dp)
+            .padding(horizontal = 2.dp)
             .background(
-                if (isChecked) AppColor.Secondary else Color.Unspecified,
-                shape = RoundedCornerShape(25.dp)
+                if (isChecked) AppColor.Black else Color.Unspecified,
+                shape = RoundedCornerShape(5.dp)
             )
             .border(
                 width = 1.dp,
                 color = if (isChecked) Color.Unspecified else Color.Black,
-                shape = RoundedCornerShape(25.dp)
+                shape = RoundedCornerShape(5.dp)
             )
-            .wrapContentWidth()
-            .padding(horizontal = 5.dp)
-            .padding(top = 1.dp)
+            .padding(vertical = 5.dp)
+            .padding(horizontal = 10.dp)
             .clickable {
                 onClick()
             },
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
     ) {
         leadingIcon?.let {
             Image(
@@ -207,18 +235,18 @@ fun FilterChip(
 
         Text(
             text = label,
-            modifier = Modifier.padding(start = 5.dp),
             color = if (isChecked) Color.White else Color.Black,
             fontSize = 14.sp,
+            fontFamily = FontFamily(Font(R.font.oppinsedium))
         )
 
-        Icon(
-            modifier = Modifier.alpha(
-                if (isChecked) 1f else 0f
-            ),
-            imageVector = Icons.Filled.Done,
-            contentDescription = "",
-            tint = Color.Green
-        )
+//        if (isChecked) {
+//            Icon(
+//                modifier = Modifier.padding(start = 5.dp),
+//                imageVector = Icons.Filled.Done,
+//                contentDescription = "",
+//                tint = Color.Green
+//            )
+//        }
     }
 }

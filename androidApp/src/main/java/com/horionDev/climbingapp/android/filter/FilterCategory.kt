@@ -261,7 +261,7 @@ fun LastSearchItem(search: String, onSearchDelete: () -> Unit, onSelectSearch: (
         Icon(
             painter = painterResource(id = R.drawable.historic),
             contentDescription = "",
-            tint = AppColor.Primary
+            tint = AppColor.garcrux
         )
 
         Text(
@@ -280,7 +280,7 @@ fun LastSearchItem(search: String, onSearchDelete: () -> Unit, onSelectSearch: (
             modifier = Modifier.clickable { onSearchDelete() },
             imageVector = Icons.Outlined.Close,
             contentDescription = "",
-            tint = AppColor.Secondary
+            tint = AppColor.garcrux
         )
     }
 }

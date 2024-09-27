@@ -89,6 +89,7 @@ fun AroundLocationScreen(
                 text = stringResource(id = R.string.search),
                 fontWeight = FontWeight.W700,
                 fontSize = 22.sp,
+                fontFamily = FontFamily(Font(R.font.oppinsold)),
                 modifier = Modifier
                     .padding(15.dp)
                     .align(Alignment.CenterVertically)
@@ -98,7 +99,7 @@ fun AroundLocationScreen(
         Text(
             modifier = Modifier.padding(top = 16.dp),
             text = stringResource(id = R.string.around_location_subtitlee),
-            fontFamily = FontFamily(Font(R.font.circularstdmedium)),
+            fontFamily = FontFamily(Font(R.font.oppinsedium)),
             fontWeight = FontWeight(450),
             fontSize = 12.sp,
             color = AppColor.neutralText
@@ -114,23 +115,23 @@ fun AroundLocationScreen(
         )
 
         if (suggestionsList.value.isEmpty()) {
-
-            Text(
-                modifier = Modifier.padding(top = 54.dp),
-                fontFamily = FontFamily(Font(R.font.circularstdmedium)),
-                text = stringResource(id = R.string.last_searched),
-                fontSize = 14.sp,
-                fontWeight =
-                FontWeight.W500,
-                color = Color.Black
-            )
-
-            Divider(modifier = Modifier.padding(top = 12.dp))
-
-            LastSearchedLocationList(
-                placesHistoric,
-                { onDeleteSearch(it) },
-                { onSelectPlace(it) })
+//
+//            Text(
+//                modifier = Modifier.padding(top = 54.dp),
+//                fontFamily = FontFamily(Font(R.font.oppinsedium)),
+//                text = stringResource(id = R.string.last_searched),
+//                fontSize = 14.sp,
+//                fontWeight =
+//                FontWeight.W500,
+//                color = Color.Black
+//            )
+//
+//            Divider(modifier = Modifier.padding(top = 12.dp))
+//
+//            LastSearchedLocationList(
+//                placesHistoric,
+//                { onDeleteSearch(it) },
+//                { onSelectPlace(it) })
 
         } else {
             SuggestionsList(list = suggestionsList.value) {
@@ -147,32 +148,32 @@ fun AroundLocationScreen(
     }
 }
 
-@Composable
-fun LastSearchedLocationList(
-    placeHistoric: StateFlow<List<Search>>,
-    onDeleteSearch: (Search) -> Unit,
-    onSelectPlace: (Search) -> Unit
-) {
-
-    val searches by placeHistoric.collectAsState()
-    val scrollState = rememberScrollState()
-
-    LazyColumn(
-        modifier = Modifier
-            .padding(top = 22.dp)
-            .scrollable(
-                state = scrollState, orientation = Orientation.Vertical
-            )
-    ) {
-        items(searches) { search ->
-            LastSearchItem(onSearchDelete = {
-                onDeleteSearch(search)
-            }, onSelectSearch = { searchLabelSelected ->
-                onSelectPlace(searches[searches.indexOfFirst { it.searchLabel == searchLabelSelected }])
-            }, search = search.searchLabel)
-        }
-    }
-}
+//@Composable
+//fun LastSearchedLocationList(
+//    placeHistoric: StateFlow<List<Search>>,
+//    onDeleteSearch: (Search) -> Unit,
+//    onSelectPlace: (Search) -> Unit
+//) {
+//
+//    val searches by placeHistoric.collectAsState()
+//    val scrollState = rememberScrollState()
+//
+//    LazyColumn(
+//        modifier = Modifier
+//            .padding(top = 22.dp)
+//            .scrollable(
+//                state = scrollState, orientation = Orientation.Vertical
+//            )
+//    ) {
+//        items(searches) { search ->
+//            LastSearchItem(onSearchDelete = {
+//                onDeleteSearch(search)
+//            }, onSelectSearch = { searchLabelSelected ->
+//                onSelectPlace(searches[searches.indexOfFirst { it.searchLabel == searchLabelSelected }])
+//            }, search = search.searchLabel)
+//        }
+//    }
+//}
 
 @Composable
 fun SuggestionsList(
@@ -193,17 +194,20 @@ fun SuggestionsList(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(48.dp)
+                    .defaultMinSize(minHeight = 50.dp)
                     .clickable { onItemClicked(search) },
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = search.name,
-                    fontFamily = FontFamily(Font(R.font.circularstdmedium)),
-                    fontWeight = FontWeight(450),
-                    fontSize = 18.sp,
-                    color = AppColor.Primary30
-                )
+                Column {
+                    Text(
+                        text = search.name,
+                        fontFamily = FontFamily(Font(R.font.oppinsedium)),
+                        fontWeight = FontWeight(450),
+                        fontSize = 16.sp,
+                        color = AppColor.Black
+                    )
+                    Divider(modifier = Modifier.padding(top = 5.dp))
+                }
             }
         }
     }

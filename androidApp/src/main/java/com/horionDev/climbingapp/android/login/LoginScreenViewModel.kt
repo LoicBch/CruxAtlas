@@ -21,6 +21,7 @@ class LoginScreenViewModel(
 
     private lateinit var username: String
     private lateinit var pass: String
+    private lateinit var mail: String
 
     val loginIsComplete = savedStateHandle.getStateFlow(
         "loginIsComplete", false
@@ -63,6 +64,15 @@ class LoginScreenViewModel(
             savedStateHandle["passIsCorrect"] = true
         } else {
             savedStateHandle["passIsCorrect"] = false
+        }
+    }
+
+    fun controlMail(mail: String) {
+        if (mail.isNotEmpty()) {
+            this.mail = mail
+            savedStateHandle["mailIsCorrect"] = true
+        } else {
+            savedStateHandle["mailIsCorrect"] = false
         }
     }
 

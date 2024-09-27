@@ -19,11 +19,14 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.sharp.Close
 import androidx.compose.runtime.Composable
@@ -41,6 +44,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -53,6 +58,7 @@ import com.horionDev.climbingapp.android.LocalDependencyContainer
 import com.horionDev.climbingapp.android.R
 import com.horionDev.climbingapp.android.composables.AppButton
 import com.horionDev.climbingapp.android.composables.GlobalPopupState
+import com.horionDev.climbingapp.android.composables.SmallAppButton
 import com.horionDev.climbingapp.android.destinations.SignupScreenDestination
 import com.horionDev.climbingapp.android.ui.theme.AppColor
 import com.ramcosta.composedestinations.annotation.Destination
@@ -97,78 +103,104 @@ fun LoginScreen(
                         "A new password has been sent to your email. Please check your inbox and spam folder"
                     appViewModel.showGlobalPopup(popup)
                 }
+
+                else -> {}
             }
         }
     }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(text = "Connect to your account", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-        Text(text = "let's explore", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-
-        Image(
+    Column(Modifier.fillMaxSize()) {
+        Row(modifier = Modifier.fillMaxWidth()) {
+            IconButton(onClick = { navigator.popBackStack() }) {
+                Icon(imageVector = Icons.Outlined.ArrowBack, contentDescription = "")
+            }
+        }
+        Column(
             modifier = Modifier
-                .size(100.dp, 100.dp)
-                .padding(top = 10.dp),
-            painter = painterResource(id = R.drawable.logo),
-            contentDescription = ""
-        )
-
-        TextFieldAnimate(
-            modifier = Modifier.padding(top = 40.dp), placeHolder = R.string.username
+                .fillMaxSize()
+                .padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            viewModel.controlUsername(it.text)
-        }
-
-        TextFieldAnimate(
-            modifier = Modifier.padding(top = 15.dp),
-            asteriskVisible = true,
-            placeHolder = R.string.password
-        ) {
-            viewModel.controlPass(it.text)
-        }
-
-        if (loginFailed) {
             Text(
-                modifier = Modifier.padding(vertical = 5.dp),
-                text = "Username or password incorrect", color = AppColor.Primary30
+                text = "Connect to your account",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily(
+                    Font(R.font.oppinsedium)
+                )
+            )
+            Text(
+                text = "let's explore",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily(Font(R.font.oppinsedium))
+            )
+
+            Image(
+                modifier = Modifier
+                    .size(100.dp, 100.dp)
+                    .padding(top = 10.dp),
+                painter = painterResource(id = R.drawable.app_logo),
+                contentDescription = ""
+            )
+
+            TextFieldAnimate(
+                modifier = Modifier.padding(top = 40.dp), placeHolder = R.string.username
+            ) {
+                viewModel.controlUsername(it.text)
+            }
+
+            TextFieldAnimate(
+                modifier = Modifier.padding(top = 15.dp),
+                asteriskVisible = true,
+                placeHolder = R.string.password
+            ) {
+                viewModel.controlPass(it.text)
+            }
+
+            if (loginFailed) {
+                Text(
+                    modifier = Modifier.padding(vertical = 5.dp),
+                    text = "Username or password incorrect", color = Color.Red,
+                    fontFamily = FontFamily(Font(R.font.oppinsedium)),
+                    fontSize = 14.sp
+                )
+            }
+
+            Row(modifier = Modifier.padding(horizontal = 18.dp)) {
+                AppButton(
+                    modifier = Modifier.padding(top = 40.dp),
+                    onClick = {
+                        viewModel.login()
+                    },
+                    isActive = loginIsValid,
+                    textRes = R.string.login
+                )
+            }
+
+            Text(
+                modifier = Modifier
+                    .clickable {
+                        navigator.navigate(SignupScreenDestination)
+                    }
+                    .padding(vertical = 16.dp),
+                textAlign = TextAlign.Center,
+                fontSize = 14.sp,
+                fontFamily = FontFamily(Font(R.font.oppinsegular)),
+                text = "Dont have an account yet ? \nClick to create one",
+            )
+
+            Text(
+                modifier = Modifier
+                    .clickable {
+                        viewModel.showNewPassPopup()
+                    },
+                textAlign = TextAlign.Center,
+                fontSize = 14.sp,
+                fontFamily = FontFamily(Font(R.font.oppinsegular)),
+                text = "Forgot your password ? Click here",
             )
         }
-
-        Button(
-            modifier = Modifier.padding(top = 40.dp),
-            onClick = {
-                viewModel.login()
-            },
-            enabled = loginIsValid
-        ) {
-            Text(text = "Login")
-        }
-
-        Text(
-            modifier = Modifier
-                .clickable {
-                    navigator.navigate(SignupScreenDestination)
-                }
-                .padding(top = 5.dp),
-            textAlign = TextAlign.Center,
-            text = "Dont have an account yet ? \nClick to create one",
-        )
-
-        Text(
-            modifier = Modifier
-                .clickable {
-                    viewModel.showNewPassPopup()
-                }
-                .padding(top = 5.dp),
-            textAlign = TextAlign.Center,
-            text = "Forgot your password ? Click here",
-        )
     }
 
     if (askForNewPass) {
@@ -194,12 +226,21 @@ fun PopupPasswordReset(onRequestNewPassword: (String) -> Unit, onClose: () -> Un
                 .background(
                     color = Color.White, shape = RoundedCornerShape(5)
                 )
-                .padding(top = 10.dp, start = 16.dp, end = 16.dp)
+                .padding(25.dp)
                 .align(Alignment.Center)
         ) {
-            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Spacer(modifier = Modifier.weight(1f))
-                Text(text = "Reset password", color = AppColor.Primary30)
+                Text(
+                    text = "Reset password", fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily(
+                        Font(R.font.oppinsedium)
+                    )
+                )
                 Spacer(modifier = Modifier.weight(1f))
                 Icon(
                     imageVector = Icons.Sharp.Close,
@@ -210,19 +251,19 @@ fun PopupPasswordReset(onRequestNewPassword: (String) -> Unit, onClose: () -> Un
                     }
                 )
             }
-            TextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Email") },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+
+            TextFieldAnimate(
+                Modifier.padding(top = 20.dp, bottom = 10.dp),
+                placeHolder = R.string.email,
+            ){
+                email = it.text
+            }
+
             AppButton(
                 isActive = email.isNotEmpty(),
                 onClick = { onRequestNewPassword(email) },
-                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                modifier = Modifier
+                    .fillMaxWidth(),
                 textRes = R.string.valid
             )
         }
@@ -263,7 +304,7 @@ fun TextFieldAnimate(
                     },
                     imageVector = Icons.Outlined.Close,
                     contentDescription = "",
-                    tint = AppColor.Primary30
+                    tint = AppColor.Black
                 )
             }
         },
@@ -276,6 +317,10 @@ fun TextFieldAnimate(
         onValueChange = { textFieldValue ->
             textState.value = textFieldValue
             onUserSearch(textFieldValue)
-        }
+        },
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor = AppColor.garcrux,
+            cursorColor = AppColor.garcrux
+        )
     )
 }

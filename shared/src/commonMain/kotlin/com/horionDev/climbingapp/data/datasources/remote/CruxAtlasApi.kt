@@ -1,5 +1,6 @@
 package com.horionDev.climbingapp.data.datasources.remote
 
+import io.ktor.http.encodeURLQueryComponent
 import com.horionDev.climbingapp.data.ResultWrapper
 import com.horionDev.climbingapp.data.map
 import com.horionDev.climbingapp.data.model.ErrorMessage
@@ -65,7 +66,7 @@ class CruxAtlasApi(private var client: HttpClient) : Api, KoinComponent {
         return client.safePost<String, ErrorResponse> {
             url("users")
             contentType(ContentType.Application.Json)
-            setBody(UserDto(0, username, password, email, false))
+            setBody(UserDto(0, username, password, email, null,false))
         }
     }
 
@@ -73,7 +74,7 @@ class CruxAtlasApi(private var client: HttpClient) : Api, KoinComponent {
         return client.safePost<NothingResponse, ErrorResponse> {
             url("users/resetPassword")
             url {
-                parameters.append("mail", email)
+                parameters.append("mail", email.encodeURLQueryComponent())
             }
         }
     }

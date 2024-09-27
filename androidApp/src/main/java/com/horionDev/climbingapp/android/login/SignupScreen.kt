@@ -18,9 +18,16 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import com.horionDev.climbingapp.android.R
+import com.horionDev.climbingapp.android.composables.AppButton
+import com.horionDev.climbingapp.android.ui.theme.AppColor
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.getViewModel
@@ -32,6 +39,7 @@ fun SignupScreen(navigator: DestinationsNavigator, viewModel: SignupViewModel = 
 
     val signupIsValid by viewModel.signupIsValid.collectAsState()
     val signupIsComplete by viewModel.signupIsComplete.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
 
     if (signupIsComplete) {
         Popup(onDismissRequest = {
@@ -61,8 +69,19 @@ fun SignupScreen(navigator: DestinationsNavigator, viewModel: SignupViewModel = 
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(text = "Create your account")
-            Text(text = "let's explore")
+            Text(
+                text = "Create your account", fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily(
+                    Font(R.font.oppinsedium)
+                )
+            )
+
+            Text(
+                text = "let's explore", fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily(Font(R.font.oppinsedium))
+            )
 
             TextFieldAnimate(
                 modifier = Modifier.padding(top = 40.dp), placeHolder = R.string.username
@@ -84,16 +103,25 @@ fun SignupScreen(navigator: DestinationsNavigator, viewModel: SignupViewModel = 
                 viewModel.controlPass(it.text)
             }
 
-            Button(
-                modifier = Modifier.padding(top = 40.dp),
-                onClick = {
-                    viewModel.signup()
-                },
-                enabled = signupIsValid
-            ) {
-                Text(text = "Signup !")
+            if (errorMessage != "") {
+                Text(
+                    modifier = Modifier.padding(vertical = 5.dp),
+                    text = errorMessage, color = Color.Red,
+                    fontFamily = FontFamily(Font(R.font.oppinsedium)),
+                    fontSize = 14.sp
+                )
+            }
+
+            Row(Modifier.padding(horizontal = 18.dp)) {
+                AppButton(
+                    modifier = Modifier.padding(top = 40.dp),
+                    onClick = {
+                        viewModel.signup()
+                    },
+                    isActive = signupIsValid,
+                    textRes = R.string.signup
+                )
             }
         }
     }
-
 }

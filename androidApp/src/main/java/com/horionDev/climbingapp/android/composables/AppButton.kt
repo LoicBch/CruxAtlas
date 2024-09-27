@@ -37,7 +37,7 @@ fun AppButton(isActive: Boolean, onClick: () -> Unit, modifier: Modifier, @Strin
         onClick = onClick,
         enabled = isActive,
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = if (isActive) AppColor.Secondary
+            backgroundColor = if (isActive) AppColor.garcrux
             else AppColor.unSelectedFilterOption
         )
     ) {
@@ -47,7 +47,7 @@ fun AppButton(isActive: Boolean, onClick: () -> Unit, modifier: Modifier, @Strin
                 id = textRes,
             ),
             textAlign = TextAlign.Center, fontFamily = FontFamily(Font(R.font.circularstdmedium)),
-            color = Color.White,
+            color = Color.Black,
             fontSize = 16.sp,
             fontWeight = FontWeight.W700
         )
@@ -68,7 +68,7 @@ fun SmallAppButton(
         onClick = onClick,
         enabled = isActive,
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = if (isActive) AppColor.Secondary
+            backgroundColor = if (isActive) AppColor.garcrux
             else AppColor.unSelectedFilterOption
         )
     ) {

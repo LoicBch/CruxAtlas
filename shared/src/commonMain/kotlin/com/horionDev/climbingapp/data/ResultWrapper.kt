@@ -1,6 +1,7 @@
 package com.horionDev.climbingapp.data
 
 import com.horionDev.climbingapp.data.model.ErrorMessage
+import com.horionDev.climbingapp.domain.model.composition.ErrorResponse
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
@@ -23,19 +24,21 @@ sealed class ResultWrapper<out T, out E> {
 suspend inline fun <reified T, reified E> HttpClient.safeGet(block: HttpRequestBuilder.() -> Unit): ResultWrapper<T, E> {
     return try {
         val response = get { block() }
-        //        if (response.status.isSuccess()) {
-        //            ResultWrapper.Success(response.body(), response.headers["Comment"]!!)
-        ResultWrapper.Success(response.body())
-        //        } else {
-        //            val code = response.status.value
-        //            ResultWrapper.Failure.HttpError(code, response.body())
-        //        }
+        if (response.status.isSuccess()) {
+            ResultWrapper.Success(response.body())
+        } else {
+            val code = response.status.value
+            ResultWrapper.Failure.HttpError(code, response.body())
+        }
     } catch (e: ClientRequestException) {
         val code = e.response.status.value
         ResultWrapper.Failure.HttpError(code, e.errorBody())
     } catch (e: SerializationException) {
         ResultWrapper.Failure.SerializationError(ErrorMessage(e.message.toString()))
     } catch (e: IOException) {
+        println(e.message)
+        println(e.message)
+        println(e.message)
         ResultWrapper.Failure.NetworkError
     } catch (e: JsonConvertException) {
         ResultWrapper.Failure.SerializationError(
@@ -126,7 +129,7 @@ suspend inline fun <reified E> ResponseException.errorBody(): E? =
     }
 
 fun ResultWrapper.Failure<*>.message() = when (this) {
-    is ResultWrapper.Failure.HttpError<*> -> if (this.errorBody is ErrorMessage) this.errorBody.message else "An http error occurred"
+    is ResultWrapper.Failure.HttpError<*> -> if (this.errorBody is ErrorResponse) this.errorBody.message else "An http error occurred"
     is ResultWrapper.Failure.SerializationError -> "a serialization error occurred"
     is ResultWrapper.Failure.NetworkError -> "a network error occurred"
     is ResultWrapper.Failure.UnknownError -> TODO()
@@ -148,6 +151,7 @@ fun <T, E, U> ResultWrapper<T, E>.map(
                 ResultWrapper.Success(transform(it))
             } ?: ResultWrapper.Success(null as U)
         }
+
         is ResultWrapper.Failure -> this
     }
 }
@@ -161,6 +165,7 @@ suspend fun <T, E, U> ResultWrapper<T, E>.andThen(
                 transform(it)
             } ?: ResultWrapper.Success(null as U)
         }
+
         is ResultWrapper.Failure -> this
     }
 }

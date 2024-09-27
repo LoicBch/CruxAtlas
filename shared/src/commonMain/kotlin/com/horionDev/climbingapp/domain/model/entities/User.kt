@@ -8,5 +8,6 @@ data class User(
     var statut: String = "",
 //    Remove this and check on server if user is allowed to access functionalities
     var isSubscribe: Boolean = false,
-    var favorites: MutableList<String> = mutableListOf()
+    var favorites: MutableList<String> = mutableListOf(),
+    var imageUrl: String? = null
 )
