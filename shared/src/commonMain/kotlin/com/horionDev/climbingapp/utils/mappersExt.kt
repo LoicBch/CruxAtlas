@@ -28,6 +28,9 @@ fun UserDto.toVo() = User(
     username,
     password,
     email,
+    country,
+    city,
+    gender, age, weight, height, climbingSince,
     "U",
     isSubscribe,
     imageUrl = if (imageUrl == "") null else imageUrl
@@ -67,7 +70,7 @@ fun CragDto.toVo() = Crag(
     emptyList(),
     latitude,
     longitude,
-    thumbnailImageUrl
+    thumbnailUrl
 )
 
 @JvmName(name = "sectorDtoListToVo")
@@ -173,11 +176,14 @@ fun Dealer.toMarker() = AppMarker(this.id, false, this.latitude, this.longitude)
 fun List<Dealer>.toMarker() = map { it.toMarker() }
 
 @JvmName("listLaundryToMListMarker")
-fun LaundryDto.toMarker() = AppMarker(id!!, false, this.latitude!!.toDouble(), this.longitude!!.toDouble())
+fun LaundryDto.toMarker() =
+    AppMarker(id!!, false, this.latitude!!.toDouble(), this.longitude!!.toDouble())
+
 fun List<LaundryDto>.toMarker() = map { it.toMarker() }
 
 @JvmName("listClimbingToListMarker")
 fun Crag.toMarker() = AppMarker(id.toString(), false, this.latitude, this.longitude)
+
 @JvmName("listClimbingToListMark")
 fun List<Crag>.toMarker() = map { it.toMarker() }
 

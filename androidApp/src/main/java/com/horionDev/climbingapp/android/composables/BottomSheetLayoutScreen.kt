@@ -35,7 +35,6 @@ enum class FilterOptions {
     DIFFICULTY, OtherClimbingFilters
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @ExperimentalMaterialApi
 @Composable
 fun BottomSheetLayoutScreen() {

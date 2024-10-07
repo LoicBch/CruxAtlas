@@ -19,6 +19,7 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.json.Json
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
@@ -37,7 +38,7 @@ val apiDependency = module {
             }
 
             install(ContentNegotiation) {
-                json(DefaultJson, ContentType.Any)
+                json(Json { ignoreUnknownKeys = true }, ContentType.Any)
             }
 
             defaultRequest {

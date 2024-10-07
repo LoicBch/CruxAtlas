@@ -56,6 +56,7 @@ import com.horionDev.climbingapp.android.UnityParentActivity
 import com.horionDev.climbingapp.android.composables.AppButton
 import com.horionDev.climbingapp.android.composables.ImageAppButton
 import com.horionDev.climbingapp.android.destinations.LoginScreenDestination
+import com.horionDev.climbingapp.android.destinations.ProfileScreenDestination
 import com.horionDev.climbingapp.android.ui.theme.AppColor
 import com.horionDev.climbingapp.domain.model.NewsItem
 import com.horionDev.climbingapp.domain.model.entities.RouteGrade
@@ -78,13 +79,6 @@ fun NewsFeedScreen(
 
     val news by viewModel.news.collectAsState()
     val loading by viewModel.isLoading.collectAsState()
-    val walls = remember {
-        listOf(
-            Triple("Ange", "Ceuse, France", RouteGrade.SevenA),
-            Triple("Berlin", "Ceuse, France", RouteGrade.SevenCPlus),
-            Triple("La galere", "Ceuse, France", RouteGrade.SevenA)
-        )
-    }
 
     Column(
         modifier = Modifier
@@ -103,7 +97,9 @@ fun NewsFeedScreen(
         }
 
         if (SessionManager.isLogged()) {
-            ProfileCard()
+            ProfileCard {
+                navigator.navigate(ProfileScreenDestination)
+            }
         } else {
             LoginCard(navigator)
         }
@@ -150,10 +146,13 @@ fun NewsFeedScreen(
 }
 
 @Composable
-fun ProfileCard() {
+fun ProfileCard(onOpenProfile: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable {
+                onOpenProfile()
+            }
             .shadow(
                 elevation = 4.dp,
                 shape = RoundedCornerShape(25),
@@ -425,7 +424,7 @@ fun AnotherListCard(walls: List<Pair<String, String>>) {
                         isActive = true,
                         onClick = {
                             val intent = Intent(context, UnityParentActivity::class.java)
-                                .putExtra("unity", "my_unity_scene")
+                                .putExtra("MODEL_PATH", "pathToModel")
                             launcher.launch(intent)
                         },
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),

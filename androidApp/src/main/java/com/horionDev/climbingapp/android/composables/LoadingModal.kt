@@ -40,10 +40,11 @@ fun LoadingModal(modifier: Modifier) {
                 .padding(vertical = 24.dp, horizontal = 16.dp)
                 .width(IntrinsicSize.Max)
         ) {
-
-            Image(painter = painterResource(id = R.drawable.logo), contentDescription = "")
+            Image(painter = painterResource(id = R.drawable.app_logo), contentDescription = "")
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(5.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {

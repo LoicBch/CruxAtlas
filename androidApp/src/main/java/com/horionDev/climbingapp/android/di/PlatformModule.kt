@@ -7,6 +7,7 @@ import com.horionDev.climbingapp.android.onBoarding.SplashScreenViewModel
 import com.horionDev.climbingapp.android.newsFeed.NewsFeedViewModel
 import com.horionDev.climbingapp.android.login.LoginScreenViewModel
 import com.horionDev.climbingapp.android.login.SignupViewModel
+import com.horionDev.climbingapp.android.profile.ProfileViewModel
 import com.horionDev.climbingapp.utils.KMMPreference
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.context.GlobalContext.get
@@ -24,6 +25,7 @@ val viewModelModule = module {
     viewModelOf(::NewsFeedViewModel)
     viewModelOf(::LoginScreenViewModel)
     viewModelOf(::SignupViewModel)
+    viewModelOf(::ProfileViewModel)
 }
 
 val persistenceModule = module {

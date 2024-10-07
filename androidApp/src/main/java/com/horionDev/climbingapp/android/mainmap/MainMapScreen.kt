@@ -60,6 +60,7 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import com.horionDev.climbingapp.android.destinations.CragSheetDestination
+import com.horionDev.climbingapp.android.extensions.hasLocationPermission
 import com.horionDev.climbingapp.domain.model.entities.Crag
 import com.horionDev.climbingapp.domain.model.entities.ceuse
 import com.horionDev.climbingapp.domain.model.entities.gradeDistributionString
@@ -137,29 +138,28 @@ fun MainMap(
 
     LaunchedEffect(true) {
 
-        //        if (updateSource == UpdateSource.DEFAULT) {
-        ////            viewModel.getAds()
-        //            if (context.hasLocationPermission) {
-        //                cameraPositionState.move(
-        //                    CameraUpdateFactory.newLatLng(
-        //                        LatLng(
-        //                            Globals.geoLoc.lastKnownLocation.latitude,
-        //                            Globals.geoLoc.lastKnownLocation.longitude
-        //                        )
-        //                    )
-        //                )
-        //                viewModel.showLaundry(Globals.geoLoc.lastKnownLocation)
-        //            } else {
-        //                cameraPositionState.move(
-        //                    CameraUpdateFactory.newLatLng(
-        //                        LatLng(
-        //                            Constants.DEFAULT_LOCATION.latitude,
-        //                            Constants.DEFAULT_LOCATION.longitude
-        //                        )
-        //                    )
-        //                )
-        //            }
-        //        }
+        if (updateSource == UpdateSource.DEFAULT) {
+            if (context.hasLocationPermission) {
+                cameraPositionState.move(
+                    CameraUpdateFactory.newLatLng(
+                        LatLng(
+                            Globals.GeoLoc.lastKnownLocation.latitude,
+                            Globals.GeoLoc.lastKnownLocation.longitude
+                        )
+                    )
+                )
+                viewModel.showCrags(Globals.GeoLoc.lastKnownLocation)
+            } else {
+                cameraPositionState.move(
+                    CameraUpdateFactory.newLatLng(
+                        LatLng(
+                            Constants.DEFAULT_LOCATION.latitude,
+                            Constants.DEFAULT_LOCATION.longitude
+                        )
+                    )
+                )
+            }
+        }
     }
 
     LaunchedEffect(appViewModel.filtersApplied) {
@@ -169,22 +169,23 @@ fun MainMap(
     }
 
 
-//    LaunchedEffect(appViewModel.loadAroundMeIsPressed) { //        appViewModel.loadAroundMeIsPressed.collect {
-//                    if (it) {
-//                        if (context.hasLocationPermission) {
-//                            cameraPositionState.move(
-//                                CameraUpdateFactory.newLatLng(
-//                                    LatLng(
-//                                        Globals.geoLoc.lastKnownLocation.latitude,
-//                                        Globals.geoLoc.lastKnownLocation.longitude
-//                                    )
-//                                )
-//                            )
-//                            viewModel.showLaundry(Globals.geoLoc.lastKnownLocation)
-//                        }
-//                    }
-//                }
-//    }
+    LaunchedEffect(appViewModel.loadAroundMeIsPressed) {
+        appViewModel.loadAroundMeIsPressed.collect {
+            if (it) {
+                if (context.hasLocationPermission) {
+                    cameraPositionState.move(
+                        CameraUpdateFactory.newLatLng(
+                            LatLng(
+                                Globals.GeoLoc.lastKnownLocation.latitude,
+                                Globals.GeoLoc.lastKnownLocation.longitude
+                            )
+                        )
+                    )
+                    viewModel.showCrags(Globals.GeoLoc.lastKnownLocation)
+                }
+            }
+        }
+    }
 
     locationSearchRecipient.onNavResult { result ->
         when (result) {
@@ -233,11 +234,11 @@ fun MainMap(
         Box(modifier = Modifier.fillMaxSize()) {
             Column(modifier = Modifier.align(Alignment.BottomCenter)) {
 
-                //                if (!cameraPositionState.isMoving && !cameraPositionState.locationVo.isAroundLastSearchedLocation) {
-                //                    SearchHereButton(onClick = {
-                ////                        viewModel.showLaundry(cameraPositionState.locationVo)
-                //                    }, cameraPositionState)
-                //                }
+                if (!cameraPositionState.isMoving && !cameraPositionState.locationVo.isAroundLastSearchedLocation) {
+                    SearchHereButton(onClick = {
+                        viewModel.showCrags(cameraPositionState.locationVo)
+                    }, cameraPositionState)
+                }
 
                 if (locationSearched.isNotEmpty()) LocationSearchContainer(locationSearched,
                     cameraPositionState,
@@ -252,7 +253,7 @@ fun MainMap(
 
                 if (laundry.value.isNotEmpty()) {
                     HorizontalSpotsList(cameraPositionState = cameraPositionState,
-                        crags = listOf(ceuse),
+                        crags = laundry.value,
                         onItemClicked = {
                             navigator.navigate(
                                 CragSheetDestination(it)
@@ -448,7 +449,7 @@ fun SearchHereButton(onClick: () -> Unit, cameraPositionState: CameraPositionSta
             shape = RoundedCornerShape(Dimensions.radiusAppButton),
             onClick = { onClick() },
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = AppColor.Secondary
+                backgroundColor = AppColor.garcrux
             )
         ) {
             Text(
@@ -456,9 +457,9 @@ fun SearchHereButton(onClick: () -> Unit, cameraPositionState: CameraPositionSta
                 text = stringResource(
                     id = R.string.search_this_area
                 ),
-                color = Color.White,
+                color = Color.Black,
                 fontSize = 14.sp,
-                fontFamily = FontFamily(Font(R.font.circularstdmedium)),
+                fontFamily = FontFamily(Font(R.font.oppinsedium)),
                 fontWeight = FontWeight.W500
             )
         }
@@ -505,7 +506,7 @@ fun VerticalCragsList(
                 .height(130.dp)
                 .background(Color.White, RoundedCornerShape(8))
                 .clickable { onItemClicked(item) }) {
-                VerticalListItem(ceuse)
+                VerticalListItem(item)
             }
         }
     }
@@ -516,7 +517,7 @@ fun VerticalListItem(crag: Crag) {
 
     val application = LocalContext.current.applicationContext as Application
 
-    if (crag.image.isNotEmpty()) {
+    if (!crag.image.isNullOrEmpty()) {
         Box {
             GlideImage(
                 modifier = Modifier
@@ -568,34 +569,34 @@ fun VerticalListItem(crag: Crag) {
                 color = AppColor.neutralText
             )
 
-            Text(
-                fontWeight = FontWeight(450),
-                maxLines = 1,
-                fontSize = 12.sp,
-                fontFamily = FontFamily(Font(R.font.oppinsedium)),
-                text = crag.gradeDistributionString(),
-                color = AppColor.neutralText
-            )
+//            Text(
+//                fontWeight = FontWeight(450),
+//                maxLines = 1,
+//                fontSize = 12.sp,
+//                fontFamily = FontFamily(Font(R.font.oppinsedium)),
+//                text = crag.gradeDistributionString(),
+//                color = AppColor.neutralText
+//            )
         }
 
-//        val context = LocalContext.current
-//        val launcher =
-//            rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult(),
-//                onResult = { result -> // Traiter le résultat ici
-//                })
+        val context = LocalContext.current
+        val launcher =
+            rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult(),
+                onResult = { result -> // Traiter le résultat ici
+                })
 //
-//        AppButton(
-//            isActive = true,
-//            onClick = {
-//                val intent = Intent(context, UnityParentActivity::class.java).putExtra(
-//                    "unity",
-//                    "my_unity_scene"
-//                )
-//                launcher.launch(intent)
-//            },
-//            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-//            textRes = R.string.unity_viewer
-//        )
+        AppButton(
+            isActive = true,
+            onClick = {
+                val intent = Intent(context, UnityParentActivity::class.java).putExtra(
+                    "unity",
+                    "my_unity_scene"
+                )
+                launcher.launch(intent)
+            },
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            textRes = R.string.unity_viewer
+        )
 
 //        Spacer(modifier = Modifier.weight(1f))
 //
@@ -704,7 +705,7 @@ fun HorizontalSpotsList(
 @Composable
 fun HorizontalListItem(crag: Crag) {
 
-    if (crag.image.isNotEmpty()) {
+    if (!crag.image.isNullOrEmpty()) {
         Box {
             GlideImage(
                 modifier = Modifier
@@ -756,15 +757,15 @@ fun HorizontalListItem(crag: Crag) {
                 color = AppColor.neutralText
             )
 
-            Text(
-                modifier = Modifier.padding(bottom = 2.dp),
-                fontWeight = FontWeight(450),
-                maxLines = 1,
-                fontSize = 12.sp,
-                fontFamily = FontFamily(Font(R.font.oppinsedium)),
-                text = crag.gradeDistributionString(),
-                color = AppColor.neutralText
-            )
+//            Text(
+//                modifier = Modifier.padding(bottom = 2.dp),
+//                fontWeight = FontWeight(450),
+//                maxLines = 1,
+//                fontSize = 12.sp,
+//                fontFamily = FontFamily(Font(R.font.oppinsedium)),
+//                text = crag.gradeDistributionString(),
+//                color = AppColor.neutralText
+//            )
         }
 
 

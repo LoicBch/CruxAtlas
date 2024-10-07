@@ -177,5 +177,8 @@
     <string name="finish_spot_creation_photo">finish</string>
     <string name="valid">validate</string>
     <string name="signup">Signup</string>
+    <string name="boulders">boulders</string>
+    <string name="routes">routes</string>
+    <string name="about">about</string>
 
 </resources>

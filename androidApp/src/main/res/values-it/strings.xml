@@ -145,5 +145,8 @@
     <string name="bug_report">Want to report a bug? Outdated information?</string>
     <string name="bug_text">Send us an email and we’ll get back to you as soon as possible:
     contact@camper-pro.com</string>
+    <string name="boulders">boulders</string>
+    <string name="routes">routes</string>
+    <string name="about">about</string>
 
 </resources>

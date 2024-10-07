@@ -9,15 +9,15 @@ class CragDto(
     val id: Int,
     val areaId: Int,
     val name: String,
-    val description: String,
-    val sectors: List<Sector>,
+    val description: String? = "",
+    val sectors: List<Sector>? = emptyList(),
     val latitude: Double,
     val longitude: Double,
-    val thumbnailImageUrl: String,
-    val boundingBox: BoundingBox = BoundingBox(0.0, 0.0, 0.0, 0.0),
-    val orientation: String,
-    val altitude: String,
-    val approachLenght: String
+    val thumbnailUrl: String? = "",
+    val boundingBox: BoundingBox? = BoundingBox(0.0, 0.0, 0.0, 0.0),
+    val orientation: String? = "",
+    val altitude: String? = "",
+    val approachLenght: String? = ""
 )
 
 @Serializable

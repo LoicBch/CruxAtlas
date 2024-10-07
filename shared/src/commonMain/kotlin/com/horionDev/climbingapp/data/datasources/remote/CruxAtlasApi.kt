@@ -24,11 +24,16 @@ import com.horionDev.climbingapp.data.model.dto.UserDto
 import com.horionDev.climbingapp.data.model.dto.UserProfileDto
 import com.horionDev.climbingapp.data.model.responses.NothingResponse
 import com.horionDev.climbingapp.data.safeDelete
+import com.horionDev.climbingapp.data.safePatch
 import com.horionDev.climbingapp.domain.model.CragDetails
 import com.horionDev.climbingapp.domain.model.NewsItem
 import com.horionDev.climbingapp.domain.model.UserProfile
+import com.horionDev.climbingapp.domain.model.entities.BoulderLog
+import com.horionDev.climbingapp.domain.model.entities.RouteLog
+import com.horionDev.climbingapp.utils.SessionManager
 import io.ktor.client.*
 import io.ktor.client.request.*
+import io.ktor.client.utils.EmptyContent.contentType
 import io.ktor.http.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -66,7 +71,7 @@ class CruxAtlasApi(private var client: HttpClient) : Api, KoinComponent {
         return client.safePost<String, ErrorResponse> {
             url("users")
             contentType(ContentType.Application.Json)
-            setBody(UserDto(0, username, password, email, null,false))
+            setBody(UserDto(0, username, password, email))
         }
     }
 
@@ -135,7 +140,9 @@ class CruxAtlasApi(private var client: HttpClient) : Api, KoinComponent {
     }
 
     override suspend fun get3DModel(cragId: Int): ResultWrapper<String, ErrorResponse> {
-        TODO("Not yet implemented")
+        return client.safeGet<String, ErrorResponse> {
+            url("crags/$cragId/3d")
+        }
     }
 
     override suspend fun getLocationSuggestions(input: String): ResultWrapper<List<Place>, ErrorMessage> {
@@ -149,7 +156,11 @@ class CruxAtlasApi(private var client: HttpClient) : Api, KoinComponent {
         }
     }
 
-    override suspend fun logRoute(userId: Int, cragId: Int, log: String): ResultWrapper<NothingResponse, ErrorResponse> {
+    override suspend fun logRoute(
+        userId: Int,
+        cragId: Int,
+        log: String
+    ): ResultWrapper<NothingResponse, ErrorResponse> {
         return client.safePost<NothingResponse, ErrorResponse> {
             url("users/$userId/log")
             url {
@@ -168,6 +179,63 @@ class CruxAtlasApi(private var client: HttpClient) : Api, KoinComponent {
         }.map {
             it.map { it.toString() }
         }
+    }
+
+    override suspend fun fetchRouteLogs(userId: Int): ResultWrapper<List<RouteLog>, ErrorResponse> {
+        return client.safeGet<List<RouteLog>, ErrorResponse> {
+            url("users/$userId/routeLogs")
+            url {
+                parameters.append("user_id", userId.toString())
+            }
+        }
+    }
+
+    override suspend fun fetchBoulderLogs(userId: Int): ResultWrapper<List<BoulderLog>, ErrorResponse> {
+        return client.safeGet<List<BoulderLog>, ErrorResponse> {
+            url("users/$userId/boulderLogs")
+            url {
+                parameters.append("user_id", userId.toString())
+            }
+        }
+    }
+
+    override suspend fun addRouteLog(
+        userId: Int,
+        routeId: Int,
+        routeLog: RouteLog
+    ): ResultWrapper<NothingResponse, ErrorResponse> {
+        return client.safePost<NothingResponse, ErrorResponse> {
+            url("users/$userId/route/log")
+            url {
+                parameters.append("route_id", routeId.toString())
+            }
+            setBody(routeLog)
+            addBearerToken(kmmPreference)
+        }
+    }
+
+    override suspend fun addBoulderLog(
+        userId: Int,
+        boulderId: Int,
+        boulderLog: BoulderLog
+    ): ResultWrapper<NothingResponse, ErrorResponse> {
+        return client.safePost<NothingResponse, ErrorResponse> {
+            url("users/$userId/boulder/log")
+            url {
+                parameters.append("boulder_id", boulderId.toString())
+            }
+            setBody(boulderLog)
+            addBearerToken(kmmPreference)
+        }
+    }
+
+    override suspend fun updateUser(userDto: UserDto): ResultWrapper<User, ErrorResponse> {
+        return client.safePatch<UserDto, ErrorResponse> {
+            url("users/${SessionManager.user.id}")
+            contentType(ContentType.Application.Json)
+            setBody(userDto)
+            addBearerToken(kmmPreference)
+        }.map { it.toVo() }
     }
 
     override suspend fun addCragAsFavoriteToUser(

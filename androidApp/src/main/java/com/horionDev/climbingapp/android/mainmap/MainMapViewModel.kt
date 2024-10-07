@@ -63,17 +63,17 @@ class MainMapViewModel(
     private val _event = MutableSharedFlow<MainMapEvent>()
     val event = _event.asSharedFlow()
 
-    private val climbingRoutesFrance = listOf(
-        ceuse, ceuse
-    )
+//    private val climbingRoutesFrance = listOf(
+//        ceuse, ceuse
+//    )
 
-    init {
-        savedStateHandle["updateSource"] = UpdateSource.AROUND_ME
-        markers.clear()
-        markers.addAll(climbingRoutesFrance.toMarker().toList())
-        savedStateHandle["laundry"] = climbingRoutesFrance.toList()
-        savedStateHandle["dealersSorted"] = climbingRoutesFrance.toList()
-    }
+//    init {
+//        savedStateHandle["updateSource"] = UpdateSource.AROUND_ME
+//        markers.clear()
+//        markers.addAll(climbingRoutesFrance.toMarker().toList())
+//        savedStateHandle["laundry"] = climbingRoutesFrance.toList()
+//        savedStateHandle["dealersSorted"] = climbingRoutesFrance.toList()
+//    }
 
     val state = combine(
         updateSource, ads, loading, verticalListIsShowing, cameraIsOutOfRadiusLimit
@@ -137,6 +137,8 @@ class MainMapViewModel(
                     markers.clear()
                     markers.addAll(spots!!.toMarker().toList())
                     savedStateHandle["dealers"] = spots.toList()
+                    savedStateHandle["dealersSorted"] = spots.toList()
+                    savedStateHandle["laundry"] = spots.toList()
                     savedStateHandle["placeSearched"] = ""
                     if (seeAllMarkers) {
                         updateMapRegion(markers)
