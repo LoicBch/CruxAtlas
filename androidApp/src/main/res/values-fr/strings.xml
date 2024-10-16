@@ -1,93 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!--  Around location -->
-    <string name="around_location_placeholder">Appuyez pour commencer à taper</string>
-    <string name="around_location_subtitle"> city</string>
-    <string name="cd_magnifying_glass_icon">icône de loupe</string>
+    <!--  Autour de la position -->
+    <string name="around_location_placeholder">Touchez pour commencer à taper</string>
+    <string name="around_location_subtitle">Rechercher un lieu : adresse</string>
+    <string name="around_location_subtitlee">Rechercher ville, falaise, voies...</string>
+    <string name="cd_magnifying_glass_icon">icône loupe</string>
 
-    <!--  Filter -->
-    <string name="filters_title">Filtrer</string>
-    <string name="search_details_subtitle">Détails de recherche</string>
-    <string name="choose_motorhome_brand">Choisissez la marque de camping-car</string>
-    <string name="choose_services_type">Choisissez le type de services</string>
-    <string name="choose_accessories_brand">Choisissez la marque d\'accessoires</string>
-    <string name="all_motorhome_brand">toutes les marques de camping-car</string>
-    <string name="all_services_type">tous les types de services</string>
-    <string name="all_accessories_brand">toutes les marques d\'accessoires</string>
-    <string name="apply_filters">Appliquer des filtres</string>
-    <string name="search_placeholder">Appuyez pour commencer à taper</string>
-    <string name="last_searched">Dernière recherche</string>
+    <!--  À ajouter -->
+    <string name="unity_viewer">Ouvrir le visualiseur 3D</string>
+    <string name="app_name">Crux Atlas</string>
+    <string name="general">Général</string>
+    <string name="approach">Approche</string>
+    <string name="topos">Topos</string>
+    <string name="favorite">Favori</string>
+    <string name="view_in_3D">Voir en 3D</string>
+
+    <string name="filters_title">Filtre</string>
+    <string name="apply_filters">Appliquer les filtres</string>
+    <string name="search_placeholder">Touchez pour commencer à taper</string>
+    <string name="last_searched">Dernières recherches</string>
     <string name="search_result">Résultats de recherche</string>
-    <string name="filter_step1_title">Comment pouvons-nous vous aider aujourd\'hui?</string>
-    <string name="filter_step2_title">Sélectionnez les détails</string>
-    <string name="filter_step1_option1"> upgrade or buy motorhome"</string>
-    <string name="filter_step1_option2">Trouver les concessionnaires de camping-car officiels</string>
-    <string name="filter_step1_option3">Rechercher des accessoires de camping-car</string>
-    <string name="choose_country">Choisissez un pays</string>
-    <string name="confirm_selection">Confirmer la sélection</string>
-    <string name="motorhome_brands">Marques de camping-car</string>
-    <string name="motorhome_services">Services de camping-car</string>
-    <string name="where_do_you_want_to_go">Où voulez-vous aller</string>
-    <string name="cd_filter_icon">icône de filtre</string>
+    <string name="choose_country">Choisissez le pays</string>
+    <string name="where_do_you_want_to_go">Où voulez-vous aller ?</string>
+    <string name="cd_filter_icon">icône filtre</string>
     <string name="cd_filter_option">ouvrir et choisir %1$s</string>
 
     <!--  Global -->
     <string name="all">Tout</string>
     <string name="reset">Réinitialiser</string>
-    <string name="step">Pas</string>
-    <string name="slider_missing_network_title">Connexion au réseau perdue</string>
+    <string name="step">Étape</string>
+    <string name="slider_missing_network_title">Connexion réseau perdue</string>
     <string name="slider_missing_network_text">Veuillez vérifier vos paramètres internet</string>
     <string name="slider_missing_gps_text">Veuillez activer votre GPS</string>
     <string name="slider_missing_gps_title">Signal GPS perdu</string>
-    <string name="popup_missing_network_title">Connexion au réseau perdue</string>
+    <string name="popup_missing_network_title">Connexion réseau perdue</string>
     <string name="popup_missing_gps_title">Signal GPS perdu</string>
-    <string name="popup_missing_network_text">Vous ne pouvez pas accéder à cette fonction hors ligne</string>
-    <string name="popup_missing_gps_text">you can\'t access this function without location</string>
-    <string name="loading">loading</string>
-    <string name="get_offer">Obtenez une offre limitée dans le temps!</string>
+    <string name="popup_missing_network_text">vous ne pouvez pas accéder à cette fonction hors ligne</string>
+    <string name="popup_missing_gps_text">vous ne pouvez pas accéder à cette fonction sans localisation</string>
+    <string name="loading">chargement</string>
 
-    <!--  MainMap Screen -->
-    <string name="appbar_around_me">Autour de moi</string>
-    <string name="appbar_around_location">Autour d\'un lieu</string>
-    <string name="appbar_partners">Partenaires</string>
+    <!--  Écran MainMap -->
+    <string name="appbar_home">Accueil</string>
+    <string name="appbar_explore">Explorer</string>
+    <string name="search">Rechercher des lieux</string>
+    <string name="appbar_around_location">Autour de la position</string>
     <string name="appbar_menu">Plus</string>
     <string name="search_this_area">Rechercher dans cette zone</string>
-    <string name="cd_button_vertical_list">passer en mode liste</string>
-    <string name="cd_button_filter">passer en mode liste</string>
-    <string name="cd_button_mapstyle">Changer la couche de carte</string>
+    <string name="cd_button_vertical_list">passer au mode liste</string>
+    <string name="cd_button_filter">passer au mode liste</string>
+    <string name="cd_button_mapstyle">Changer la couche de la carte</string>
     <string name="cd_around_me">afficher les lieux autour de moi</string>
-    <string name="cd_around_location">ouvrir l\'écran pour rechercher autour d\'un emplacement</string>
+    <string name="cd_around_location">ouvrir l\'écran pour rechercher autour d\'un lieu</string>
     <string name="cd_partners">ouvrir l\'écran des partenaires</string>
     <string name="cd_menu">ouvrir le menu</string>
-    <string name="cd_search_here">rechercher à cet emplacement</string>
+    <string name="cd_search_here">rechercher à cet endroit</string>
 
-    <!--  More -->
-    <string name="menu_travel_tools">Outils de voyage</string>
-    <string name="menu_events">Événements</string>
-    <string name="menu_leveler">Niveau à bulle</string>
-    <string name="menu_my_location">Ma position</string>
+    <!--  Plus -->
     <string name="menu_app_settings">Paramètres de l\'application</string>
-    <string name="menu_travel_checklists">Listes de contrôle de voyage</string>
-    <string name="cd_travel_tools">icône d\'outils de voyage</string>
-    <string name="cd_travel_checklist">icône de liste de contrôle de voyage</string>
-    <string name="cd_leveler">icône de niveau à bulle</string>
-    <string name="cd_events">ouvrir la carte des événements</string>
-    <string name="cd_my_location">icône de ma position</string>
-    <string name="cd_app_settings">icône des paramètres de l\'application</string>
 
-    <!--  Partner -->
-    <string name="navigate_to_event">Naviguer vers l\'événement</string>
-    <string name="unity_viewer">Open 3D Viewer</string>
-    <string name="cd_arrow_back">retourner en arrière</string>
+    <!--  Partenaire -->
+    <string name="cd_arrow_back">revenir en arrière</string>
 
-    <!--  Settings -->
+    <!--  Paramètres -->
     <string name="measuring_system">Système de mesure</string>
     <string name="language">Langue</string>
     <string name="help">Aide</string>
     <string name="term_of_use">Conditions d\'utilisation</string>
     <string name="privacy_policy">Politique de confidentialité</string>
-    <string name="build">Construire</string>
+    <string name="build">Version de build</string>
     <string name="version">Version de l\'application</string>
     <string name="technical_infos">Informations techniques</string>
     <string name="app_settings">Paramètres de l\'application</string>
@@ -96,58 +77,94 @@
     <string name="italian">Italien</string>
     <string name="spanish">Espagnol</string>
     <string name="german">Allemand</string>
-    <string name="meter">metre</string>
+    <string name="meter">mètre</string>
     <string name="miles">miles</string>
-    <string name="serv">l</string>
+    <string name="serv">revenir en arrière</string>
 
-    <!--  Sorting -->
+    <!--  Tri -->
     <string name="sorting">Tri</string>
     <string name="sort_places">Trier les lieux</string>
     <string name="none">Aucun</string>
     <string name="by_distance_from_you">Par distance de vous</string>
-    <string name="distance_from_searched_location">Par distance de l\'emplacement recherché</string>
-    <string name="by_date">Par date (plus tôt en premier)</string>
+    <string name="distance_from_searched_location">Par distance du lieu recherché</string>
+    <string name="by_date">Par date (la plus proche d\'abord)</string>
     <string name="apply_sorting">Appliquer le tri</string>
-    <string name="z">icône de loupe</string>
 
-    <!--  Spot Sheet -->
-    <string name="verified">Vérifié</string>
-    <string name="overview">Vue d\'ensemble</string>
+    <!--  Fiche du lieu -->
+    <string name="overview">Aperçu</string>
     <string name="details">Détails</string>
-    <string name="contact_info">Coordonnées</string>
+    <string name="contact_info">Infos de contact</string>
     <string name="phone">Téléphone</string>
     <string name="website">Site web</string>
-    <string name="from_you">de votre position</string>
-    <string name="view_all_services">Voir tous les services disponibles à cet endroit</string>
-    <string name="view_all_brands">Voir toutes les marques disponibles à cet endroit</string>
+    <string name="from_you">de vous</string>
     <string name="navigate">Naviguer</string>
-    <string name="services">Services</string>
-    <string name="official_dealers">Concessionnaires officiels</string>
-    <string name="accessories">Accessoires</string>
-    <string name="services_subtitle">Il s\'agit d\'informations supplémentaires que nous pouvons ajouter.</string>
-    <string name="dealers_subtitle"> but it might offer services for other brands as well. Contact place to find out."</string>
-    <string name="accessories_subtitle">Ces marques sont vendues et/ou entretenues à cet endroit.</string>
 
-    <!--  checkLists -->
-    <string name="travel_checklists">Listes de contrôle de voyage</string>
-    <string name="clear_all">Effacer tout</string>
+    <!--  Listes de contrôle -->
+    <string name="clear_all">Tout effacer</string>
 
-    <!--  myLocation -->
-    <string name="my_location">Mon emplacement actuel</string>
-    <string name="my_parking">Mon emplacement de stationnement</string>
-    <string name="park_here">Stationner ici</string>
+    <!--  maPosition -->
+    <string name="my_location">Ma position actuelle</string>
     <string name="delete">Supprimer</string>
-    <string name="delete_location_popup">"Do you want to permanently delete this saved location? The action cannot be undone."</string>
 
-    <!--  Help -->
-    <string name="need_help">Need help</string>
-    <string name="help_subtitle">Find out everything about Camper-Pro:</string>
+    <!--  Aide -->
+    <string name="need_help">Besoin d\'aide</string>
+    <string name="help_subtitle">Découvrez tout sur Camper-Pro :</string>
     <string name="faq_link">camper-pro.com/faq</string>
-    <string name="bug_report">Want to report a bug? Outdated information?</string>
-    <string name="bug_text">Send us an email and we’ll get back to you as soon as possible:
+    <string name="bug_report">Vous souhaitez signaler un bug ? Informations obsolètes ?</string>
+    <string name="bug_text">Envoyez-nous un e-mail et nous vous répondrons dès que possible :
     contact@camper-pro.com</string>
-    <string name="boulders">boulders</string>
-    <string name="routes">routes</string>
-    <string name="about">about</string>
+    <string name="login">Se connecter</string>
+    <string name="explore">Commencez à explorer</string>
+    <string name="menu_account">Ressources téléchargées</string>
+    <string name="add_location">Ajouter un lieu</string>
+    <string name="password">mot de passe</string>
+    <string name="username">nom d\'utilisateur</string>
+    <string name="dowloaded">Ressources 3D téléchargées</string>
+    <string name="email">Email</string>
+    <string name="sectorMissing">Un secteur manque ? Aidez la communauté en l\'ajoutant</string>
+    <string name="addSector">Ajouter un secteur</string>
+    <string name="addRoute">Ajouter une voie</string>
+    <string name="routeMissing">Une voie manque ? Aidez la communauté en l\'ajoutant</string>
+    <string name="help_add_data">ajouter des données</string>
+    <string name="no_seasons">Cette falaise n\'a pas d\'informations sur les saisons</string>
+    <string name="no_infos">Cet endroit n\'a pas d\'informations</string>
+    <string name="remove">supprimer</string>
+    <string name="add_photo_from_camera">Ajouter depuis la caméra</string>
+    <string name="add_photo_from_gallery">ajouter depuis la galerie</string>
+    <string name="finish_spot_creation_photo">terminer</string>
+    <string name="valid">valider</string>
+    <string name="signup">S\'inscrire</string>
+    <string name="boulders">blocs</string>
+    <string name="routes">voies</string>
+    <string name="about">à propos</string>
+    <string name="climbing_since">grimpe depuis</string>
+    <string name="height">taille</string>
+    <string name="weight">poids</string>
+    <string name="age">âge</string>
+    <string name="gender">sexe</string>
+    <string name="city">ville</string>
+    <string name="country">pays</string>
+    <string name="american_yds">Américain YDS</string>
+    <string name="uiaa">UIAA</string>
+    <string name="bookmarks">Favoris</string>
+    <string name="by_countries">Par pays</string>
+    <string name="by_grades">Par niveaux</string>
+    <string name="filters">Filtres</string>
+    <string name="reset_all">Réinitialiser tout</string>
+    <string name="create_account">Créer un compte</string>
+    <string name="lets_explore">Explorons</string>
+    <string name="incorrect_log">Nom d\'utilisateur ou mot de passe incorrect</string>
+    <string name="no_account">Pas encore de compte ? \\nCliquez pour en créer un</string>
+    <string name="forgot_password">Mot de passe oublié ? Cliquez ici</string>
+    <string name="reset_password">Réinitialiser le mot de passe</string>
+    <string name="sectors">secteurs</string>
+    <string name="france">France</string>
+    <string name="italy">Italie</string>
+    <string name="spain">Espagne</string>
+    <string name="germany">Allemagne</string>
+    <string name="switzerland">Suisse</string>
+    <string name="belgium">Belgique</string>
+    <string name="netherlands">Pays-Bas</string>
+    <string name="ireland">Irlande</string>
 
 </resources>

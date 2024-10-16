@@ -122,7 +122,7 @@ fun LoginScreen(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Connect to your account",
+                text = stringResource(id = R.string.create_account),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = FontFamily(
@@ -130,7 +130,7 @@ fun LoginScreen(
                 )
             )
             Text(
-                text = "let's explore",
+                text = stringResource(id = R.string.lets_explore),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = FontFamily(Font(R.font.oppinsedium))
@@ -161,7 +161,7 @@ fun LoginScreen(
             if (loginFailed) {
                 Text(
                     modifier = Modifier.padding(vertical = 5.dp),
-                    text = "Username or password incorrect", color = Color.Red,
+                    text = stringResource(id = R.string.incorrect_log), color = Color.Red,
                     fontFamily = FontFamily(Font(R.font.oppinsedium)),
                     fontSize = 14.sp
                 )
@@ -187,7 +187,7 @@ fun LoginScreen(
                 textAlign = TextAlign.Center,
                 fontSize = 14.sp,
                 fontFamily = FontFamily(Font(R.font.oppinsegular)),
-                text = "Dont have an account yet ? \nClick to create one",
+                text = stringResource(id = R.string.no_account),
             )
 
             Text(
@@ -198,7 +198,7 @@ fun LoginScreen(
                 textAlign = TextAlign.Center,
                 fontSize = 14.sp,
                 fontFamily = FontFamily(Font(R.font.oppinsegular)),
-                text = "Forgot your password ? Click here",
+                text = stringResource(id = R.string.forgot_password),
             )
         }
     }
@@ -235,7 +235,7 @@ fun PopupPasswordReset(onRequestNewPassword: (String) -> Unit, onClose: () -> Un
             ) {
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
-                    text = "Reset password", fontSize = 18.sp,
+                    text = stringResource(id = R.string.reset_password), fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = FontFamily(
                         Font(R.font.oppinsedium)

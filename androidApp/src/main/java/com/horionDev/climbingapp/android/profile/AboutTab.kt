@@ -1,5 +1,7 @@
 package com.horionDev.climbingapp.android.profile
 
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,15 +19,28 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.horionDev.climbingapp.android.R
+import com.horionDev.climbingapp.data.model.dto.UserDto
+import com.horionDev.climbingapp.domain.model.entities.User
 
 @Composable
-fun AboutTab(Gallery: @Composable () -> Unit) {
+fun AboutTab(user: User, Gallery: @Composable () -> Unit) {
+
+    val gender = user.gender.ifEmpty { "Unknown" }
+    val country = user.country.ifEmpty { "Unknown" }
+    val city = user.city.ifEmpty { "Unknown" }
+    val age = if (user.age == 0) "Unknown" else user.age
+    val weight = if (user.weight == 0) "Unknown" else user.weight
+    val height = if (user.height == 0) "Unknown" else user.height
+    val climbingSince = user.climbingSince.ifEmpty { "Unknown" }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(top = 8.dp)
-//            .verticalScroll(rememberScrollState())
+            .scrollable(
+                state = rememberScrollState(),
+                orientation = Orientation.Vertical
+            )
     ) {
 
         Row(modifier = Modifier.fillMaxWidth()) {
@@ -39,13 +54,13 @@ fun AboutTab(Gallery: @Composable () -> Unit) {
         }
         Divider(modifier = Modifier.padding(bottom = 12.dp))
 
-        Text(text = "Gender: Male")
-        Text(text = "Country: France")
-        Text(text = "Age: 25")
-        Text(text = "Height: 1.80m")
-        Text(text = "Weight: 70kg")
-        Text(text = "Climbing since 2015")
-        Text(text = "Member since 2023")
+        Text(text = "Gender : $gender", fontFamily = FontFamily(Font(R.font.oppinsedium)))
+        Text(text = "Country : $country", fontFamily = FontFamily(Font(R.font.oppinsedium)))
+        Text(text = "City : $city", fontFamily = FontFamily(Font(R.font.oppinsedium)))
+        Text(text = "Age : $age", fontFamily = FontFamily(Font(R.font.oppinsedium)))
+        Text(text = "Height : $height", fontFamily = FontFamily(Font(R.font.oppinsedium)))
+        Text(text = "Weight : $weight", fontFamily = FontFamily(Font(R.font.oppinsedium)))
+        Text(text = "Climbing since $climbingSince", fontFamily = FontFamily(Font(R.font.oppinsedium)))
 
         Gallery()
     }

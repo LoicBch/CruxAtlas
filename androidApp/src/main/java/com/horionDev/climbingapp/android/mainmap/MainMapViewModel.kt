@@ -153,6 +153,10 @@ class MainMapViewModel(
         savedStateHandle["placeSearched"] = ""
     }
 
+    fun showBookmarks() {
+        TODO("Not yet implemented")
+    }
+
     sealed class MainMapEvent {
         data class UpdateRegion(val bounds: LatLngBounds, val padding: Int) : MainMapEvent()
     }

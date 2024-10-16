@@ -44,13 +44,6 @@ import com.horionDev.climbingapp.android.destinations.AddSpotLocationScreenDesti
 import com.horionDev.climbingapp.android.ui.theme.AppColor
 import com.horionDev.climbingapp.domain.model.entities.Crag
 import com.horionDev.climbingapp.domain.model.entities.Route
-import com.horionDev.climbingapp.domain.model.entities.RouteGrade.FiveC
-import com.horionDev.climbingapp.domain.model.entities.RouteGrade.NineB
-import com.horionDev.climbingapp.domain.model.entities.RouteGrade.SevenA
-import com.horionDev.climbingapp.domain.model.entities.RouteGrade.SevenCPlus
-import com.horionDev.climbingapp.domain.model.entities.RouteGrade.SixA
-import com.horionDev.climbingapp.domain.model.entities.RouteGrade.SixAPlus
-import com.horionDev.climbingapp.domain.model.entities.RouteGrade.SixBPlus
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @Composable
@@ -78,12 +71,12 @@ fun RoutesChart(routes: List<Route>) {
     val chartData = mutableListOf<BarData>()
     routes
         .groupBy(Route::grade)
-        .toSortedMap(compareBy { it.ordinal })
+        .toSortedMap(compareBy { it })
         .forEach {
             chartData.add(
                 BarData(
                     it.value.size.toFloat(),
-                    it.key.displayValue,
+                    it.key,
                     color = AppColor.Primary,
                 )
             )

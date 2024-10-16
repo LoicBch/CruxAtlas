@@ -43,7 +43,7 @@ fun Dropdown(modifier: Modifier, title: String, content: @Composable () -> Unit)
                     .padding(start = 16.dp),
                 painter = painterResource(id = R.drawable.tools),
                 contentDescription = stringResource(
-                    id = R.string.cd_travel_tools
+                    id = R.string.dowloaded
                 ),
                 tint = if (isExpanded) AppColor.Primary else AppColor.Tertiary
             )

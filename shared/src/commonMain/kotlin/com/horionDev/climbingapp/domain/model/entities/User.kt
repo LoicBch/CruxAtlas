@@ -1,5 +1,9 @@
 package com.horionDev.climbingapp.domain.model.entities
 
+import com.horionDev.climbingapp.utils.CommonParcelable
+import com.horionDev.climbingapp.utils.CommonParcelize
+
+@CommonParcelize
 data class User(
     val id: Int = -1,
     val username: String = "guest",
@@ -17,4 +21,4 @@ data class User(
     var isSubscribe: Boolean = false,
     var favorites: MutableList<String> = mutableListOf(),
     var imageUrl: String? = null
-)
+) : CommonParcelable

@@ -8,6 +8,7 @@ import com.horionDev.climbingapp.domain.model.composition.Location
 import com.horionDev.climbingapp.domain.model.composition.LocationInfos
 import com.horionDev.climbingapp.domain.model.composition.AppMarker
 import com.horionDev.climbingapp.domain.model.entities.Area
+import com.horionDev.climbingapp.domain.model.entities.Boulder
 import com.horionDev.climbingapp.domain.model.entities.Crag
 import com.horionDev.climbingapp.domain.model.entities.Route
 import com.horionDev.climbingapp.domain.model.entities.RouteGrade
@@ -30,7 +31,7 @@ fun UserDto.toVo() = User(
     email,
     country,
     city,
-    gender, age, weight, height, climbingSince,
+    gender, age, weight, height, if (climbingSince == "null") "" else climbingSince,
     "U",
     isSubscribe,
     imageUrl = if (imageUrl == "") null else imageUrl
@@ -94,10 +95,33 @@ fun List<RouteDto>.toVo() = map { it.toVo() }
 fun RouteDto.toVo() = Route(
     id,
     name,
+    cragName = cragName,
     description = "",
-    RouteGrade.valueOf(grade),
+    RouteGrade.values().find { it.displayValue == grade.uppercase() }!!,
     cragId.toString(),
     sectorId.toString()
+)
+
+@JvmName(name = "routeToDto")
+fun List<Route>.toDto() = map { it.toDto() }
+fun Route.toDto() = RouteDto(
+    id = id,
+    name = name,
+    cragName = cragName,
+    grade = grade.displayValue.lowercase(),
+    sectorId = 2,
+    cragId = 1
+)
+
+@JvmName(name = "boulderDtoListToVo")
+fun List<BoulderDto>.toVo() = map { it.toVo() }
+fun BoulderDto.toVo() = Boulder(
+    id,
+    cragId,
+    cragName,
+    sectorId,
+    name,
+    RouteGrade.valueOf(grade)
 )
 
 

@@ -158,10 +158,10 @@ fun SectorRow(sector: Sector, onSectorClick: (Sector) -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(modifier = Modifier.weight(4.5f), text = sector.name)
-        Text(modifier = Modifier.weight(2f), text = "${RouteGrade.values()[sector.routes.minOf {
-            it.grade.ordinal }].displayValue} to ${RouteGrade.values()[sector.routes.maxOf { it.grade.ordinal }].displayValue}")
-        Text(modifier = Modifier.weight(2.5f), text = sector.routes.size.toString(), textAlign =
-        TextAlign.End)
+//        Text(modifier = Modifier.weight(2f), text = "${RouteGrade.values()[sector.routes.minOf {
+//            it.grade.ordinal }].displayValue} to ${RouteGrade.values()[sector.routes.maxOf { it.grade.ordinal }].displayValue}")
+//        Text(modifier = Modifier.weight(2.5f), text = sector.routes.size.toString(), textAlign =
+//        TextAlign.End)
     }
     Divider()
 }
@@ -190,7 +190,7 @@ fun RouteRow(index: Int, routeItem: Route, onRouteClick: (Route) -> Unit) {
             fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
         )
         Text(text = routeItem.name)
-        Text(text = routeItem.grade.displayValue)
+//        Text(text = routeItem.grade.displayValue)
     }
     Divider()
 

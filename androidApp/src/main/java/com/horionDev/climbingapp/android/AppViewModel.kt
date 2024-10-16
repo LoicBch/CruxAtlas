@@ -13,6 +13,9 @@ import com.horionDev.climbingapp.domain.model.composition.Filter
 import com.horionDev.climbingapp.domain.model.composition.UpdateSource
 import com.horionDev.climbingapp.domain.model.composition.filterName
 import com.horionDev.climbingapp.domain.model.composition.getIdFromFilterName
+import com.horionDev.climbingapp.domain.model.entities.GradeNotation
+import com.horionDev.climbingapp.domain.model.entities.RouteGrade
+import com.horionDev.climbingapp.domain.model.entities.UIAAGrade
 import com.horionDev.climbingapp.managers.location.LocationManager
 import com.horionDev.climbingapp.utils.*
 import kotlinx.coroutines.channels.Channel
@@ -22,7 +25,7 @@ import kotlinx.coroutines.launch
 // TODO: make a viewmodel specific to bottomSheetScreen and keep this viewModel for commons data
 // todo same for filters and search
 @OptIn(ExperimentalMaterialApi::class)
-class AppViewModel() : ViewModel() {
+class AppViewModel(private val kmmPreference: KMMPreference) : ViewModel() {
 
     val bottomSheetIsShowing = ModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden, isSkipHalfExpanded = true
@@ -116,6 +119,16 @@ class AppViewModel() : ViewModel() {
 
     fun onNetworkObserveStarted() {
         _networkIsObserved.update { true }
+    }
+
+    fun getCurrentGradesSystem(): GradeNotation {
+        val notation = kmmPreference.getInt(Constants.PreferencesKey.GRADING_SYSTEM, -1)
+        return when (notation) {
+            Constants.AMERICAN_YDS -> GradeNotation.UIAA
+            Constants.FRENCH ->  GradeNotation.French
+            Constants.UIAA ->  GradeNotation.YDS
+            else -> GradeNotation.YDS
+        }
     }
 
     fun onSortingOptionSelected(sortOption: SortOption) {

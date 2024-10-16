@@ -11,8 +11,10 @@ import com.horionDev.climbingapp.domain.model.UserProfile
 import com.horionDev.climbingapp.domain.model.composition.AuthRequest
 import com.horionDev.climbingapp.domain.model.composition.AuthResponse
 import com.horionDev.climbingapp.domain.model.composition.ErrorResponse
+import com.horionDev.climbingapp.domain.model.entities.Boulder
 import com.horionDev.climbingapp.domain.model.entities.BoulderLog
 import com.horionDev.climbingapp.domain.model.entities.Crag
+import com.horionDev.climbingapp.domain.model.entities.Route
 import com.horionDev.climbingapp.domain.model.entities.RouteLog
 import com.horionDev.climbingapp.domain.model.entities.User
 
@@ -57,8 +59,9 @@ interface Api {
     ): ResultWrapper<NothingResponse, ErrorResponse>
 
     suspend fun fetchFavorite(userId: Int): ResultWrapper<List<String>, ErrorResponse>
-    suspend fun fetchRouteLogs(userId: Int): ResultWrapper<List<RouteLog>, ErrorResponse>
-    suspend fun fetchBoulderLogs(userId: Int): ResultWrapper<List<BoulderLog>, ErrorResponse>
+    suspend fun fetchBoulderLogs(userId: Int): ResultWrapper<List<Pair<BoulderLog, Boulder>>, ErrorResponse>
+    suspend fun fetchRouteLogs(userId: Int): ResultWrapper<List<Pair<RouteLog, Route>>, ErrorResponse>
+    suspend fun updatePhoto(userId: Int, byteArray: ByteArray): ResultWrapper<NothingResponse, ErrorResponse>
     suspend fun addRouteLog(
         userId: Int,
         routeId: Int,

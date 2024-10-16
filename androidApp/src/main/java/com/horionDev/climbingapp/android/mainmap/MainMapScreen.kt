@@ -81,7 +81,7 @@ import org.koin.androidx.compose.getViewModel
 @Composable
 fun MainMap(
     locationSearchRecipient: ResultRecipient<AroundLocationScreenDestination, Place>,
-    launchEventsSearchRecipient: ResultRecipient<MenuScreenDestination, Boolean>,
+    bookmarkRecipient: ResultRecipient<MenuScreenDestination, Boolean>,
     navigator: DestinationsNavigator,
     navController: NavController,
     viewModel: MainMapViewModel = getViewModel()
@@ -183,6 +183,15 @@ fun MainMap(
                     )
                     viewModel.showCrags(Globals.GeoLoc.lastKnownLocation)
                 }
+            }
+        }
+    }
+
+    bookmarkRecipient.onNavResult { result ->
+        when (result) {
+            is NavResult.Canceled -> {}
+            is NavResult.Value -> {
+                viewModel.showBookmarks()
             }
         }
     }
@@ -552,7 +561,7 @@ fun VerticalListItem(crag: Crag) {
                 maxLines = 1,
                 fontSize = 12.sp,
                 fontFamily = FontFamily(Font(R.font.oppinsedium)),
-                text = "${crag.sectors.size} sectors",
+                text = "${crag.sectors.size}" + stringResource(id = R.string.sectors),
                 color = AppColor.neutralText
             )
 
@@ -565,7 +574,7 @@ fun VerticalListItem(crag: Crag) {
                 text = "${
                     crag.sectors.map { it.routes.size }
                         .foldRight(0) { element, acc -> acc + element }
-                } routes",
+                }" + stringResource(id = R.string.routes),
                 color = AppColor.neutralText
             )
 
@@ -740,7 +749,7 @@ fun HorizontalListItem(crag: Crag) {
                 maxLines = 1,
                 fontSize = 12.sp,
                 fontFamily = FontFamily(Font(R.font.oppinsedium)),
-                text = "${crag.sectors.size} sectors",
+                text = "${crag.sectors.size}" + stringResource(id = R.string.sectors),
                 color = AppColor.neutralText
             )
 
@@ -753,7 +762,7 @@ fun HorizontalListItem(crag: Crag) {
                 text = "${
                     crag.sectors.map { it.routes.size }
                         .foldRight(0) { element, acc -> acc + element }
-                } routes",
+                }" + stringResource(id = R.string.routes),
                 color = AppColor.neutralText
             )
 

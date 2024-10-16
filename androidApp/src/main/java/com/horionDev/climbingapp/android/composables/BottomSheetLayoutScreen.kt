@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -26,8 +27,10 @@ import com.horionDev.climbingapp.android.LocalDependencyContainer
 import com.horionDev.climbingapp.android.R
 import com.horionDev.climbingapp.android.ui.theme.AppColor
 import com.horionDev.climbingapp.domain.model.entities.RouteGrade
+import com.horionDev.climbingapp.domain.model.entities.getGrade
 import com.horionDev.climbingapp.utils.Globals
 import com.horionDev.climbingapp.utils.Globals.filters.countries
+import com.horionDev.climbingapp.utils.KMMPreference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -39,18 +42,28 @@ enum class FilterOptions {
 @Composable
 fun BottomSheetLayoutScreen() {
 
-    val grades = RouteGrade.values()
+    val appViewModel = LocalDependencyContainer.current.appViewModel
+    val gradeNotation = appViewModel.getCurrentGradesSystem()
+    val grades = gradeNotation.getGrade()
     val initialState = grades.map { false }
     val checkedStateGrades = remember { mutableStateListOf(*initialState.toTypedArray()) }
 
 
-    val countries = Globals.filters.countries
+    val countries = listOf(
+        stringResource(id = R.string.france),
+        stringResource(id = R.string.italy),
+        stringResource(id = R.string.spain),
+        stringResource(id = R.string.germany),
+        stringResource(id = R.string.switzerland),
+        stringResource(id = R.string.belgium),
+        stringResource(id = R.string.netherlands),
+        stringResource(id = R.string.ireland),
+    )
     val initialStateCountries = countries.map { false }
     val checkedStateCountries = remember { mutableStateListOf(*initialState.toTypedArray()) }
 
 
     val sheetState = LocalDependencyContainer.current.appViewModel.bottomSheetIsShowing
-    val appViewModel = LocalDependencyContainer.current.appViewModel
     val scope = rememberCoroutineScope()
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -60,8 +73,6 @@ fun BottomSheetLayoutScreen() {
         AppButton(
             isActive = true,
             onClick = {
-                //                    appViewModel.applyFilter(checkedState.mapIndexed { a, b -> if (b) types[a] else null }
-                //                                                 .filterNotNull())
                 scope.launch {
                     sheetState.hide()
                 }
@@ -87,7 +98,7 @@ fun CountriesFilters(
     ) {
 
         Text(
-            text = "By countries",
+            text = stringResource(id = R.string.by_countries),
             fontWeight = FontWeight.Bold,
             fontSize = 14.sp,
             fontFamily = FontFamily(Font(R.font.oppinsedium))
@@ -114,7 +125,7 @@ fun CountriesFilters(
 @Composable
 @OptIn(ExperimentalLayoutApi::class)
 private fun GradesFilters(
-    grades: Array<RouteGrade>,
+    grades: List<String>,
     checkedState: SnapshotStateList<Boolean>
 ) {
     Column(
@@ -123,7 +134,7 @@ private fun GradesFilters(
     ) {
 
         Text(
-            text = "By grades",
+            text = stringResource(id = R.string.by_grades),
             fontWeight = FontWeight.Bold,
             fontSize = 14.sp,
             fontFamily = FontFamily(Font(R.font.oppinsedium))
@@ -140,7 +151,7 @@ private fun GradesFilters(
                     modifier = Modifier.padding(end = 8.dp, bottom = 8.dp),
                     isChecked = checkedState[index],
                     onClick = { checkedState[index] = !checkedState[index] },
-                    label = grades[index].displayValue
+                    label = grades[index]
                 )
             }
         }
@@ -169,7 +180,7 @@ private fun FilterHeader(
         }
         Spacer(modifier = Modifier.weight(1f))
         Text(
-            text = "Filters",
+            text = stringResource(id = R.string.filters),
             fontWeight = FontWeight.Bold,
             fontSize = 18.sp,
             fontFamily = FontFamily(
@@ -178,7 +189,7 @@ private fun FilterHeader(
         )
         Spacer(modifier = Modifier.weight(1f))
         Text(
-            text = "Reset all ${checkedGrades.filter { it }.size + checkedCountries.filter { it }.size}",
+            text = stringResource(id = R.string.reset_all) + "${checkedGrades.filter { it }.size + checkedCountries.filter { it }.size}",
             fontWeight = FontWeight.Bold,
             fontSize = 14.sp,
             fontFamily = FontFamily(

@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.horionDev.climbingapp.android.composables.SearchField
 import com.horionDev.climbingapp.android.composables.collectAsStateWithLifecycleImmutable
-import com.horionDev.climbingapp.android.filter.LastSearchItem
 import com.horionDev.climbingapp.android.ui.theme.AppColor
 import com.horionDev.climbingapp.domain.model.Place
 import com.horionDev.climbingapp.domain.model.Search

@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -70,7 +71,7 @@ fun SignupScreen(navigator: DestinationsNavigator, viewModel: SignupViewModel = 
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Create your account", fontSize = 20.sp,
+                text = stringResource(id = R.string.create_account), fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = FontFamily(
                     Font(R.font.oppinsedium)
@@ -78,7 +79,7 @@ fun SignupScreen(navigator: DestinationsNavigator, viewModel: SignupViewModel = 
             )
 
             Text(
-                text = "let's explore", fontSize = 16.sp,
+                text = stringResource(id = R.string.lets_explore), fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = FontFamily(Font(R.font.oppinsedium))
             )

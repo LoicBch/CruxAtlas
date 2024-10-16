@@ -38,11 +38,15 @@ val apiDependency = module {
             }
 
             install(ContentNegotiation) {
-                json(Json { ignoreUnknownKeys = true }, ContentType.Any)
+                json(Json {
+                    encodeDefaults = true
+                    ignoreUnknownKeys = true
+                    isLenient = true
+                }, ContentType.Any)
             }
 
             defaultRequest {
-                url(Constants.BASE_URL)
+                url(Constants.BASE_URLL)
             }
         })
     }

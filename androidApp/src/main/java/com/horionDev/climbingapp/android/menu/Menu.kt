@@ -1,14 +1,21 @@
 package com.horionDev.climbingapp.android.menu
 
+//import com.horionDev.climbingapp.android.destinations.AddSpotLocationDestination
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
-import com.horionDev.climbingapp.android.R
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.ArrowForward
@@ -27,11 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.horionDev.climbingapp.android.LocalDependencyContainer
-import com.horionDev.climbingapp.android.addSpot.AddSpotLocationScreen
-import com.horionDev.climbingapp.android.composables.Dropdown
-import com.horionDev.climbingapp.android.destinations.AddSpotLocationScreenDestination
-import com.horionDev.climbingapp.android.destinations.AddSpotTypeScreenDestination
-//import com.horionDev.climbingapp.android.destinations.AddSpotLocationDestination
+import com.horionDev.climbingapp.android.R
 import com.horionDev.climbingapp.android.destinations.SettingsMenuDestination
 import com.horionDev.climbingapp.android.ui.theme.AppColor
 import com.horionDev.climbingapp.android.ui.theme.Dimensions
@@ -55,7 +58,7 @@ data class MenuItem(
 @Destination
 @Composable
 fun MenuScreen(
-    navigator: DestinationsNavigator, resultNavigator: ResultBackNavigator<Boolean>
+    navigator: DestinationsNavigator, bookmarksResult: ResultBackNavigator<Boolean>
 ) {
 
     val menuItems: List<MenuItem> = listOf(
@@ -66,15 +69,10 @@ fun MenuScreen(
 //
 //            }, R.drawable.checklist, R.string.cd_travel_checklist, true
 //        ),
-        MenuItem(
-            R.string.add_location, {
-                navigator.navigate(AddSpotTypeScreenDestination())
-            }, R.drawable.my_location, R.string.cd_my_location, false
-        ),
 //        MenuItem(
-//            R.string.menu_account, {
-//                navigator.navigate(LoginScreenDestination)
-//            }, R.drawable.user, R.string.cd_my_location, false
+//            R.string.add_location, {
+//                navigator.navigate(AddSpotTypeScreenDestination())
+//            }, R.drawable.my_location, R.string.cd_my_location, false
 //        ),
         MenuItem(
             R.string.menu_account, {
@@ -82,9 +80,14 @@ fun MenuScreen(
             }, R.drawable.download, R.string.dowloaded, false
         ),
         MenuItem(
+            R.string.bookmarks, {
+                bookmarksResult.setResult(true)
+            }, R.drawable.bookmark, R.string.sectors, false
+        ),
+        MenuItem(
             R.string.menu_app_settings, {
                 navigator.navigate(SettingsMenuDestination)
-            }, R.drawable.settings, R.string.cd_app_settings, false
+            }, R.drawable.settings, R.string.sectors, false
         )
     )
 
@@ -125,24 +128,24 @@ fun MenuScreen(
         menuItems.filter { !it.isSubMenu }.forEach { menuItem ->
             MenuItem(menuItem = menuItem)
 
-            if (menuItem.labelRes == R.string.menu_events) {
+//            if (menuItem.labelRes == R.string.menu_events) {
 
-                Divider(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 15.dp)
-                )
-
-                Dropdown(
-                    title = stringResource(id = R.string.menu_travel_tools),
-                    modifier = Modifier.padding(horizontal = 15.dp)
-                ) {
-                    Column {
-                        MenuItem(menuItem = menuItems.find { it.labelRes == R.string.menu_travel_checklists }!!)
-                        MenuItem(menuItem = menuItems.find { it.labelRes == R.string.menu_my_location }!!)
-                    }
-                }
-            }
+//                Divider(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(horizontal = 15.dp)
+//                )
+//
+//                Dropdown(
+//                    title = stringResource(id = R.string.menu_travel_tools),
+//                    modifier = Modifier.padding(horizontal = 15.dp)
+//                ) {
+//                    Column {
+//                        MenuItem(menuItem = menuItems.find { it.labelRes == R.string.menu_travel_checklists }!!)
+//                        MenuItem(menuItem = menuItems.find { it.labelRes == R.string.menu_my_location }!!)
+//                    }
+//                }
+//            }
 
             Divider(
                 modifier = Modifier
@@ -171,15 +174,12 @@ fun MenuItem(
                 start = if (menuItem.isSubMenu) 30.dp else 0.dp
             )
             .clickable {
-                if (menuItem.labelRes == R.string.menu_events) {
-                    appViewModel.onEventDisplayedChange(true)
-                }
                 menuItem.onclick()
             }, verticalAlignment = Alignment.CenterVertically
     ) {
 
         Icon(
-            modifier = Modifier.padding(horizontal = 22.dp),
+            modifier = Modifier.padding(horizontal = 22.dp).size(24.dp),
             painter = painterResource(id = menuItem.drawableRes),
             contentDescription = stringResource(id = menuItem.contentDescriptionRes),
             tint = AppColor.Tertiary

@@ -33,6 +33,12 @@ class Users(private var cruxAtlasApi: Api) : UserRepository {
         cragId: Int
     ) = cruxAtlasApi.removeCragAsFavoriteForUser(userId, cragId)
 
+    override suspend fun updatePhoto(
+        userId: Int,
+        byteArray: ByteArray
+    ) = cruxAtlasApi.updatePhoto(userId, byteArray)
+
+
     override suspend fun fetchRouteLogs(userId: Int) = cruxAtlasApi.fetchRouteLogs(userId)
 
     override suspend fun fetchBoulderLogs(userId: Int) = cruxAtlasApi.fetchBoulderLogs(userId)
@@ -41,7 +47,7 @@ class Users(private var cruxAtlasApi: Api) : UserRepository {
         routeLog: RouteLog,
         userId: Int,
         routeId: Int
-    ) =  cruxAtlasApi.addRouteLog(userId, routeId, routeLog)
+    ) = cruxAtlasApi.addRouteLog(userId, routeId, routeLog)
 
     override suspend fun addBoulderLog(
         boulderLog: BoulderLog,

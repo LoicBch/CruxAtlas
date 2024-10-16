@@ -70,9 +70,11 @@ dependencies {
     implementation("io.insert-koin:koin-core:3.2.2")
     implementation("io.insert-koin:koin-android:3.3.0")
     implementation("io.insert-koin:koin-androidx-compose:3.3.0")
+    implementation("com.android.volley:volley:1.2.1")
     ksp("io.github.raamcosta.compose-destinations:ksp:1.7.27-beta")
     implementation("com.google.android.gms:play-services-location:21.0.1")
     implementation("androidx.startup:startup-runtime:1.1.1")
     implementation("com.himanshoe:charty:2.0.0-alpha01")
+    implementation("com.github.skydoves:orchestra-spinner:1.2.0")
 //    implementation("com.patrykandpatrick.vico:compose:2.0.0-alpha.22")
 }

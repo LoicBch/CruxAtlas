@@ -357,7 +357,7 @@ fun WallsItemCard(walls: List<Triple<String, String, RouteGrade>>) {
                     )
 
                     Text(
-                        text = wall.third.displayValue,
+                        text = wall.third.grade,
                         fontWeight = FontWeight.W500
                     )
 

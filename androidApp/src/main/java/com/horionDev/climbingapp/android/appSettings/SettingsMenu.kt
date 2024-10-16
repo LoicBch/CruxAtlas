@@ -36,6 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.horionDev.climbingapp.android.R
+import com.horionDev.climbingapp.android.R.string.french
 import com.horionDev.climbingapp.android.ui.theme.AppColor
 import com.horionDev.climbingapp.utils.Constants
 import com.horionDev.climbingapp.utils.KMMPreference
@@ -60,16 +61,16 @@ fun SettingsMenu(navigator: DestinationsNavigator) {
     val menuItems = listOf(Pair(stringResource(id = R.string.measuring_system)) {
         measuringPopupIsShown.value = true
     },
-                           Pair(stringResource(id = R.string.language)) {
-                               languagePopupIsShown.value = true
-                           },
-                           Pair(stringResource(id = R.string.help)) { },
-                           Pair(stringResource(id = R.string.term_of_use)) {
+        Pair(stringResource(id = R.string.language)) {
+            languagePopupIsShown.value = true
+        },
+        Pair(stringResource(id = R.string.help)) { },
+        Pair(stringResource(id = R.string.term_of_use)) {
 
-                           },
-                           Pair(stringResource(id = R.string.privacy_policy)) {
+        },
+        Pair(stringResource(id = R.string.privacy_policy)) {
 
-                           })
+        })
 
     Column() {
         HeaderSettingsMenu(navigator = navigator)
@@ -102,12 +103,13 @@ fun LanguagePopup(onClose: () -> Unit) {
     val currentConfig = LocalConfiguration.current
 
     val languages = listOf(
-        Pair(stringResource(id = R.string.french), Locale.FRENCH),
+        Pair(stringResource(id = french), Locale.FRENCH),
         Pair(stringResource(id = R.string.english), Locale.US),
         Pair(
             stringResource(id = R.string.german),
             Locale.GERMAN
-        ), //        Pair(stringResource(id = R.string.spanish), Locale.ITALIAN),
+        ),
+        Pair(stringResource(id = R.string.spanish), Locale("es")),
         Pair(stringResource(id = R.string.italian), Locale.ITALIAN)
     )
 
@@ -167,12 +169,22 @@ fun MeasuringPopup(onClose: () -> Unit) {
     val application = LocalContext.current.applicationContext as Application
 
     val metrics = listOf(
-        Pair(stringResource(id = R.string.meter)) {
-            KMMPreference(application).put(Constants.PreferencesKey.METRIC, Constants.METER)
+        Pair(stringResource(id = R.string.american_yds)) {
+            KMMPreference(application).put(
+                Constants.PreferencesKey.GRADING_SYSTEM,
+                Constants.AMERICAN_YDS
+            )
             onClose()
         },
-        Pair(stringResource(id = R.string.miles)) {
-            KMMPreference(application).put(Constants.PreferencesKey.METRIC, Constants.MILES)
+        Pair(stringResource(id = french)) {
+            KMMPreference(application).put(
+                Constants.PreferencesKey.GRADING_SYSTEM,
+                Constants.FRENCH
+            )
+            onClose()
+        },
+        Pair(stringResource(id = R.string.uiaa)) {
+            KMMPreference(application).put(Constants.PreferencesKey.GRADING_SYSTEM, Constants.UIAA)
             onClose()
         }
     )
@@ -220,6 +232,65 @@ fun MeasuringPopup(onClose: () -> Unit) {
     }
 }
 
+//@Composable
+//fun MeasuringPopup(onClose: () -> Unit) {
+//
+//    val application = LocalContext.current.applicationContext as Application
+//
+//    val metrics = listOf(
+//        Pair(stringResource(id = R.string.meter)) {
+//            KMMPreference(application).put(Constants.PreferencesKey.METRIC, Constants.METER)
+//            onClose()
+//        },
+//        Pair(stringResource(id = R.string.miles)) {
+//            KMMPreference(application).put(Constants.PreferencesKey.METRIC, Constants.MILES)
+//            onClose()
+//        }
+//    )
+//
+//    Box(modifier = Modifier
+//        .fillMaxSize()
+//        .background(color = AppColor.ClearGrey)
+//        .clickable {
+//            onClose()
+//        }) {
+//        Column(
+//            Modifier
+//                .padding(horizontal = 34.dp)
+//                .shadow(4.dp, RoundedCornerShape(5))
+//                .background(
+//                    color = Color.White, shape = RoundedCornerShape(5)
+//                )
+//                .padding(top = 10.dp, start = 16.dp, end = 16.dp)
+//                .align(Alignment.Center)
+//        ) {
+//            metrics.forEachIndexed { index, metric ->
+//
+//                val (title, action) = metric
+//
+//                if (index != 0) Divider(modifier = Modifier.fillMaxWidth())
+//
+//                Row(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .height(40.dp)
+//                        .align(CenterHorizontally)
+//                        .clickable {
+//                            action()
+//                        }, verticalAlignment = CenterVertically
+//                ) {
+//                    Text(
+//                        text = title,
+//                        fontWeight = FontWeight.W500,
+//                        fontSize = 16.sp,
+//                        color = Color.Black
+//                    )
+//                }
+//            }
+//        }
+//    }
+//}
+
 @Composable
 fun BuildInfos() {
     val context = LocalContext.current
@@ -236,7 +307,7 @@ fun BuildInfos() {
     ) {
         Image(
             modifier = Modifier.size(80.dp),
-            painter = painterResource(id = R.drawable.logo),
+            painter = painterResource(id = R.drawable.app_logo),
             contentDescription = ""
         )
         Column(modifier = Modifier.padding(start = 16.dp)) {

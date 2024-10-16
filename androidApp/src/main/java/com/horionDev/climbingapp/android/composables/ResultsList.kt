@@ -18,7 +18,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.horionDev.climbingapp.android.R
-import com.horionDev.climbingapp.android.filter.OptionItem
 import com.horionDev.climbingapp.android.ui.theme.AppColor
 
 @Composable
@@ -45,7 +44,7 @@ fun ResultsList(onItemClick: (String) -> Unit, subTitleLabel: String, results: L
             )
     ) {
         items(items = results) {
-            OptionItem(Modifier.clickable { onItemClick(it) }, it)
+//            OptionItem(Modifier.clickable { onItemClick(it) }, it)
         }
     }
 }

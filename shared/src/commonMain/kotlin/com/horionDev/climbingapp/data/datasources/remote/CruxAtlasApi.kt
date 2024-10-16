@@ -28,11 +28,17 @@ import com.horionDev.climbingapp.data.safePatch
 import com.horionDev.climbingapp.domain.model.CragDetails
 import com.horionDev.climbingapp.domain.model.NewsItem
 import com.horionDev.climbingapp.domain.model.UserProfile
+import com.horionDev.climbingapp.domain.model.entities.Boulder
 import com.horionDev.climbingapp.domain.model.entities.BoulderLog
+import com.horionDev.climbingapp.domain.model.entities.BoulderWithLog
+import com.horionDev.climbingapp.domain.model.entities.Route
 import com.horionDev.climbingapp.domain.model.entities.RouteLog
+import com.horionDev.climbingapp.domain.model.entities.RouteWithLog
 import com.horionDev.climbingapp.utils.SessionManager
 import io.ktor.client.*
 import io.ktor.client.request.*
+import io.ktor.client.request.forms.MultiPartFormDataContent
+import io.ktor.client.request.forms.formData
 import io.ktor.client.utils.EmptyContent.contentType
 import io.ktor.http.*
 import org.koin.core.component.KoinComponent
@@ -181,21 +187,45 @@ class CruxAtlasApi(private var client: HttpClient) : Api, KoinComponent {
         }
     }
 
-    override suspend fun fetchRouteLogs(userId: Int): ResultWrapper<List<RouteLog>, ErrorResponse> {
-        return client.safeGet<List<RouteLog>, ErrorResponse> {
-            url("users/$userId/routeLogs")
+    override suspend fun fetchRouteLogs(userId: Int): ResultWrapper<List<Pair<RouteLog, Route>>, ErrorResponse> {
+        return client.safeGet<List<RouteWithLog>, ErrorResponse> {
+            url("users/$userId/routesLogs")
             url {
                 parameters.append("user_id", userId.toString())
             }
+        }.map {
+            it.map { routeWithLog -> routeWithLog.log to routeWithLog.route.toVo() }
         }
     }
 
-    override suspend fun fetchBoulderLogs(userId: Int): ResultWrapper<List<BoulderLog>, ErrorResponse> {
-        return client.safeGet<List<BoulderLog>, ErrorResponse> {
+    override suspend fun updatePhoto(
+        userId: Int,
+        byteArray: ByteArray
+    ): ResultWrapper<NothingResponse, ErrorResponse> {
+        return client.safePost<NothingResponse, ErrorResponse> {
+            url("users/$userId/photo")
+            setBody(
+                MultiPartFormDataContent(
+                    formData {
+                        append("image", byteArray, Headers.build {
+                            append(HttpHeaders.ContentType, "image/jpeg")
+                            append(HttpHeaders.ContentDisposition, "filename=\"image.jpg\"")
+                        })
+                    }
+                )
+            )
+            addBearerToken(kmmPreference)
+        }
+    }
+
+    override suspend fun fetchBoulderLogs(userId: Int): ResultWrapper<List<Pair<BoulderLog, Boulder>>, ErrorResponse> {
+        return client.safeGet<List<BoulderWithLog>, ErrorResponse> {
             url("users/$userId/boulderLogs")
             url {
                 parameters.append("user_id", userId.toString())
             }
+        }.map {
+            it.map { boulderWithLog -> boulderWithLog.log to boulderWithLog.boulder.toVo() }
         }
     }
 
