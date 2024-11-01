@@ -429,12 +429,14 @@ fun PopupUpdateProfile(
             R.drawable.default_profile
         ))
     }
+    var newImageUri by remember { mutableStateOf<Uri?>(null) }
 
     // Launcher to pick image from gallery
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         selectedImageUri = uri
+        newImageUri = uri
     }
 
     // Check permission and request if necessary
@@ -466,8 +468,6 @@ fun PopupUpdateProfile(
                     .clickable { }
                     .verticalScroll(rememberScrollState())
             ) {
-
-
                 Row(
                     Modifier
                         .fillMaxWidth()
@@ -649,8 +649,8 @@ fun PopupUpdateProfile(
                             newClimbingSince
                         )
                         onUpdate(userDto)
-                        if (selectedImageUri != null) {
-                            onUpdatePhoto(selectedImageUri!!)
+                        if (newImageUri != null) {
+                            onUpdatePhoto(newImageUri!!)
                         }
                     },
                     modifier = Modifier

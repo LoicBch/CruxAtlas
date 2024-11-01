@@ -10,6 +10,7 @@ import com.horionDev.climbingapp.domain.model.composition.AppMarker
 import com.horionDev.climbingapp.domain.model.entities.Area
 import com.horionDev.climbingapp.domain.model.entities.Boulder
 import com.horionDev.climbingapp.domain.model.entities.Crag
+import com.horionDev.climbingapp.domain.model.entities.FrenchGrade
 import com.horionDev.climbingapp.domain.model.entities.Route
 import com.horionDev.climbingapp.domain.model.entities.RouteGrade
 import com.horionDev.climbingapp.domain.model.entities.Sector
@@ -67,7 +68,7 @@ fun CragDto.toVo() = Crag(
     id,
     name,
     description,
-    areaId,
+    areaId.toInt(),
     emptyList(),
     latitude,
     longitude,
@@ -97,7 +98,8 @@ fun RouteDto.toVo() = Route(
     name,
     cragName = cragName,
     description = "",
-    RouteGrade.values().find { it.displayValue == grade.uppercase() }!!,
+//    RouteGrade.values().find { it.displayValue == grade.uppercase() }!!,
+    "test",
     cragId.toString(),
     sectorId.toString()
 )
@@ -108,7 +110,7 @@ fun Route.toDto() = RouteDto(
     id = id,
     name = name,
     cragName = cragName,
-    grade = grade.displayValue.lowercase(),
+    grade = "grade",
     sectorId = 2,
     cragId = 1
 )
@@ -121,7 +123,7 @@ fun BoulderDto.toVo() = Boulder(
     cragName,
     sectorId,
     name,
-    RouteGrade.valueOf(grade)
+grade = RouteGrade.French(FrenchGrade.GRADE_1)
 )
 
 

@@ -1,7 +1,7 @@
 plugins {
     id("com.android.application")
     kotlin("android")
-    id("com.google.devtools.ksp") version "1.7.10-1.0.6"
+    id("com.google.devtools.ksp") version "1.9.0-1.0.11"
 }
 
 kotlin {
@@ -34,7 +34,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.3.0"
+        kotlinCompilerExtensionVersion = "1.5.1"
     }
     packagingOptions {
         resources {
@@ -67,6 +67,8 @@ dependencies {
     implementation("com.github.skydoves:landscapist-glide:2.1.0")
     implementation("com.google.android.gms:play-services-maps:18.1.0")
     implementation("com.google.maps.android:maps-compose:2.5.3")
+    implementation("com.google.maps.android:maps-compose-utils:5.0.0")
+    implementation("com.google.maps.android:maps-ktx:5.0.0")
     implementation("io.insert-koin:koin-core:3.2.2")
     implementation("io.insert-koin:koin-android:3.3.0")
     implementation("io.insert-koin:koin-androidx-compose:3.3.0")

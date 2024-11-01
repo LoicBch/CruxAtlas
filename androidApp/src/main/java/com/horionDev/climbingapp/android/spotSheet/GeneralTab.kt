@@ -60,7 +60,7 @@ fun GeneralTab(crag: Crag, navigator: DestinationsNavigator) {
         Divider()
         CragInfos(crag, navigator = navigator)
         Divider()
-        RoutesChart(cragRoutes)
+//        RoutesChart(cragRoutes)
         Divider()
         SeasonInfos()
     }

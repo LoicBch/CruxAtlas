@@ -15,10 +15,14 @@ public class UnityParentActivity extends UnityPlayerActivity {
         // Calls UnityPlayerActivity.onCreate()
         super.onCreate(savedInstanceState);
         // Prints debug message to Logcat
-        Log.d("OverrideActivity", "onCreate called!");
         Intent intent = getIntent();
-        String modelPath = intent.getStringExtra("MODEL_PATH");
-        UnityPlayer.UnitySendMessage("ZoomObject", "ReceiveMessage", modelPath);
+        try {
+            Thread.sleep(10000);
+            String modelPath = intent.getStringExtra("MODEL_PATH");
+            UnityPlayer.UnitySendMessage("Importer", "ReceiveMessage", modelPath);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -40,8 +44,8 @@ public class UnityParentActivity extends UnityPlayerActivity {
 
     @Override
     public void onBackPressed() {
-            Log.d("CustomActivity", "Back button pressed!");
-            finish();
+        Log.d("CustomActivity", "Back button pressed!");
+        finish();
     }
 
 }

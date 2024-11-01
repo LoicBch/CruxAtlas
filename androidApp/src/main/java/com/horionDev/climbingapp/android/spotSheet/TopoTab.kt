@@ -39,7 +39,6 @@ import com.horionDev.climbingapp.domain.model.entities.Crag
 import com.horionDev.climbingapp.domain.model.entities.Route
 import com.horionDev.climbingapp.domain.model.entities.RouteGrade
 import com.horionDev.climbingapp.domain.model.entities.Sector
-import com.unity3d.player.s
 import kotlin.reflect.KProperty
 
 @Composable

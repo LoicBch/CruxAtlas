@@ -12,5 +12,8 @@ class RouteDto(
     val cragName: String,
     val sectorId: Int,
     val name: String,
-    val grade: String
+    val grade: String,
+    val sectorName : String,
+    val ascents: Int,
+    val rating: Double,
 ): CommonParcelable

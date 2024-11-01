@@ -38,22 +38,29 @@ import com.horionDev.climbingapp.data.model.dto.PhotoDto
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
+import com.horionDev.climbingapp.android.profile.ProfileViewModel
 import com.horionDev.climbingapp.domain.model.entities.Crag
 import com.horionDev.climbingapp.domain.model.entities.Sector
-import com.horionDev.climbingapp.domain.model.entities.ceuse
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.getViewModel
 
 @Destination
 @Composable
-fun CragSheet(navigator: DestinationsNavigator, crag: Crag) {
+fun CragSheet(
+    navigator: DestinationsNavigator,
+    crag: Crag,
+    viewModel: CragDetailViewModel = getViewModel()
+) {
 
     val photos = remember {
         mutableStateListOf<PhotoDto>()
     }
+
+    val cragDetails by viewModel.cragDetails.collectAsState()
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -229,7 +236,7 @@ fun BaseInfos(modifier: Modifier, crag: Crag) {
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun Tabs(crag: Crag, navigator: DestinationsNavigator,  onSectorSelected: (Sector) -> Unit) {
+fun Tabs(crag: Crag, navigator: DestinationsNavigator, onSectorSelected: (Sector) -> Unit) {
     val pagerState = rememberPagerState()
     val scope = rememberCoroutineScope()
 
@@ -255,16 +262,16 @@ fun Tabs(crag: Crag, navigator: DestinationsNavigator,  onSectorSelected: (Secto
             .padding(horizontal = 16.dp)
     ) {
         TabRow(selectedTabIndex = pagerState.currentPage,
-               backgroundColor = Color.Transparent,
-               contentColor = AppColor.Primary,
-               indicator = {
-                   TabRowDefaults.Indicator(
-                       modifier = Modifier.customTabIndicator(
-                           currentTabPosition = it[pagerState.currentPage],
-                           tabWidth = tabWidths[pagerState.currentPage]
-                       )
-                   )
-               }) {
+            backgroundColor = Color.Transparent,
+            contentColor = AppColor.Primary,
+            indicator = {
+                TabRowDefaults.Indicator(
+                    modifier = Modifier.customTabIndicator(
+                        currentTabPosition = it[pagerState.currentPage],
+                        tabWidth = tabWidths[pagerState.currentPage]
+                    )
+                )
+            }) {
 
             tabScreensTitle.forEachIndexed { index, tab ->
                 Tab(

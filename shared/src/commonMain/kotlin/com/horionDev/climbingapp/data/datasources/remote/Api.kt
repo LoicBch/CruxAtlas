@@ -4,7 +4,7 @@ import com.horionDev.climbingapp.data.model.ErrorMessage
 import com.horionDev.climbingapp.data.ResultWrapper
 import com.horionDev.climbingapp.data.model.dto.UserDto
 import com.horionDev.climbingapp.data.model.responses.NothingResponse
-import com.horionDev.climbingapp.domain.model.CragDetails
+import com.horionDev.climbingapp.domain.model.CragDetailsDto
 import com.horionDev.climbingapp.domain.model.NewsItem
 import com.horionDev.climbingapp.domain.model.Place
 import com.horionDev.climbingapp.domain.model.UserProfile
@@ -33,11 +33,12 @@ interface Api {
     suspend fun authenticate(token: String): ResultWrapper<User, ErrorResponse>
 
     //Crag
-    suspend fun getCragDetails(cragId: Int): ResultWrapper<CragDetails, ErrorResponse>
+    suspend fun getCragDetails(cragId: Int): ResultWrapper<CragDetailsDto, ErrorResponse>
     suspend fun getCragAroundLocation(
         latitude: Double,
         longitude: Double
     ): ResultWrapper<List<Crag>, ErrorResponse>
+//    suspend fun getParkingSpots(cragId: Int): ResultWrapper<List<ParkingSpotDto>, ErrorResponse>
 
     suspend fun getNews(
         page: Int
@@ -58,7 +59,7 @@ interface Api {
         log: String
     ): ResultWrapper<NothingResponse, ErrorResponse>
 
-    suspend fun fetchFavorite(userId: Int): ResultWrapper<List<String>, ErrorResponse>
+    suspend fun fetchFavorite(userId: Int): ResultWrapper<List<Crag>, ErrorResponse>
     suspend fun fetchBoulderLogs(userId: Int): ResultWrapper<List<Pair<BoulderLog, Boulder>>, ErrorResponse>
     suspend fun fetchRouteLogs(userId: Int): ResultWrapper<List<Pair<RouteLog, Route>>, ErrorResponse>
     suspend fun updatePhoto(userId: Int, byteArray: ByteArray): ResultWrapper<NothingResponse, ErrorResponse>

@@ -40,7 +40,6 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.horionDev.climbingapp.android.LocalDependencyContainer
 import com.horionDev.climbingapp.android.R
-import com.horionDev.climbingapp.android.UnityParentActivity
 import com.horionDev.climbingapp.android.composables.AppButton
 import com.horionDev.climbingapp.android.composables.LoadingModal
 import com.horionDev.climbingapp.android.composables.collectAsStateWithLifecycleImmutable
@@ -59,11 +58,10 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
+import com.horionDev.climbingapp.android.UnityParentActivity
 import com.horionDev.climbingapp.android.destinations.CragSheetDestination
 import com.horionDev.climbingapp.android.extensions.hasLocationPermission
 import com.horionDev.climbingapp.domain.model.entities.Crag
-import com.horionDev.climbingapp.domain.model.entities.ceuse
-import com.horionDev.climbingapp.domain.model.entities.gradeDistributionString
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -190,8 +188,7 @@ fun MainMap(
     bookmarkRecipient.onNavResult { result ->
         when (result) {
             is NavResult.Canceled -> {}
-            is NavResult.Value -> {
-                viewModel.showBookmarks()
+            is NavResult.Value -> { viewModel.showBookmarks()
             }
         }
     }
@@ -222,22 +219,25 @@ fun MainMap(
             ),
             cameraPositionState = cameraPositionState
         ) {
-            markersState.value.forEach { marker ->
-                val markerState =
-                    MarkerState(position = LatLng(marker.latitude, marker.longitude))
-                Marker(icon = if (marker.selected) { //                    BitmapDescriptorFactory.fromResource(R.drawable.marker_selected)
-                    BitmapDescriptorFactory.fromResource(R.drawable.marker)
-                } else {
-                    BitmapDescriptorFactory.fromResource(R.drawable.marker)
-                }, state = markerState, onClick = {
-                    navigator.navigate(
-                        CragSheetDestination(
-                            laundry.value.find { it.id.toString() == marker.placeLinkedId }!!
-                        )
-                    )
-                    true
-                })
-            }
+
+            ClusteringMarkersMapContent(appMarkers = markersState.value)
+
+//            markersState.value.forEach { marker ->
+//                val markerState =
+//                    MarkerState(position = LatLng(marker.latitude, marker.longitude))
+//                Marker(icon = if (marker.selected) { //                    BitmapDescriptorFactory.fromResource(R.drawable.marker_selected)
+//                    BitmapDescriptorFactory.fromResource(R.drawable.marker)
+//                } else {
+//                    BitmapDescriptorFactory.fromResource(R.drawable.marker)
+//                }, state = markerState, onClick = {
+//                    navigator.navigate(
+//                        CragSheetDestination(
+//                            laundry.value.find { it.id.toString() == marker.placeLinkedId }!!
+//                        )
+//                    )
+//                    true
+//                })
+//            }
         }
 
         Box(modifier = Modifier.fillMaxSize()) {
@@ -594,18 +594,18 @@ fun VerticalListItem(crag: Crag) {
                 onResult = { result -> // Traiter le résultat ici
                 })
 //
-        AppButton(
-            isActive = true,
-            onClick = {
-                val intent = Intent(context, UnityParentActivity::class.java).putExtra(
-                    "unity",
-                    "my_unity_scene"
-                )
-                launcher.launch(intent)
-            },
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            textRes = R.string.unity_viewer
-        )
+//        AppButton(
+//            isActive = true,
+//            onClick = {
+//                val intent = Intent(context, UnityParentActivity::class.java).putExtra(
+//                    "unity",
+//                    "my_unity_scene"
+//                )
+//                launcher.launch(intent)
+//            },
+//            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+//            textRes = R.string.unity_viewer
+//        )
 
 //        Spacer(modifier = Modifier.weight(1f))
 //
@@ -778,24 +778,24 @@ fun HorizontalListItem(crag: Crag) {
         }
 
 
-//        val context = LocalContext.current
-//        val launcher =
-//            rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult(),
-//                onResult = { result -> // Traiter le résultat ici
-//                })
+        val context = LocalContext.current
+        val launcher =
+            rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult(),
+                onResult = { result -> // Traiter le résultat ici
+                })
 
-//        AppButton(
-//            isActive = true,
-//            onClick = {
-//                val intent = Intent(context, UnityParentActivity::class.java).putExtra(
-//                    "unity",
-//                    "my_unity_scene"
-//                )
-//                launcher.launch(intent)
-//            },
-//            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-//            textRes = R.string.unity_viewer
-//        )
+        AppButton(
+            isActive = true,
+            onClick = {
+                val intent = Intent(context, UnityParentActivity::class.java).putExtra(
+                    "MODEL_PATH",
+                    "models/tequila"
+                )
+                launcher.launch(intent)
+            },
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            textRes = R.string.unity_viewer
+        )
 
 //        Spacer(modifier = Modifier.weight(1f))
 //

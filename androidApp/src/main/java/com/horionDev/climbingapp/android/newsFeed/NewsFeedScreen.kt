@@ -52,7 +52,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.horionDev.climbingapp.android.R
-import com.horionDev.climbingapp.android.UnityParentActivity
 import com.horionDev.climbingapp.android.composables.AppButton
 import com.horionDev.climbingapp.android.composables.ImageAppButton
 import com.horionDev.climbingapp.android.destinations.LoginScreenDestination
@@ -420,16 +419,16 @@ fun AnotherListCard(walls: List<Pair<String, String>>) {
                         color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    AppButton(
-                        isActive = true,
-                        onClick = {
-                            val intent = Intent(context, UnityParentActivity::class.java)
-                                .putExtra("MODEL_PATH", "pathToModel")
-                            launcher.launch(intent)
-                        },
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                        textRes = R.string.unity_viewer
-                    )
+//                    AppButton(
+//                        isActive = true,
+////                        onClick = {
+////                            val intent = Intent(context, UnityParentActivity::class.java)
+////                                .putExtra("MODEL_PATH", "pathToModel")
+////                            launcher.launch(intent)
+////                        },
+//                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+//                        textRes = R.string.unity_viewer
+//                    )
                 }
                 Image(
                     painter = painterResource(id = R.drawable.vatertag),

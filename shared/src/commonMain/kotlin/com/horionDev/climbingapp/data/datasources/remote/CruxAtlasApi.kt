@@ -25,7 +25,7 @@ import com.horionDev.climbingapp.data.model.dto.UserProfileDto
 import com.horionDev.climbingapp.data.model.responses.NothingResponse
 import com.horionDev.climbingapp.data.safeDelete
 import com.horionDev.climbingapp.data.safePatch
-import com.horionDev.climbingapp.domain.model.CragDetails
+import com.horionDev.climbingapp.domain.model.CragDetailsDto
 import com.horionDev.climbingapp.domain.model.NewsItem
 import com.horionDev.climbingapp.domain.model.UserProfile
 import com.horionDev.climbingapp.domain.model.entities.Boulder
@@ -39,7 +39,6 @@ import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
-import io.ktor.client.utils.EmptyContent.contentType
 import io.ktor.http.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -90,6 +89,8 @@ class CruxAtlasApi(private var client: HttpClient) : Api, KoinComponent {
         }
     }
 
+
+
     override suspend fun authenticate(token: String): ResultWrapper<User, ErrorResponse> {
         return client.safeGet<UserDto, ErrorResponse> {
             url("authenticate")
@@ -116,6 +117,12 @@ class CruxAtlasApi(private var client: HttpClient) : Api, KoinComponent {
         }.map { it.toVo() }
     }
 
+//    override suspend fun getParkingSpots(cragId: Int): ResultWrapper<List<ParkingSpotDto>, ErrorResponse> {
+//        return client.safeGet<List<ParkingSpotDto>, ErrorResponse> {
+//            url("crags/$cragId/parking")
+//        }
+//    }
+
     override suspend fun getNews(page: Int): ResultWrapper<List<NewsItem>, ErrorResponse> {
         return client.safeGet<List<NewsItemDto>, ErrorResponse> {
             url("feed")
@@ -131,8 +138,8 @@ class CruxAtlasApi(private var client: HttpClient) : Api, KoinComponent {
         }.map { it.toVo() }
     }
 
-    override suspend fun getCragDetails(cragId: Int): ResultWrapper<CragDetails, ErrorResponse> {
-        return client.safeGet<CragDetailsDto, ErrorResponse> {
+    override suspend fun getCragDetails(cragId: Int): ResultWrapper<com.horionDev.climbingapp.domain.model.CragDetailsDto, ErrorResponse> {
+        return client.safeGet<com.horionDev.climbingapp.domain.model.CragDetailsDto, ErrorResponse> {
             url("crags/$cragId/details")
         }.map { it.toVo() }
     }
@@ -176,14 +183,14 @@ class CruxAtlasApi(private var client: HttpClient) : Api, KoinComponent {
         }
     }
 
-    override suspend fun fetchFavorite(userId: Int): ResultWrapper<List<String>, ErrorResponse> {
-        return client.safeGet<List<Int>, ErrorResponse> {
+    override suspend fun fetchFavorite(userId: Int): ResultWrapper<List<Crag>, ErrorResponse> {
+        return client.safeGet<List<CragDto>, ErrorResponse> {
             url("users/$userId/favorite")
             url {
                 parameters.append("id", userId.toString())
             }
         }.map {
-            it.map { it.toString() }
+            it.map { it.toVo() }
         }
     }
 

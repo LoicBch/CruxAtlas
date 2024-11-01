@@ -2,7 +2,7 @@ plugins {
     kotlin("multiplatform")
     kotlin("native.cocoapods")
     id("com.android.library")
-    kotlin("plugin.serialization") version "1.4.21"
+    kotlin("plugin.serialization") version "1.9.0"
     id("com.squareup.sqldelight")
     id("kotlin-parcelize")
 }
@@ -54,7 +54,6 @@ kotlin {
                 implementation("com.squareup.sqldelight:android-driver:1.5.4")
             }
         }
-        val androidTest by getting
         val iosX64Main by getting
         val iosArm64Main by getting
         val iosSimulatorArm64Main by getting

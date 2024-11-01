@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 class CragDto(
     val id: Int,
-    val areaId: Int,
+    val areaId: String,
     val name: String,
     val description: String? = "",
     val sectors: List<Sector>? = emptyList(),

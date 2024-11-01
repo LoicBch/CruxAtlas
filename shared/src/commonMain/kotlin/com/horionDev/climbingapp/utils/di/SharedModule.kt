@@ -33,8 +33,8 @@ val apiDependency = module {
         CruxAtlasApi(HttpClient {
 
             install(Logging) {
-                level = LogLevel.ALL
-                logger = Logger.DEFAULT
+                logger = Logger.SIMPLE
+                level = LogLevel.INFO
             }
 
             install(ContentNegotiation) {

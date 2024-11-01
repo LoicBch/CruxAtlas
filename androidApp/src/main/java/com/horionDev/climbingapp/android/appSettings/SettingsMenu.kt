@@ -104,7 +104,7 @@ fun LanguagePopup(onClose: () -> Unit) {
 
     val languages = listOf(
         Pair(stringResource(id = french), Locale.FRENCH),
-        Pair(stringResource(id = R.string.english), Locale.US),
+        Pair(stringResource(id = R.string.english), Locale.ENGLISH),
         Pair(
             stringResource(id = R.string.german),
             Locale.GERMAN
@@ -167,6 +167,7 @@ fun LanguagePopup(onClose: () -> Unit) {
 fun MeasuringPopup(onClose: () -> Unit) {
 
     val application = LocalContext.current.applicationContext as Application
+    val context = LocalContext.current
 
     val metrics = listOf(
         Pair(stringResource(id = R.string.american_yds)) {
@@ -218,6 +219,7 @@ fun MeasuringPopup(onClose: () -> Unit) {
                         .align(CenterHorizontally)
                         .clickable {
                             action()
+                            (context as Activity).recreate()
                         }, verticalAlignment = CenterVertically
                 ) {
                     Text(

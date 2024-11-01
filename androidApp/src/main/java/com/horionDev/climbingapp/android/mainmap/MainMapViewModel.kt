@@ -19,15 +19,19 @@ import com.horionDev.climbingapp.utils.SortOption
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.horionDev.climbingapp.domain.model.entities.Crag
-import com.horionDev.climbingapp.domain.model.entities.ceuse
+import com.horionDev.climbingapp.domain.model.entities.User
 import com.horionDev.climbingapp.domain.repositories.CragRepository
+import com.horionDev.climbingapp.domain.repositories.UserRepository
+import com.horionDev.climbingapp.utils.SessionManager
+import com.horionDev.climbingapp.utils.SessionManager.user
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import toMarker
 
 class MainMapViewModel(
     private val savedStateHandle: SavedStateHandle,
-    private val crags: CragRepository
+    private val crags: CragRepository,
+    private val users: UserRepository
 ) : ViewModel() {
 
     private var previousSelectedMarkerIndex = 0
@@ -154,7 +158,29 @@ class MainMapViewModel(
     }
 
     fun showBookmarks() {
-        TODO("Not yet implemented")
+        savedStateHandle["loading"] = true
+        viewModelScope.launch {
+            when (val result = users.fetchFavorite(user.id)) {
+                is ResultWrapper.Success -> {
+                    val spots = result.value
+                    savedStateHandle["updateSource"] = UpdateSource.AROUND_ME
+                    markers.clear()
+                    markers.addAll(spots.toMarker().toList())
+                    savedStateHandle["dealers"] = spots.toList()
+                    savedStateHandle["dealersSorted"] = spots.toList()
+                    savedStateHandle["laundry"] = spots.toList()
+                    savedStateHandle["placeSearched"] = ""
+                    updateMapRegion(markers)
+
+                    savedStateHandle["loading"] = false
+
+                }
+
+                is ResultWrapper.Failure -> {
+                    savedStateHandle["loading"] = false
+                }
+            }
+        }
     }
 
     sealed class MainMapEvent {

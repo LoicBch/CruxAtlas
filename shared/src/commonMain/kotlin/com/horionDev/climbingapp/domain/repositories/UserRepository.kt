@@ -9,6 +9,7 @@ import com.horionDev.climbingapp.domain.model.composition.AuthResponse
 import com.horionDev.climbingapp.domain.model.composition.ErrorResponse
 import com.horionDev.climbingapp.domain.model.entities.Boulder
 import com.horionDev.climbingapp.domain.model.entities.BoulderLog
+import com.horionDev.climbingapp.domain.model.entities.Crag
 import com.horionDev.climbingapp.domain.model.entities.Route
 import com.horionDev.climbingapp.domain.model.entities.RouteLog
 import com.horionDev.climbingapp.domain.model.entities.User
@@ -24,7 +25,7 @@ interface UserRepository {
 
     suspend fun publicProfile(userId: Int): ResultWrapper<UserProfile, ErrorResponse>
     suspend fun forgotPassword(email: String): ResultWrapper<NothingResponse, ErrorResponse>
-    suspend fun fetchFavorite(userId: Int): ResultWrapper<List<String>, ErrorResponse>
+    suspend fun fetchFavorite(userId: Int): ResultWrapper<List<Crag>, ErrorResponse>
     suspend fun addCragAsFavoriteToUser(
         userId: Int,
         cragId: Int
