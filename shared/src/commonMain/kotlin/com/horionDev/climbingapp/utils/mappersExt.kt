@@ -3,6 +3,7 @@ import com.horionDev.climbingapp.data.model.responses.LocationInfoResponse
 import com.horionDev.climbingapp.data.model.responses.StarterResponse
 import com.horionDev.climbingapp.data.model.responses.SuggestionResponse
 import com.horionDev.climbingapp.domain.model.*
+import com.horionDev.climbingapp.domain.model.CragDetailsDto
 import com.horionDev.climbingapp.domain.model.composition.Filter
 import com.horionDev.climbingapp.domain.model.composition.Location
 import com.horionDev.climbingapp.domain.model.composition.LocationInfos
@@ -44,6 +45,10 @@ fun CragDetailsDto.toVo() = CragDetails(
     id
 )
 
+class CragDetails(id: Int) {
+
+}
+
 @JvmName(name = "userProfileDtoListToVo")
 fun List<UserProfileDto>.toVo() = map { it.toVo() }
 fun UserProfileDto.toVo() = UserProfile(
@@ -77,12 +82,16 @@ fun CragDto.toVo() = Crag(
 
 @JvmName(name = "sectorDtoListToVo")
 fun List<SectorDto>.toVo() = map { it.toVo() }
-fun SectorDto.toVo() = Sector(
-    id,
-    name,
-    description = "",
-    cragId
-)
+fun SectorDto.toVo() = routes?.let {
+    Sector(
+        id,
+        name,
+        description = "",
+        cragId,
+        routes = it.toVo(),
+        parkingSpots = parkingSpots
+    )
+}
 
 @JvmName(name = "areaDtoListToVo")
 fun List<AreaDto>.toVo() = map { it.toVo() }
@@ -112,7 +121,10 @@ fun Route.toDto() = RouteDto(
     cragName = cragName,
     grade = "grade",
     sectorId = 2,
-    cragId = 1
+    cragId = 1,
+    sectorName = "sectorName",
+    ascents = 1,
+    rating = 1.0
 )
 
 @JvmName(name = "boulderDtoListToVo")
@@ -123,7 +135,7 @@ fun BoulderDto.toVo() = Boulder(
     cragName,
     sectorId,
     name,
-grade = RouteGrade.French(FrenchGrade.GRADE_1)
+    grade = RouteGrade.French(FrenchGrade.GRADE_1)
 )
 
 

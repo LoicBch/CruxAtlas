@@ -4,7 +4,6 @@ import io.ktor.http.encodeURLQueryComponent
 import com.horionDev.climbingapp.data.ResultWrapper
 import com.horionDev.climbingapp.data.map
 import com.horionDev.climbingapp.data.model.ErrorMessage
-import com.horionDev.climbingapp.data.model.dto.CragDetailsDto
 import com.horionDev.climbingapp.data.model.dto.CragDto
 import com.horionDev.climbingapp.data.model.dto.NewsItemDto
 import com.horionDev.climbingapp.data.model.responses.SuggestionResponse
@@ -138,10 +137,10 @@ class CruxAtlasApi(private var client: HttpClient) : Api, KoinComponent {
         }.map { it.toVo() }
     }
 
-    override suspend fun getCragDetails(cragId: Int): ResultWrapper<com.horionDev.climbingapp.domain.model.CragDetailsDto, ErrorResponse> {
-        return client.safeGet<com.horionDev.climbingapp.domain.model.CragDetailsDto, ErrorResponse> {
+    override suspend fun getCragDetails(cragId: Int): ResultWrapper<CragDetailsDto, ErrorResponse> {
+        return client.safeGet<CragDetailsDto, ErrorResponse> {
             url("crags/$cragId/details")
-        }.map { it.toVo() }
+        }
     }
 
     override suspend fun getSpotsFavoriteByUser(userId: Int): ResultWrapper<List<Crag>, ErrorResponse> {

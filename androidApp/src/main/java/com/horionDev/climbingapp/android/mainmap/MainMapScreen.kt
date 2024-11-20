@@ -789,7 +789,7 @@ fun HorizontalListItem(crag: Crag) {
             onClick = {
                 val intent = Intent(context, UnityParentActivity::class.java).putExtra(
                     "MODEL_PATH",
-                    "models/tequila"
+                    "/data/data/com.horionDev.climbingapp.android/models/tequila"
                 )
                 launcher.launch(intent)
             },
