@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.horionDev.climbingapp.data.ResultWrapper
-import com.horionDev.climbingapp.domain.model.composition.AuthRequest
+import com.horionDev.climbingapp.data.model.dto.AuthRequest
 import com.horionDev.climbingapp.domain.repositories.UserRepository
 import com.horionDev.climbingapp.domain.usecases.LoginUseCase
 import kotlinx.coroutines.flow.*

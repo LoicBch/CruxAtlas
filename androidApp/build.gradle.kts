@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     kotlin("android")
+    id("kotlin-parcelize")
     id("com.google.devtools.ksp") version "1.9.0-1.0.11"
 }
 
@@ -46,6 +47,19 @@ android {
             isMinifyEnabled = false
         }
     }
+
+//    compileOptions {
+//        sourceCompatibility = JavaVersion.VERSION_21
+//        targetCompatibility = JavaVersion.VERSION_21
+//    }
+
+//    kotlinOptions {
+//        jvmTarget = "21"
+//        freeCompilerArgs += listOf(
+//            "-P",
+//            "plugin:org.jetbrains.kotlin.parcelize:additionalAnnotation=com.horionDev.climbingapp.utils.CommonParcelize"
+//        )
+//    }
 }
 
 dependencies {
@@ -54,6 +68,7 @@ dependencies {
     implementation(files("libs/unityLibrary-debug.aar"))
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1")
     implementation("androidx.compose.ui:ui:1.3.1")
+    implementation("io.github.theapache64:rebugger:1.0.0-rc03")
     implementation("androidx.compose.ui:ui-tooling:1.3.1")
     implementation("androidx.compose.ui:ui-tooling-preview:1.3.1")
     implementation("androidx.compose.foundation:foundation:1.3.1")
@@ -66,11 +81,12 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.0.0")
     implementation("com.github.skydoves:landscapist-glide:2.1.0")
     implementation("com.google.android.gms:play-services-maps:18.1.0")
-    implementation("com.google.maps.android:maps-compose:2.5.3")
+    implementation("com.google.maps.android:maps-compose:5.0.0")
     implementation("com.google.maps.android:maps-compose-utils:5.0.0")
     implementation("com.google.maps.android:maps-ktx:5.0.0")
     implementation("io.insert-koin:koin-core:3.2.2")
     implementation("io.insert-koin:koin-android:3.3.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
     implementation("io.insert-koin:koin-androidx-compose:3.3.0")
     implementation("com.android.volley:volley:1.2.1")
     ksp("io.github.raamcosta.compose-destinations:ksp:1.7.27-beta")

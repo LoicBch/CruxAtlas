@@ -20,13 +20,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.horionDev.climbingapp.android.R
+import com.horionDev.climbingapp.data.model.dto.BoulderLogDto
 import com.horionDev.climbingapp.domain.model.entities.Boulder
-import com.horionDev.climbingapp.domain.model.entities.BoulderLog
-import com.horionDev.climbingapp.domain.model.entities.Route
-import com.horionDev.climbingapp.domain.model.entities.RouteLog
 
 @Composable
-fun BouldersTab(boulders: List<Pair<BoulderLog, Boulder>>) {
+fun BouldersTab(boulders: List<Pair<BoulderLogDto, Boulder>>) {
     Column {
 //        BoulderStatistics()
         BoulderLogBook(boulders)
@@ -52,7 +50,7 @@ fun BoulderStatistics() {
 }
 
 @Composable
-fun BoulderLogBook(bouldersLog: List<Pair<BoulderLog, Boulder>>) {
+fun BoulderLogBook(bouldersLog: List<Pair<BoulderLogDto, Boulder>>) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -88,7 +86,7 @@ fun BoulderLogBook(bouldersLog: List<Pair<BoulderLog, Boulder>>) {
 }
 
 @Composable
-fun BoulderLogItem(boulderLog: Pair<BoulderLog, Boulder>) {
+fun BoulderLogItem(boulderLog: Pair<BoulderLogDto, Boulder>) {
     Row(
         modifier = Modifier
             .fillMaxWidth()

@@ -3,8 +3,9 @@ plugins {
     kotlin("native.cocoapods")
     id("com.android.library")
     kotlin("plugin.serialization") version "1.9.0"
-    id("com.squareup.sqldelight")
     id("kotlin-parcelize")
+    id("kotlin-kapt")
+    id("com.squareup.sqldelight")
 }
 
 kotlin {
@@ -27,6 +28,8 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+
+                implementation("com.soywiz.korlibs.korio:korio:3.4.0")
 
                 // Ktor
                 implementation("io.ktor:ktor-client-core:2.1.3")
@@ -94,6 +97,11 @@ android {
         minSdk = 24
         targetSdk = 34
     }
+
+//    compileOptions {
+//        sourceCompatibility = JavaVersion.VERSION_21
+//        targetCompatibility = JavaVersion.VERSION_21
+//    }
 }
 
 dependencies {

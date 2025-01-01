@@ -15,6 +15,7 @@ object AppColor {
     val ClearGrey = Color(0x6649454F)
     val Red = Color(0xFFDC362E)
     val greyTags = Color(0xFFF4F6F9)
+    val PlaceHolderImage = Color(0xFFd8d2d4)
 
     val Primary30 = Color(0xFF33417D)
     val Primary40 = Color(0xFF4457A7)

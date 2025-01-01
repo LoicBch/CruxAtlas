@@ -21,7 +21,6 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.ArrowBack
-import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
@@ -39,7 +38,7 @@ import com.horionDev.climbingapp.android.R
 import com.horionDev.climbingapp.android.composables.AppButton
 import com.horionDev.climbingapp.android.composables.SmallAppButton
 import com.horionDev.climbingapp.android.extensions.createImageFile
-import com.horionDev.climbingapp.domain.model.entities.Crag
+import com.horionDev.climbingapp.android.parcelable.CragParcel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.skydoves.landscapist.ImageOptions
@@ -51,7 +50,7 @@ import java.util.*
 @Composable
 fun AddSpotPhotoScreen(
     navigator: DestinationsNavigator,
-    crag: Crag,
+    crag: CragParcel,
 //    viewModel: AddSpotPhotoScreenViewModel = getViewModel(),
 //    resultNavigator: ResultBackNavigator<Location>
 ) {

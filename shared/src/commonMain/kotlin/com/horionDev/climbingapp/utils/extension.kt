@@ -1,8 +1,5 @@
 package com.horionDev.climbingapp.utils
 
-import com.horionDev.climbingapp.data.model.dto.LaundryDto
-import com.horionDev.climbingapp.domain.model.Event
-import com.horionDev.climbingapp.domain.model.Dealer
 import kotlin.math.floor
 import kotlin.math.round
 
@@ -14,23 +11,3 @@ fun Double.toDMS(): String {
 
     return "$degrees° $minutes' $seconds''"
 }
-
-
-//Faire un objet location et mettre cette extension sur location
-//val LaundryDto.fullLocation get() = "$ville, $code_postal"
-val LaundryDto.fullLocation get() = "climbing address"
-val LaundryDto.fullGeolocalisation
-    get() = "$latitude, $longitude (lat, lng)\nN ${
-        latitude!!.toDouble()
-            .toDMS()
-    }, E ${longitude!!.toDouble().toDMS()}"
-
-val Dealer.fullLocation get() = "$address, $city, $postalCode"
-val Dealer.fullGeolocalisation
-    get() =
-        "$latitude, $longitude (lat, lng)\nN ${latitude.toDMS()}, E ${longitude.toDMS()}"
-
-val Event.fullLocation get() = "$address, $city, $postalCode"
-val Event.fullGeolocalisation
-    get() =
-        "$latitude, $longitude (lat, lng)\nN ${latitude.toDMS()}, E ${longitude.toDMS()}"

@@ -25,7 +25,16 @@ import com.horionDev.climbingapp.android.di.AppDependencyContainer
 import com.horionDev.climbingapp.android.home.HomeScreen
 import com.horionDev.climbingapp.android.onBoarding.SplashScreen
 import com.horionDev.climbingapp.android.onBoarding.SplashScreenViewModel
+import com.horionDev.climbingapp.utils.Constants
+import com.horionDev.climbingapp.utils.di.AndroidDependencyProvider
+import com.horionDev.climbingapp.utils.di.ModelInitializer
 import org.koin.androidx.compose.getViewModel
+import java.io.File
+import java.security.Key
+import java.util.zip.ZipInputStream
+import javax.crypto.Cipher
+import javax.crypto.CipherInputStream
+import javax.crypto.spec.SecretKeySpec
 
 val LocalDependencyContainer = compositionLocalOf<AppDependencyContainer> {
     error("No dependency container provided!")
@@ -64,6 +73,7 @@ fun MyApplicationTheme(
         colors = colors, typography = typography, shapes = shapes, content = content
     )
 }
+
 
 class MainActivity : ComponentActivity() {
 

@@ -3,7 +3,11 @@
 package com.horionDev.climbingapp.android.mainmap
 
 import android.app.Application
-import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Paint
+import android.graphics.Rect
+import android.graphics.Typeface
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,9 +30,10 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
@@ -38,13 +43,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
+import com.google.android.gms.maps.CameraUpdate
 import com.horionDev.climbingapp.android.LocalDependencyContainer
 import com.horionDev.climbingapp.android.R
-import com.horionDev.climbingapp.android.composables.AppButton
 import com.horionDev.climbingapp.android.composables.LoadingModal
 import com.horionDev.climbingapp.android.composables.collectAsStateWithLifecycleImmutable
-import com.horionDev.climbingapp.android.destinations.AroundLocationScreenDestination
-import com.horionDev.climbingapp.android.destinations.MenuScreenDestination
 import com.horionDev.climbingapp.android.extensions.isScrollingUp
 import com.horionDev.climbingapp.android.extensions.lastVisibleItemIndex
 import com.horionDev.climbingapp.android.ui.theme.AppColor
@@ -58,9 +61,11 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
-import com.horionDev.climbingapp.android.UnityParentActivity
-import com.horionDev.climbingapp.android.destinations.CragSheetDestination
+import com.horionDev.climbingapp.android.destinations.AreaDetailsDestination
+import com.horionDev.climbingapp.android.destinations.MenuScreenDestination
 import com.horionDev.climbingapp.android.extensions.hasLocationPermission
+import com.horionDev.climbingapp.android.parcelable.PlaceParcel
+import com.horionDev.climbingapp.android.parcelable.toParcelable
 import com.horionDev.climbingapp.domain.model.entities.Crag
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
@@ -78,7 +83,7 @@ import org.koin.androidx.compose.getViewModel
 @Destination
 @Composable
 fun MainMap(
-    locationSearchRecipient: ResultRecipient<AroundLocationScreenDestination, Place>,
+//    locationSearchRecipient: ResultRecipient<AroundLocationScreenDestination, PlaceParcel>,
     bookmarkRecipient: ResultRecipient<MenuScreenDestination, Boolean>,
     navigator: DestinationsNavigator,
     navController: NavController,
@@ -90,12 +95,19 @@ fun MainMap(
     val markersState by viewModel.markersFlow.collectAsStateWithLifecycleImmutable()
     val updateSource by viewModel.updateSource.collectAsState()
 
-    val dealers by viewModel.dealers.collectAsStateWithLifecycleImmutable()
-    val events by viewModel.events.collectAsStateWithLifecycleImmutable()
-    val laundry by viewModel.laundry.collectAsStateWithLifecycleImmutable()
+//    val dealers by viewModel.dealers.collectAsStateWithLifecycleImmutable()
+//    val events by viewModel.events.collectAsStateWithLifecycleImmutable()
+    val crags by viewModel.cragsMarker.collectAsStateWithLifecycleImmutable()
+    val areas by viewModel.areasFetched.collectAsStateWithLifecycleImmutable()
 
     var mapProperties by remember {
-        mutableStateOf(MapProperties(isMyLocationEnabled = false, mapType = MapType.NORMAL))
+        mutableStateOf(
+            MapProperties(
+                isMyLocationEnabled = false,
+                mapType = MapType.NORMAL,
+                isBuildingEnabled = true
+            )
+        )
     }
 
     val context = LocalContext.current
@@ -120,19 +132,20 @@ fun MainMap(
 
     val appViewModel = LocalDependencyContainer.current.appViewModel
 
-    LaunchedEffect(true) { //        viewModel.event.collect {
-        //            when (it) {
-        //                is MainMapViewModel.MainMapEvent.UpdateRegion -> {
-        //                    cameraPositionState.move(
-        //                        CameraUpdateFactory.newLatLngBounds(
-        //                            it.bounds,
-        //                            it.padding
-        //                        )
-        //                    )
-        //                }
-        //            }
-        //        }
-    }
+//    LaunchedEffect(true) {
+    //        viewModel.event.collect {
+    //            when (it) {
+    //                is MainMapViewModel.MainMapEvent.UpdateRegion -> {
+    //                    cameraPositionState.move(
+    //                        CameraUpdateFactory.newLatLngBounds(
+    //                            it.bounds,
+    //                            it.padding
+    //                        )
+    //                    )
+    //                }
+    //            }
+    //        }
+//    }
 
     LaunchedEffect(true) {
 
@@ -147,6 +160,7 @@ fun MainMap(
                     )
                 )
                 viewModel.showCrags(Globals.GeoLoc.lastKnownLocation)
+//                viewModel.showAreas()
             } else {
                 cameraPositionState.move(
                     CameraUpdateFactory.newLatLng(
@@ -160,11 +174,11 @@ fun MainMap(
         }
     }
 
-    LaunchedEffect(appViewModel.filtersApplied) {
-        appViewModel.filtersApplied.collect {
+//    LaunchedEffect(appViewModel.filtersApplied) {
+//        appViewModel.filtersApplied.collect {
 //            viewModel.showSpots(cameraPositionState.locationVo, true)
-        }
-    }
+//        }
+//    }
 
 
     LaunchedEffect(appViewModel.loadAroundMeIsPressed) {
@@ -188,66 +202,119 @@ fun MainMap(
     bookmarkRecipient.onNavResult { result ->
         when (result) {
             is NavResult.Canceled -> {}
-            is NavResult.Value -> { viewModel.showBookmarks()
+            is NavResult.Value -> {
+                viewModel.showBookmarks()
             }
         }
     }
 
-    locationSearchRecipient.onNavResult { result ->
-        when (result) {
-            is NavResult.Canceled -> {}
-            is NavResult.Value -> {
-                cameraPositionState.move(
-                    CameraUpdateFactory.newLatLng(
-                        LatLng(
-                            result.value.location.latitude, result.value.location.longitude
-                        )
-                    )
-                )
-//                viewModel.showSpotsAroundPlace(result.value)
-            }
-        }
-    }
+//    locationSearchRecipient.onNavResult { result ->
+//        when (result) {
+//            is NavResult.Canceled -> {}
+//            is NavResult.Value -> {
+//                cameraPositionState.move(
+//                    CameraUpdateFactory.newLatLng(
+//                        LatLng(
+//                            result.value.location.latitude, result.value.location.longitude
+//                        )
+//                    )
+//                )
+////                viewModel.showSpotsAroundPlace(result.value)
+//            }
+//        }
+//    }
 
 
     Box {
+
+        val screenHeight = LocalConfiguration.current.screenHeightDp.dp.value.toInt()
+        val screenWidth = LocalConfiguration.current.screenWidthDp.dp.value.toInt()
+
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             properties = mapProperties,
             uiSettings = MapUiSettings(
-                zoomControlsEnabled = false, myLocationButtonEnabled = true,
+                zoomControlsEnabled = false,
+                myLocationButtonEnabled = true,
+                tiltGesturesEnabled = true
             ),
             cameraPositionState = cameraPositionState
         ) {
+            if (updateSource == UpdateSource.AREA) {
 
-            ClusteringMarkersMapContent(appMarkers = markersState.value)
+                markersState.value.forEach { marker ->
+                    val markerState =
+                        MarkerState(position = LatLng(marker.latitude, marker.longitude))
+                    Marker(icon = if (marker.selected) { //                    BitmapDescriptorFactory.fromResource(R.drawable.marker_selected)
+                        BitmapDescriptorFactory.fromResource(R.drawable.marker)
+                    } else {
+                        BitmapDescriptorFactory.fromResource(R.drawable.marker)
+                    }, state = markerState, onClick = {
+                        navigator.navigate(
+                            com.horionDev.climbingapp.android.destinations.CragDetailsDestination(
+                                crags.value.find { it.id.toString() == marker.placeLinkedId }!!
+                                    .toParcelable()
+                            )
+                        )
+                        true
+                    })
+                }
+            } else {
+                ClusteringMarkersMapContent(
+                    appMarkers = markersState.value,
+                    screenWidth,
+                    screenHeight
+                )
+            }
 
-//            markersState.value.forEach { marker ->
-//                val markerState =
-//                    MarkerState(position = LatLng(marker.latitude, marker.longitude))
-//                Marker(icon = if (marker.selected) { //                    BitmapDescriptorFactory.fromResource(R.drawable.marker_selected)
-//                    BitmapDescriptorFactory.fromResource(R.drawable.marker)
-//                } else {
-//                    BitmapDescriptorFactory.fromResource(R.drawable.marker)
-//                }, state = markerState, onClick = {
-//                    navigator.navigate(
-//                        CragSheetDestination(
-//                            laundry.value.find { it.id.toString() == marker.placeLinkedId }!!
-//                        )
-//                    )
-//                    true
-//                })
-//            }
+            if (areas.value.isNotEmpty()) {
+                areas.value.forEach { area ->
+
+                    if (area.polygon.isNotEmpty()) {
+                        Polygon(
+                            points = area.polygon.map {
+                                LatLng(it.latitude, it.longitude)
+                            },
+                            strokeColor = Color.Blue, // Couleur des bordures
+                            fillColor = Color(0x550000FF), // Couleur de remplissage (semi-transparente)
+                            strokeWidth = 5f,
+                            clickable = true,
+                            onClick = {
+                                viewModel.showCragsFromArea(area.id.toString())
+                            }
+                        )
+
+                        val centroid = LatLng(
+                            area.polygon.calculateCentroid().latitude,
+                            area.polygon.calculateCentroid().longitude
+                        )
+                        val textPosition = getPositionAbovePolygon(
+                            centroid,
+                            25000.0
+                        )
+
+                        Marker(
+                            state = MarkerState(position = textPosition),
+                            icon = BitmapDescriptorFactory.fromBitmap(createTextBitmap(area.name)),
+                            onClick = {
+                                navigator.navigate(AreaDetailsDestination(area.toParcelable()))
+                                true
+                            }
+                        )
+                    }
+                }
+            }
+
         }
 
         Box(modifier = Modifier.fillMaxSize()) {
             Column(modifier = Modifier.align(Alignment.BottomCenter)) {
 
-                if (!cameraPositionState.isMoving && !cameraPositionState.locationVo.isAroundLastSearchedLocation) {
-                    SearchHereButton(onClick = {
-                        viewModel.showCrags(cameraPositionState.locationVo)
-                    }, cameraPositionState)
-                }
+//                if (!cameraPositionState.isMoving && !cameraPositionState.locationVo.isAroundLastSearchedLocation) {
+//                    SearchHereButton(onClick = {
+//                        viewModel.showCrags(cameraPositionState.locationVo)
+//                    }, cameraPositionState)
+//                }
 
                 if (locationSearched.isNotEmpty()) LocationSearchContainer(locationSearched,
                     cameraPositionState,
@@ -255,17 +322,22 @@ fun MainMap(
                         viewModel.onCrossLocationClicked()
                     },
                     {
-                        navigator.navigate(
-                            AroundLocationScreenDestination()
-                        )
+//                        navigator.navigate(
+//                            AroundLocationScreenDestination()
+//                        )
                     })
 
-                if (laundry.value.isNotEmpty()) {
-                    HorizontalSpotsList(cameraPositionState = cameraPositionState,
-                        crags = laundry.value,
+                if (crags.value.isNotEmpty()) {
+                    HorizontalSpotsList(//cameraPositionState = cameraPositionState,
+                        onNeedToReposition = { cameraUpdate ->
+                            cameraPositionState.move(cameraUpdate)
+                        },
+                        crags = crags.value,
                         onItemClicked = {
                             navigator.navigate(
-                                CragSheetDestination(it)
+                                com.horionDev.climbingapp.android.destinations.CragDetailsDestination(
+                                    it.toParcelable()
+                                )
                             )
                         },
                         onScrollEnded = { dealer ->
@@ -279,7 +351,7 @@ fun MainMap(
                         })
                 }
             }
-            if (state.ads.isNotEmpty()) MainMapAdContainer(state.ads)
+//            if (state.ads.isNotEmpty()) MainMapAdContainer(state.ads)
 
         }
 
@@ -298,7 +370,7 @@ fun MainMap(
         }
 
         Column(modifier = Modifier.fillMaxSize()) {
-            TopButtons(cameraPositionState = cameraPositionState,
+            TopButtons(//cameraPositionState = cameraPositionState,
                 isVerticalListOpen = state.verticalListIsShowing,
                 onListButtonClick = {
                     viewModel.swapVerticalList()
@@ -317,9 +389,9 @@ fun MainMap(
             if (!state.verticalListIsShowing) {
                 Spacer(modifier = Modifier.weight(1f))
                 BottomButtons(onAroundLocation = {
-                    navigator.navigate(
-                        AroundLocationScreenDestination()
-                    )
+//                    navigator.navigate(
+//                        AroundLocationScreenDestination()
+//                    )
                 }, onAroundMe = {
                     cameraPositionState.move(
                         CameraUpdateFactory.newLatLng(
@@ -572,7 +644,7 @@ fun VerticalListItem(crag: Crag) {
                 fontSize = 12.sp,
                 fontFamily = FontFamily(Font(R.font.oppinsedium)),
                 text = "${
-                    crag.sectors.map { it.routes.size }
+                    crag.sectors.map { it.routes?.size ?: 0 }
                         .foldRight(0) { element, acc -> acc + element }
                 }" + stringResource(id = R.string.routes),
                 color = AppColor.neutralText
@@ -618,10 +690,11 @@ fun VerticalListItem(crag: Crag) {
 // TODO: infinite recomposition here  -> clean side effect
 @Composable
 fun HorizontalSpotsList(
-    cameraPositionState: CameraPositionState,
+//    cameraPositionState: CameraPositionState,
     crags: List<Crag>,
     onItemClicked: (Crag) -> Unit,
-    onScrollEnded: (Crag) -> Unit
+    onScrollEnded: (Crag) -> Unit,
+    onNeedToReposition: (CameraUpdate) -> Unit
 ) {
     val listState = rememberLazyListState()
     val needToReposition by remember {
@@ -630,18 +703,18 @@ fun HorizontalSpotsList(
         }
     }
 
-    val overlayAlpha: Float by animateFloatAsState(
-        targetValue = if (cameraPositionState.isMoving && cameraPositionState.cameraMoveStartedReason == CameraMoveStartedReason.GESTURE) 0f else 1f,
-        animationSpec = tween(
-            durationMillis = 200,
-            easing = LinearEasing,
-        )
-    )
+//    val overlayAlpha: Float by animateFloatAsState(
+//        targetValue = if (cameraPositionState.isMoving && cameraPositionState.cameraMoveStartedReason == CameraMoveStartedReason.GESTURE) 0f else 1f,
+//        animationSpec = tween(
+//            durationMillis = 200,
+//            easing = LinearEasing,
+//        )
+//    )
 
     Column {
         LazyRow(
             modifier = Modifier
-                .alpha(alpha = overlayAlpha)
+//                .alpha(alpha = overlayAlpha)
                 .fillMaxWidth()
                 .height(130.dp),
             state = listState
@@ -665,14 +738,16 @@ fun HorizontalSpotsList(
                 LaunchedEffect(needToReposition) {
                     if (needToReposition) {
                         listState.animateScrollToItem(listState.firstVisibleItemIndex)
-                        cameraPositionState.animate(
+
+                        onNeedToReposition(
                             CameraUpdateFactory.newLatLngZoom(
                                 LatLng(
                                     crags[listState.firstVisibleItemIndex].latitude!!.toDouble(),
                                     crags[listState.firstVisibleItemIndex].longitude!!.toDouble()
                                 ), 15f
-                            ), 1000
+                            )
                         )
+
                         onScrollEnded(crags[listState.firstVisibleItemIndex])
                     }
                 }
@@ -683,25 +758,29 @@ fun HorizontalSpotsList(
                     if (needToReposition) {
                         if (listState.firstVisibleItemScrollOffset > 400) {
                             listState.animateScrollToItem(listState.lastVisibleItemIndex!!)
-                            cameraPositionState.animate(
+
+                            onNeedToReposition(
                                 CameraUpdateFactory.newLatLngZoom(
                                     LatLng(
                                         crags[listState.lastVisibleItemIndex!!].latitude!!.toDouble(),
                                         crags[listState.lastVisibleItemIndex!!].longitude!!.toDouble()
                                     ), 15f
-                                ), 1000
+                                )
                             )
+
                             onScrollEnded(crags[listState.lastVisibleItemIndex!!])
                         } else {
                             listState.animateScrollToItem(listState.firstVisibleItemIndex)
-                            cameraPositionState.animate(
+
+                            onNeedToReposition(
                                 CameraUpdateFactory.newLatLngZoom(
                                     LatLng(
                                         crags[listState.firstVisibleItemIndex].latitude!!.toDouble(),
                                         crags[listState.firstVisibleItemIndex].longitude!!.toDouble()
                                     ), 15f
-                                ), 1000
+                                )
                             )
+
                             onScrollEnded(crags[listState.firstVisibleItemIndex])
                         }
                     }
@@ -760,7 +839,7 @@ fun HorizontalListItem(crag: Crag) {
                 fontSize = 12.sp,
                 fontFamily = FontFamily(Font(R.font.oppinsedium)),
                 text = "${
-                    crag.sectors.map { it.routes.size }
+                    crag.sectors.map { it.routes?.size ?: 0 }
                         .foldRight(0) { element, acc -> acc + element }
                 }" + stringResource(id = R.string.routes),
                 color = AppColor.neutralText
@@ -777,25 +856,24 @@ fun HorizontalListItem(crag: Crag) {
 //            )
         }
 
-
         val context = LocalContext.current
         val launcher =
             rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult(),
                 onResult = { result -> // Traiter le résultat ici
                 })
 
-        AppButton(
-            isActive = true,
-            onClick = {
-                val intent = Intent(context, UnityParentActivity::class.java).putExtra(
-                    "MODEL_PATH",
-                    "/data/data/com.horionDev.climbingapp.android/models/tequila"
-                )
-                launcher.launch(intent)
-            },
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            textRes = R.string.unity_viewer
-        )
+//        AppButton(
+//            isActive = true,
+//            onClick = {
+//                val intent = Intent(context, UnityParentActivity::class.java).putExtra(
+//                    "MODEL_PATH",
+//                    "/data/data/com.horionDev.climbingapp.android/models/tequila"
+//                )
+//                launcher.launch(intent)
+//            },
+//            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+//            textRes = R.string.unity_viewer
+//        )
 
 //        Spacer(modifier = Modifier.weight(1f))
 //
@@ -805,27 +883,27 @@ fun HorizontalListItem(crag: Crag) {
     }
 }
 
-@Composable
-fun MainMapAdContainer(ad: List<Ad>) {
-
-    val uriHandler = LocalUriHandler.current
-
-    GlideImage(modifier = Modifier
-        .fillMaxWidth()
-        .height(80.dp)
-        .clickable {
-            uriHandler.openUri(ad.first().url)
-            uriHandler.openUri(ad.first().click)
-        }, imageModel = { ad.first().url }, imageOptions = ImageOptions(
-        contentScale = ContentScale.FillBounds, alignment = Alignment.Center
-    )
-    )
-}
+//@Composable
+//fun MainMapAdContainer(ad: List<Ad>) {
+//
+//    val uriHandler = LocalUriHandler.current
+//
+//    GlideImage(modifier = Modifier
+//        .fillMaxWidth()
+//        .height(80.dp)
+//        .clickable {
+//            uriHandler.openUri(ad.first().url)
+//            uriHandler.openUri(ad.first().click)
+//        }, imageModel = { ad.first().url }, imageOptions = ImageOptions(
+//        contentScale = ContentScale.FillBounds, alignment = Alignment.Center
+//    )
+//    )
+//}
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TopButtons(
-    cameraPositionState: CameraPositionState,
+//    cameraPositionState: CameraPositionState,
     onListButtonClick: () -> Unit,
     isVerticalListOpen: Boolean,
     source: UpdateSource,
@@ -839,17 +917,17 @@ fun TopButtons(
     val sortingDealers by sortingDealersFlow.collectAsState()
     val sortingEvents by sortingEventsFlow.collectAsState()
 
-    val overlayAlpha: Float by animateFloatAsState(
-        targetValue = if (cameraPositionState.isMoving && cameraPositionState.cameraMoveStartedReason == CameraMoveStartedReason.GESTURE) 0f else 1f,
-        animationSpec = tween(
-            durationMillis = 200,
-            easing = LinearEasing,
-        )
-    )
+//    val overlayAlpha: Float by animateFloatAsState(
+//        targetValue = if (cameraPositionState.isMoving && cameraPositionState.cameraMoveStartedReason == CameraMoveStartedReason.GESTURE) 0f else 1f,
+//        animationSpec = tween(
+//            durationMillis = 200,
+//            easing = LinearEasing,
+//        )
+//    )
 
     Row(
         modifier = Modifier
-            .alpha(alpha = overlayAlpha)
+//            .alpha(alpha = overlayAlpha)
             .fillMaxWidth()
             .padding(top = 8.dp, start = Dimensions.appMargin, end = Dimensions.appMargin)
     ) {
@@ -903,47 +981,47 @@ fun TopButtons(
             )
         }
 
-        if (!appViewModel.isFiltersActive(updateSource = source)) {
-            IconButton(onClick = {
-                scope.launch {
-                    appViewModel.onBottomSheetContentChange(
-                        when (source) {
-                            UpdateSource.EVENTS -> BottomSheetOption.FILTER_EVENT
-                            else -> {
-                                BottomSheetOption.FILTER
-                            }
-                        }
-                    )
-                    appViewModel.bottomSheetIsShowing.show()
-                }
-
-            }) {
-                Image(
-                    painter = painterResource(id = R.drawable.filter_round),
-                    contentDescription = stringResource(id = R.string.cd_button_filter)
-                )
-            }
-        } else {
-            IconButton(onClick = {
-                scope.launch {
-                    appViewModel.onBottomSheetContentChange(
-                        when (source) {
-                            UpdateSource.EVENTS -> BottomSheetOption.FILTER_EVENT
-                            else -> {
-                                BottomSheetOption.FILTER
-                            }
-                        }
-                    )
-                    appViewModel.bottomSheetIsShowing.show()
-                }
-
-            }) {
-                Image(
-                    painter = painterResource(id = R.drawable.filter_active),
-                    contentDescription = stringResource(id = R.string.cd_button_filter)
-                )
-            }
-        }
+//        if (!appViewModel.isFiltersActive(updateSource = source)) {
+//            IconButton(onClick = {
+//                scope.launch {
+//                    appViewModel.onBottomSheetContentChange(
+//                        when (source) {
+//                            UpdateSource.EVENTS -> BottomSheetOption.FILTER_EVENT
+//                            else -> {
+//                                BottomSheetOption.FILTER
+//                            }
+//                        }
+//                    )
+//                    appViewModel.bottomSheetIsShowing.show()
+//                }
+//
+//            }) {
+//                Image(
+//                    painter = painterResource(id = R.drawable.filter_round),
+//                    contentDescription = stringResource(id = R.string.cd_button_filter)
+//                )
+//            }
+//        } else {
+//            IconButton(onClick = {
+//                scope.launch {
+//                    appViewModel.onBottomSheetContentChange(
+//                        when (source) {
+//                            UpdateSource.EVENTS -> BottomSheetOption.FILTER_EVENT
+//                            else -> {
+//                                BottomSheetOption.FILTER
+//                            }
+//                        }
+//                    )
+//                    appViewModel.bottomSheetIsShowing.show()
+//                }
+//
+//            }) {
+//                Image(
+//                    painter = painterResource(id = R.drawable.filter_active),
+//                    contentDescription = stringResource(id = R.string.cd_button_filter)
+//                )
+//            }
+//        }
     }
 }
 
@@ -952,3 +1030,32 @@ val CameraPositionState.locationVo
         this.position.target.latitude, this.position.target.longitude
     )
 
+fun createTextBitmap(text: String): Bitmap {
+    val paint = Paint().apply {
+        textSize = 50f
+        color = AppColor.Primary.toArgb()
+        typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+        textAlign = Paint.Align.LEFT
+    }
+
+    val bounds = Rect()
+    paint.getTextBounds(text, 0, text.length, bounds)
+    val width = bounds.width()
+    val height = bounds.height()
+
+    val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+    val canvas = android.graphics.Canvas(bitmap)
+    canvas.drawText(text, 0f, height.toFloat(), paint)
+
+    return bitmap
+}
+
+fun getPositionAbovePolygon(centroid: LatLng, offsetMeters: Double): LatLng {
+    val earthRadius = 6371000.0 // Earth radius in meters
+
+    // Calculate the new latitude after moving north by 'offsetMeters'
+    val offsetLatitude = centroid.latitude + (offsetMeters / earthRadius) * (180 / Math.PI)
+
+    // Longitude remains the same since we're only moving vertically
+    return LatLng(offsetLatitude, centroid.longitude)
+}

@@ -8,18 +8,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.horionDev.climbingapp.android.composables.GlobalPopupState
 import com.horionDev.climbingapp.android.composables.GlobalSliderState
-import com.horionDev.climbingapp.domain.model.Search
-import com.horionDev.climbingapp.domain.model.composition.Filter
-import com.horionDev.climbingapp.domain.model.composition.UpdateSource
-import com.horionDev.climbingapp.domain.model.composition.filterName
-import com.horionDev.climbingapp.domain.model.composition.getIdFromFilterName
-import com.horionDev.climbingapp.domain.model.entities.GradeNotation
-import com.horionDev.climbingapp.domain.model.entities.RouteGrade
-import com.horionDev.climbingapp.domain.model.entities.UIAAGrade
+import com.horionDev.climbingapp.android.parcelable.GradeNotation
 import com.horionDev.climbingapp.managers.location.LocationManager
-import com.horionDev.climbingapp.utils.*
+import com.horionDev.climbingapp.utils.BottomSheetOption
+import com.horionDev.climbingapp.utils.ConnectivityObserver
+import com.horionDev.climbingapp.utils.Constants
+import com.horionDev.climbingapp.utils.Globals
+import com.horionDev.climbingapp.utils.KMMPreference
+import com.horionDev.climbingapp.utils.SortOption
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 // TODO: make a viewmodel specific to bottomSheetScreen and keep this viewModel for commons data
@@ -30,24 +34,8 @@ class AppViewModel(private val kmmPreference: KMMPreference) : ViewModel() {
     val bottomSheetIsShowing = ModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden, isSkipHalfExpanded = true
     )
-    val historicSearches = MutableStateFlow<MutableList<Search>>(mutableListOf())
     private val loadAroundMeIsPressedChannel = Channel<Boolean>()
     val loadAroundMeIsPressed = loadAroundMeIsPressedChannel.receiveAsFlow()
-
-    private val filtersAppliedChannel = Channel<FilterType>()
-    val filtersApplied = filtersAppliedChannel.receiveAsFlow()
-
-    private val _filterDealerSelected = MutableStateFlow(Filter())
-    val filterDealerSelected = _filterDealerSelected.asStateFlow()
-
-    private val _filtersDealerUsed = MutableStateFlow(listOf<Filter>())
-    val filtersDealerUsed = _filtersDealerUsed.asStateFlow()
-
-    private val _filterEventSelected = MutableStateFlow(Filter())
-    val filterEventSelected = _filterEventSelected.asStateFlow()
-
-    private val _filtersEventUsed = MutableStateFlow(listOf<Filter>())
-    val filtersEventUsed = _filtersEventUsed.asStateFlow()
 
     private val _locationIsObserved = MutableStateFlow(false)
     val locationIsObserved = _locationIsObserved.asStateFlow()
@@ -61,24 +49,11 @@ class AppViewModel(private val kmmPreference: KMMPreference) : ViewModel() {
     private val _verticalListSortingOption = MutableStateFlow(SortOption.NONE)
     val verticalListSortingOption = _verticalListSortingOption.asStateFlow()
 
-    private val _filtersUpdated = MutableStateFlow(false)
-    val filtersUpdated = _filtersUpdated.asStateFlow()
-
     private val _globalPopup = MutableStateFlow(GlobalPopupState.HID)
     val globalPopup = _globalPopup.asStateFlow()
 
     private val _globalSlider = MutableStateFlow(mutableListOf<GlobalSliderState>())
     val globalSlider = _globalSlider.asStateFlow()
-
-    private val _sortingDealerApplied = MutableStateFlow(SortOption.NONE)
-    val sortingDealerApplied = _sortingDealerApplied.asStateFlow()
-
-    private val _sortingEventApplied = MutableStateFlow(SortOption.NONE)
-    val sortingEventApplied = _sortingEventApplied.asStateFlow()
-
-    private val _eventsAreDisplayed = MutableStateFlow(false)
-    val eventsAreDisplayed = _eventsAreDisplayed.asStateFlow()
-
 
     val observersAreSet =
         combine(locationIsObserved, networkIsObserved) { locationIsObserved, networkIsObserved ->
@@ -105,10 +80,6 @@ class AppViewModel(private val kmmPreference: KMMPreference) : ViewModel() {
 //        _loading.update { isLoading }
     }
 
-    fun onEventDisplayedChange(isDisplayed: Boolean) {
-        _eventsAreDisplayed.update { isDisplayed }
-    }
-
     fun onBottomSheetContentChange(option: BottomSheetOption) {
         _bottomSheetContent.update { option }
     }
@@ -133,137 +104,6 @@ class AppViewModel(private val kmmPreference: KMMPreference) : ViewModel() {
 
     fun onSortingOptionSelected(sortOption: SortOption) {
         _verticalListSortingOption.update { sortOption }
-    }
-
-    fun removeFilter(filter: Filter) {
-
-//        when (filter.category) {
-//            FilterType.COUNTRIES -> {
-//                _filtersEventUsed.update {
-//                    _filtersEventUsed.value.toMutableList().apply { remove(filter) }
-//                }
-//            }
-//            FilterType.UNSELECTED_DEALER -> {}
-//            FilterType.UNSELECTED_EVENT -> {}
-//            else -> {
-//                _filtersDealerUsed.update {
-//                    _filtersDealerUsed.value.toMutableList().apply { remove(filter) }
-//                }
-//            }
-//        }
-
-        viewModelScope.launch {
-//            deleteFilter(filter)
-        }
-    }
-
-    fun applyFilterToDealers() {
-
-        if (filterDealerSelected.value.category != FilterType.UNSELECTED_DEALER) {
-            _filtersDealerUsed.update {
-                _filtersDealerUsed.value.toMutableList().apply { add(_filterDealerSelected.value) }
-            }
-        }
-
-        viewModelScope.launch {
-//            applyPlacesFilters(
-//                Filter(
-//                    _filterDealerSelected.value.category, _filterDealerSelected.value.filterId, true
-//                )
-//            )
-//            filtersAppliedChannel.send(_filterEventSelected.value.category)
-        }
-    }
-
-    fun applyFilterToEvents(countrySelected: String) {
-
-        _filterEventSelected.update {
-            Filter(
-                _filterEventSelected.value.category,
-                countrySelected,
-                true
-            )
-        }
-
-        if (filterEventSelected.value.filterId != "") {
-            _filtersEventUsed.update {
-                _filtersEventUsed.value.toMutableList().apply { add(_filterEventSelected.value) }
-            }
-        }
-
-        viewModelScope.launch {
-//            applyPlacesFilters(
-//                Filter(
-//                    _filterEventSelected.value.category, _filterEventSelected.value.filterId, true
-//                )
-//            )
-            filtersAppliedChannel.send(FilterType.COUNTRIES)
-        }
-    }
-
-    fun getFilter() {
-        viewModelScope.launch {
-//            when (val result = getFiltersSaved()) {
-//                is ResultWrapper.Failure -> {
-//
-//                }
-//                is ResultWrapper.Success -> {
-//                    val dealerFilters =
-//                        result.value!!.filter { it.category != FilterType.COUNTRIES }
-//                    val eventFilters = result.value!!.filter { it.category == FilterType.COUNTRIES }
-//
-//                    if (dealerFilters.any { it.isSelected }) {
-//                        _filterDealerSelected.update { result.value!!.first { it.isSelected } }
-//                    }
-//
-//                    if (eventFilters.any { it.isSelected }) {
-//                        _filterEventSelected.update { result.value!!.first { it.isSelected } }
-//                    }
-//
-//                    _filtersDealerUsed.update { dealerFilters.filter { !it.isSelected } }
-//                    _filtersEventUsed.update { eventFilters.filter { !it.isSelected } }
-//                }
-//            }
-        }
-    }
-
-    fun isFiltersActive(updateSource: UpdateSource): Boolean {
-        return when (updateSource) {
-            UpdateSource.AROUND_ME -> {
-                _filterDealerSelected.value.filterName != ""
-            }
-            UpdateSource.EVENTS -> {
-                _filterEventSelected.value.filterName != ""
-            }
-            else -> {
-                _filterDealerSelected.value.filterName != ""
-            }
-        }
-    }
-
-    fun isSortingActive(): Boolean {
-        return _verticalListSortingOption.value != SortOption.NONE
-    }
-
-    fun addSearch(search: Search) {
-        viewModelScope.launch {
-//            addSearchUsecase(search)
-        }
-    }
-
-    fun deleteSearch(search: Search) {
-        viewModelScope.launch {
-//            deleteSearchUsecase(search)
-        }
-    }
-
-    fun getSearchesOfCategory(searchCategory: String) {
-        viewModelScope.launch {
-//            when (val res = getAllSearchForACategory(searchCategory)) {
-//                is ResultWrapper.Failure -> TODO()
-//                is ResultWrapper.Success -> historicSearches.update { res.value!!.toMutableList() }
-//            }
-        }
     }
 
     fun hideGlobalPopup() {
@@ -306,20 +146,4 @@ class AppViewModel(private val kmmPreference: KMMPreference) : ViewModel() {
             _globalPopup.update { GlobalPopupState.GPS_MISSING }
         }
     }
-
-    fun onFilterCategorySelected(category: FilterType) {
-        _filterDealerSelected.update {
-            Filter(category, "")
-        }
-    }
-
-    fun onFilterOptionSelected(filterName: String) {
-        _filterDealerSelected.update {
-            Filter(
-                _filterDealerSelected.value.category,
-                _filterDealerSelected.value.getIdFromFilterName(filterName)?: ""
-            )
-        }
-    }
-
 }

@@ -4,14 +4,12 @@ import com.horionDev.climbingapp.domain.model.composition.Location
 
 object Constants {
 
+    object SECURITY {
+        const val KEY_ARCHIVE = "43a114e32ae45d9a71c0f0f4a40078cb0ad01dfa9330eb824577791409e48043"
+        const val KEY_FILES = "c4dc317d25673abd05bac162acc539dcb9fcaa8d1297e97a0c02dfd9b8c2909a"
+    }
+
     object API {
-        const val DEALERS = "dealers.php"
-        const val STARTER = "app_general.php"
-        const val EVENTS = "events.php"
-        const val LOCATE = "locate.php"
-        const val CHECKLISTS = "checklists.php"
-        const val ADS = "ads.php"
-        const val GEOCODING = "geocoding.php"
     }
 
     object Preferences {
@@ -41,7 +39,7 @@ object Constants {
     const val GPS_UPDATE_INTERVAL = 10000L
     const val SUGGESTION_START_LENGTH = 3
     const val WEBSERVICE_VERSION = "v4"
-    const val BASE_URLL = "http://192.168.1.115:8080/"
+    const val BASE_URLL = "http://192.168.1.22:8080/"
 //    const val BASE_URL = "http://0.0.0.0:8080/"
 //    const val BASE_URL = "http://127.0.0.1:8080/"
 //    const val BASE_URL = "http://185.170.58.30:8080/"

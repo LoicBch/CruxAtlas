@@ -1,6 +1,5 @@
 package com.horionDev.climbingapp.data.model.dto
 
-import com.horionDev.climbingapp.domain.model.ParkingSpotDto
 import kotlinx.serialization.Serializable
 
 @Serializable

@@ -1,20 +1,13 @@
 package com.horionDev.climbingapp.android.profile
 
-import android.net.Uri
+import RouteWithLogDto
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.horionDev.climbingapp.data.ResultWrapper
 import com.horionDev.climbingapp.data.model.dto.UserDto
 import com.horionDev.climbingapp.data.repositories.Users
-import com.horionDev.climbingapp.domain.model.entities.Boulder
-import com.horionDev.climbingapp.domain.model.entities.BoulderLog
-import com.horionDev.climbingapp.domain.model.entities.Route
-import com.horionDev.climbingapp.domain.model.entities.RouteLog
-import com.horionDev.climbingapp.domain.model.entities.RouteWithLog
 import com.horionDev.climbingapp.utils.SessionManager
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import toDto
 
@@ -25,7 +18,7 @@ class ProfileViewModel(private val savedStateHandle: SavedStateHandle, private v
 
     //    private val _routeLogs = MutableStateFlow<List<RouteWithLog>>(emptyList())
 //    val routeLogs: StateFlow<List<RouteWithLog>> = _routeLogs
-    val routeLogs = savedStateHandle.getStateFlow("routeLogs", emptyList<RouteWithLog>())
+    val routeLogs = savedStateHandle.getStateFlow("routeLogs", emptyList<RouteWithLogDto>())
 
     //    val boulderLogs =
 //        savedStateHandle.getStateFlow("boulderLogs", emptyList<Pair<BoulderLog, Boulder>>())
@@ -42,7 +35,7 @@ class ProfileViewModel(private val savedStateHandle: SavedStateHandle, private v
                 is ResultWrapper.Success -> {
 //                    _routeLogs.value = result.value
                     savedStateHandle["routeLogs"] =
-                        result.value.map { RouteWithLog(it.first, it.second.toDto()) }
+                        result.value.map { RouteWithLogDto(it.first, it.second.toDto()) }
                 }
 
                 is ResultWrapper.Failure -> {

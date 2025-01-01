@@ -35,10 +35,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.horionDev.climbingapp.android.LocalDependencyContainer
 import com.horionDev.climbingapp.android.R
+import com.horionDev.climbingapp.android.destinations.MyAssetsScreenDestination
 import com.horionDev.climbingapp.android.destinations.SettingsMenuDestination
 import com.horionDev.climbingapp.android.ui.theme.AppColor
 import com.horionDev.climbingapp.android.ui.theme.Dimensions
-import com.horionDev.climbingapp.domain.model.MenuLink
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultBackNavigator
@@ -76,7 +76,7 @@ fun MenuScreen(
 //        ),
         MenuItem(
             R.string.menu_account, {
-
+                navigator.navigate(MyAssetsScreenDestination)
             }, R.drawable.download, R.string.dowloaded, false
         ),
         MenuItem(
@@ -179,7 +179,9 @@ fun MenuItem(
     ) {
 
         Icon(
-            modifier = Modifier.padding(horizontal = 22.dp).size(24.dp),
+            modifier = Modifier
+                .padding(horizontal = 22.dp)
+                .size(24.dp),
             painter = painterResource(id = menuItem.drawableRes),
             contentDescription = stringResource(id = menuItem.contentDescriptionRes),
             tint = AppColor.Tertiary
@@ -201,52 +203,52 @@ fun MenuItem(
         )
     }
 }
-
-@Composable
-fun PubContainerMenu(pub: MenuLink) {
-
-    val uriHandler = LocalUriHandler.current
-
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .height(70.dp)
-            .padding(start = 16.dp, end = 15.dp)
-            .clickable {
-                uriHandler.openUri(pub.url)
-                uriHandler.openUri(pub.urlstat)
-            }, verticalAlignment = Alignment.CenterVertically
-    ) {
-        GlideImage(
-            modifier = Modifier.size(30.dp), imageModel = { pub.icon }, imageOptions = ImageOptions(
-                contentScale = ContentScale.FillBounds, alignment = Alignment.Center
-            )
-        )
-        Column(
-            modifier = Modifier.padding(start = 16.dp), verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = pub.name,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.W700,
-                fontFamily = FontFamily(Font(R.font.circularstdmedium)),
-                color = AppColor.Tertiary
-            )
-            Text(
-                text = pub.subtitle,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.W500,
-                fontFamily = FontFamily(Font(R.font.circularstdmedium)),
-                color = AppColor.Tertiary
-            )
-        }
-        Spacer(modifier = Modifier.weight(1f))
-
-        Icon(
-            imageVector = Icons.Sharp.ArrowForward,
-            contentDescription = "",
-            tint = AppColor.Secondary
-        )
-
-    }
-}
+//
+//@Composable
+//fun PubContainerMenu(pub: MenuLink) {
+//
+//    val uriHandler = LocalUriHandler.current
+//
+//    Row(
+//        Modifier
+//            .fillMaxWidth()
+//            .height(70.dp)
+//            .padding(start = 16.dp, end = 15.dp)
+//            .clickable {
+//                uriHandler.openUri(pub.url)
+//                uriHandler.openUri(pub.urlstat)
+//            }, verticalAlignment = Alignment.CenterVertically
+//    ) {
+//        GlideImage(
+//            modifier = Modifier.size(30.dp), imageModel = { pub.icon }, imageOptions = ImageOptions(
+//                contentScale = ContentScale.FillBounds, alignment = Alignment.Center
+//            )
+//        )
+//        Column(
+//            modifier = Modifier.padding(start = 16.dp), verticalArrangement = Arrangement.Center
+//        ) {
+//            Text(
+//                text = pub.name,
+//                fontSize = 16.sp,
+//                fontWeight = FontWeight.W700,
+//                fontFamily = FontFamily(Font(R.font.circularstdmedium)),
+//                color = AppColor.Tertiary
+//            )
+//            Text(
+//                text = pub.subtitle,
+//                fontSize = 11.sp,
+//                fontWeight = FontWeight.W500,
+//                fontFamily = FontFamily(Font(R.font.circularstdmedium)),
+//                color = AppColor.Tertiary
+//            )
+//        }
+//        Spacer(modifier = Modifier.weight(1f))
+//
+//        Icon(
+//            imageVector = Icons.Sharp.ArrowForward,
+//            contentDescription = "",
+//            tint = AppColor.Secondary
+//        )
+//
+//    }
+//}

@@ -1,8 +1,8 @@
 package com.horionDev.climbingapp.domain.usecases
 
 import com.horionDev.climbingapp.data.ResultWrapper
-import com.horionDev.climbingapp.domain.model.composition.AuthRequest
-import com.horionDev.climbingapp.domain.model.composition.AuthResponse
+import com.horionDev.climbingapp.data.model.dto.AuthRequest
+import com.horionDev.climbingapp.data.model.responses.AuthResponse
 import com.horionDev.climbingapp.domain.model.composition.ErrorResponse
 import com.horionDev.climbingapp.domain.repositories.UserRepository
 import com.horionDev.climbingapp.utils.Constants

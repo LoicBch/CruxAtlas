@@ -4,8 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.horionDev.climbingapp.data.ResultWrapper
-import com.horionDev.climbingapp.domain.model.NewsItem
-import com.horionDev.climbingapp.domain.model.Place
+import com.horionDev.climbingapp.domain.model.entities.NewsItem
 import com.horionDev.climbingapp.domain.repositories.NewRepository
 import kotlinx.coroutines.launch
 

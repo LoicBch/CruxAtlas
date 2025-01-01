@@ -35,7 +35,6 @@ import org.koin.androidx.compose.getViewModel
 
 @Destination
 @Composable
-
 fun SignupScreen(navigator: DestinationsNavigator, viewModel: SignupViewModel = getViewModel()) {
 
     val signupIsValid by viewModel.signupIsValid.collectAsState()

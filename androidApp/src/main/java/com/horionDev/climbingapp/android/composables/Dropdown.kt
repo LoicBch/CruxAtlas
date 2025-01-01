@@ -24,7 +24,7 @@ import com.horionDev.climbingapp.android.ui.theme.AppColor
 
 @Composable
 fun Dropdown(modifier: Modifier, title: String, content: @Composable () -> Unit) {
-    var isExpanded by remember { mutableStateOf(false) }
+    var isExpanded by remember { mutableStateOf(true) }
     val angle: Float by animateFloatAsState(
         targetValue = if (isExpanded) 180f else 360f,
         animationSpec = tween(
@@ -34,24 +34,25 @@ fun Dropdown(modifier: Modifier, title: String, content: @Composable () -> Unit)
     Column {
         Row(
             Modifier
-                .height(70.dp)
+                .height(50.dp)
                 .clickable { isExpanded = !isExpanded },
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                modifier = Modifier
-                    .padding(start = 16.dp),
-                painter = painterResource(id = R.drawable.tools),
-                contentDescription = stringResource(
-                    id = R.string.dowloaded
-                ),
-                tint = if (isExpanded) AppColor.Primary else AppColor.Tertiary
-            )
+//            Icon(
+//                modifier = Modifier
+//                    .padding(start = 16.dp),
+//                painter = painterResource(id = R.drawable.tools),
+//                contentDescription = stringResource(
+//                    id = R.string.dowloaded
+//                ),
+//                tint = if (isExpanded) AppColor.Primary else AppColor.Tertiary
+//            )
 
             Text(
                 modifier = Modifier.padding(start = 16.dp),
                 text = title,
-                fontWeight = FontWeight.W700, fontFamily = FontFamily(Font(R.font.circularstdmedium)),
+                fontWeight = FontWeight.W700,
+                fontFamily = FontFamily(Font(R.font.circularstdmedium)),
                 fontSize = 16.sp,
                 color = if (isExpanded) AppColor.Primary else AppColor.Tertiary
             )
@@ -71,7 +72,9 @@ fun Dropdown(modifier: Modifier, title: String, content: @Composable () -> Unit)
         }
 
         AnimatedVisibility(visible = isExpanded) {
-            content()
+            Column {
+                content()
+            }
         }
     }
 }

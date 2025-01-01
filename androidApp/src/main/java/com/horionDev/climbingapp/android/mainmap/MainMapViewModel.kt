@@ -6,23 +6,17 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.horionDev.climbingapp.data.ResultWrapper
-import com.horionDev.climbingapp.data.datasources.remote.Api
-import com.horionDev.climbingapp.data.model.dto.LaundryDto
-import com.horionDev.climbingapp.domain.model.Ad
-import com.horionDev.climbingapp.domain.model.Dealer
-import com.horionDev.climbingapp.domain.model.Event
-import com.horionDev.climbingapp.domain.model.Place
 import com.horionDev.climbingapp.domain.model.composition.Location
 import com.horionDev.climbingapp.domain.model.composition.AppMarker
 import com.horionDev.climbingapp.domain.model.composition.UpdateSource
-import com.horionDev.climbingapp.utils.SortOption
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.horionDev.climbingapp.data.repositories.Areas
+import com.horionDev.climbingapp.domain.model.entities.Area
 import com.horionDev.climbingapp.domain.model.entities.Crag
-import com.horionDev.climbingapp.domain.model.entities.User
+import com.horionDev.climbingapp.domain.repositories.AreaRepository
 import com.horionDev.climbingapp.domain.repositories.CragRepository
 import com.horionDev.climbingapp.domain.repositories.UserRepository
-import com.horionDev.climbingapp.utils.SessionManager
 import com.horionDev.climbingapp.utils.SessionManager.user
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -31,7 +25,8 @@ import toMarker
 class MainMapViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val crags: CragRepository,
-    private val users: UserRepository
+    private val users: UserRepository,
+    private val areas: AreaRepository
 ) : ViewModel() {
 
     private var previousSelectedMarkerIndex = 0
@@ -47,44 +42,33 @@ class MainMapViewModel(
         previousSelectedMarkerIndex = index
     }
 
-    private val ads = savedStateHandle.getStateFlow("ads", emptyList<Ad>())
     val loading = savedStateHandle.getStateFlow("loading", false)
     private val verticalListIsShowing =
         savedStateHandle.getStateFlow("verticalListIsShowing", false)
     private val cameraIsOutOfRadiusLimit =
         savedStateHandle.getStateFlow("cameraIsOutOfRadiusLimit", false)
-
     val updateSource = savedStateHandle.getStateFlow("updateSource", UpdateSource.DEFAULT)
-
     val placeSearched = savedStateHandle.getStateFlow("placeSearched", "")
-
-    val events = savedStateHandle.getStateFlow("events", emptyList<Event>())
-    val dealers = savedStateHandle.getStateFlow("dealers", emptyList<Dealer>())
-    val laundry = savedStateHandle.getStateFlow("laundry", emptyList<Crag>())
-
+    val cragsMarker = savedStateHandle.getStateFlow("crags", emptyList<Crag>())
     val dealersSorted = savedStateHandle.getStateFlow("dealersSorted", emptyList<Crag>())
+    val areasFetched = savedStateHandle.getStateFlow("areas", emptyList<Area>())
 
     private val _event = MutableSharedFlow<MainMapEvent>()
     val event = _event.asSharedFlow()
-
-//    private val climbingRoutesFrance = listOf(
-//        ceuse, ceuse
-//    )
 
 //    init {
 //        savedStateHandle["updateSource"] = UpdateSource.AROUND_ME
 //        markers.clear()
 //        markers.addAll(climbingRoutesFrance.toMarker().toList())
-//        savedStateHandle["laundry"] = climbingRoutesFrance.toList()
+//        savedStateHandle["crags"] = climbingRoutesFrance.toList()
 //        savedStateHandle["dealersSorted"] = climbingRoutesFrance.toList()
 //    }
 
     val state = combine(
-        updateSource, ads, loading, verticalListIsShowing, cameraIsOutOfRadiusLimit
-    ) { updateSource, ads, isLoading, verticalListIsShowing, cameraIsOutOfRadiusLimit ->
+        updateSource, loading, verticalListIsShowing, cameraIsOutOfRadiusLimit
+    ) { updateSource, isLoading, verticalListIsShowing, cameraIsOutOfRadiusLimit ->
         MainMapState(
             updateSource = updateSource,
-            ads = ads,
             isLoading,
             verticalListIsShowing,
             cameraIsOutOfRadiusLimit
@@ -125,11 +109,28 @@ class MainMapViewModel(
         }
     }
 
+    fun showAreas() {
+        savedStateHandle["loading"] = true
+        viewModelScope.launch {
+            when (val result = areas.getAllAreas()) {
+                is ResultWrapper.Success -> {
+                    val areasFetched = result.value
+                    savedStateHandle["areas"] = areasFetched.toList().filter { it.name == "Arco" }
+                    savedStateHandle["loading"] = false
+                }
+
+                is ResultWrapper.Failure -> {
+                    savedStateHandle["loading"] = false
+                }
+            }
+        }
+    }
 
     fun showCrags(location: Location, seeAllMarkers: Boolean = false) {
         savedStateHandle["loading"] = true
         viewModelScope.launch {
-            when (val call = crags.getCragsAroundPosition(location.latitude, location.longitude)) {
+//            when (val call = crags.getCragsAroundPosition(location.latitude, location.longitude)) {
+            when (val call = crags.getAllCrags()) {
                 is ResultWrapper.Failure -> {
                     savedStateHandle["loading"] = false
                 }
@@ -139,10 +140,10 @@ class MainMapViewModel(
                     val spots = call.value
                     savedStateHandle["updateSource"] = UpdateSource.AROUND_ME
                     markers.clear()
-                    markers.addAll(spots!!.toMarker().toList())
+                    markers.addAll(spots!!.toMarker().toList())//.subList(0, 5000)
                     savedStateHandle["dealers"] = spots.toList()
                     savedStateHandle["dealersSorted"] = spots.toList()
-                    savedStateHandle["laundry"] = spots.toList()
+                    savedStateHandle["crags"] = spots.toList()
                     savedStateHandle["placeSearched"] = ""
                     if (seeAllMarkers) {
                         updateMapRegion(markers)
@@ -168,12 +169,37 @@ class MainMapViewModel(
                     markers.addAll(spots.toMarker().toList())
                     savedStateHandle["dealers"] = spots.toList()
                     savedStateHandle["dealersSorted"] = spots.toList()
-                    savedStateHandle["laundry"] = spots.toList()
+                    savedStateHandle["crags"] = spots.toList()
                     savedStateHandle["placeSearched"] = ""
                     updateMapRegion(markers)
 
                     savedStateHandle["loading"] = false
 
+                }
+
+                is ResultWrapper.Failure -> {
+                    savedStateHandle["loading"] = false
+                }
+            }
+        }
+    }
+
+    fun showCragsFromArea(areaId: String) {
+        savedStateHandle["loading"] = true
+        viewModelScope.launch {
+            when (val result = crags.fromArea(areaId)) {
+                is ResultWrapper.Success -> {
+                    Log.d("BOTTOM", "showSpots: ")
+                    val spots = result.value
+                    savedStateHandle["updateSource"] = UpdateSource.AREA
+                    markers.clear()
+                    markers.addAll(spots.toMarker().toList())
+                    savedStateHandle["dealers"] = spots.toList()
+                    savedStateHandle["dealersSorted"] = spots.toList()
+                    savedStateHandle["crags"] = spots.toList()
+                    savedStateHandle["placeSearched"] = ""
+                    updateMapRegion(markers)
+                    savedStateHandle["loading"] = false
                 }
 
                 is ResultWrapper.Failure -> {

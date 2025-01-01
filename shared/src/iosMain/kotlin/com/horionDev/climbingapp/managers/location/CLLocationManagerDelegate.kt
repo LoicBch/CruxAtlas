@@ -26,11 +26,6 @@ internal class CLLocationManagerDelegate: NSObject(), CLLocationManagerDelegateP
         LocationManager.startLocationUpdating()
     }
 
-    @Suppress("CONFLICTING_OVERLOADS")
-    override fun locationManager(manager: CLLocationManager, didStartMonitoringForRegion: CLRegion) { }
-
-    @Suppress("CONFLICTING_OVERLOADS")
-    override fun locationManager(manager: CLLocationManager, didEnterRegion: CLRegion) { }
 
     @Suppress("CONFLICTING_OVERLOADS")
     override fun locationManager(manager: CLLocationManager, didExitRegion: CLRegion) { }
@@ -45,20 +40,20 @@ internal class CLLocationManagerDelegate: NSObject(), CLLocationManagerDelegateP
     private fun notify(lastLocation: CLLocation?, lastHeading: CLHeading?) {
         val location = lastLocation ?: return
         val heading = lastHeading?.trueHeading ?: 0.0
-        location.coordinate.useContents {
-            val coordinates = Coordinates(
-                latitude,
-                longitude
-            )
-            val data = LocationData(
-                location.horizontalAccuracy,
-                location.altitude,
-                location.verticalAccuracy,
-                heading,
-                location.speed,
-                coordinates
-            )
-            LocationManager.notifyOnLocationUpdated(data)
-        }
+//        location.coordinate.useContents {
+//            val coordinates = Coordinates(
+//                latitude,
+//                longitude
+//            )
+//            val data = LocationData(
+//                location.horizontalAccuracy,
+//                location.altitude,
+//                location.verticalAccuracy,
+//                heading,
+//                location.speed,
+//                coordinates
+//            )
+//            LocationManager.notifyOnLocationUpdated(data)
+//        }
     }
 }

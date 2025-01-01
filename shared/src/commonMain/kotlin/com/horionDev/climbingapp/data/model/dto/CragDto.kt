@@ -10,7 +10,7 @@ class CragDto(
     val areaId: String,
     val name: String,
     val description: String? = "",
-    val sectors: List<Sector>? = emptyList(),
+    val sectors: List<SectorDto>? = emptyList(),
     val latitude: Double,
     val longitude: Double,
     val thumbnailUrl: String? = "",
@@ -18,21 +18,5 @@ class CragDto(
     val orientation: String? = "",
     val altitude: String? = "",
     val approachLenght: String? = ""
-)
-
-@Serializable
-data class UserProfileDto(
-    val username: String,
-    val email: String,
-    val creationDate: String,
-)
-
-@Serializable
-data class NewsItemDto(
-    val id : Int,
-    val title: String,
-    val description: String,
-    val imageUrl: String,
-//    val date: String,
 )
 

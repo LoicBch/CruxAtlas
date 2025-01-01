@@ -85,7 +85,6 @@ fun BottomBar(navController: NavHostController) {
                                     )
 
                                     appViewModel.withGpsOnly {
-                                        appViewModel.onEventDisplayedChange(false)
                                         appViewModel.onAroundMeClick()
                                     }
                                     return@withNetworkOnly
@@ -129,7 +128,6 @@ fun BottomBar(navController: NavHostController) {
                             Image(
                                 painter = painterResource(
                                     id = shouldDestinationBeSelected(
-                                        appViewModel.eventsAreDisplayed,
                                         selected,
                                         destination,
                                         currentBackStack
@@ -149,7 +147,6 @@ fun BottomBar(navController: NavHostController) {
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                                 color = getTextColor(
-                                    appViewModel.eventsAreDisplayed,
                                     selected,
                                     destination,
                                     currentBackStack
@@ -164,67 +161,63 @@ fun BottomBar(navController: NavHostController) {
 }
 
 fun getTextColor(
-    isEvent: StateFlow<Boolean>,
     selected: Boolean,
     destination: BottomBarDestination,
     currentBackStack: State<NavBackStackEntry?>
 ): Color {
-    Log.d("BOTTOM", isEvent.value.toString())
 
-    return if (isEvent.value) {
-        if (destination.direction.route == MenuScreenDestination.route && currentBackStack.value?.destination?.route == MainMapDestination.route) {
-            AppColor.Primary
-        } else {
-            if (destination.direction.route == MainMapDestination.route) {
-                AppColor.Tertiary
-            } else {
-                if (selected) {
-                    AppColor.Primary
-                } else {
-                    AppColor.Tertiary
-                }
-            }
-        }
+//    return if (isEvent.value) {
+//        if (destination.direction.route == MenuScreenDestination.route && currentBackStack.value?.destination?.route == MainMapDestination.route) {
+//            AppColor.Primary
+//        } else {
+//            if (destination.direction.route == MainMapDestination.route) {
+//                AppColor.Tertiary
+//            } else {
+//                if (selected) {
+//                    AppColor.Primary
+//                } else {
+//                    AppColor.Tertiary
+//                }
+//            }
+//        }
+//    } else {
+    return if (selected) {
+        AppColor.Primary
     } else {
-        if (selected) {
-            AppColor.Primary
-        } else {
-            AppColor.Tertiary
-        }
+        AppColor.Tertiary
     }
+//    }
 
 }
 
 fun shouldDestinationBeSelected(
-    isEvent: StateFlow<Boolean>,
     selected: Boolean,
     destination: BottomBarDestination,
     currentBackStack: State<NavBackStackEntry?>
 ): Int {
-    Log.d("BOTTOM", isEvent.value.toString())
     // TODO: Tranquille.. a refacto
 
-    return if (isEvent.value) {
-        if (destination.direction.route == MenuScreenDestination.route && currentBackStack.value?.destination?.route == MainMapDestination.route) {
-            destination.iconSelected
-        } else {
-            if (destination.direction.route == MainMapDestination.route) {
-                destination.iconUnselected
-            } else {
-                if (selected) {
-                    destination.iconSelected
-                } else {
-                    destination.iconUnselected
-                }
-            }
-        }
+//    return if (isEvent.value) {
+//        if (destination.direction.route == MenuScreenDestination.route && currentBackStack.value?.destination?.route == MainMapDestination.route) {
+//            destination.iconSelected
+//        } else {
+//            if (destination.direction.route == MainMapDestination.route) {
+//                destination.iconUnselected
+//            } else {
+//                if (selected) {
+//                    destination.iconSelected
+//                } else {
+//                    destination.iconUnselected
+//                }
+//            }
+//        }
+//    } else {
+    return if (selected) {
+        destination.iconSelected
     } else {
-        if (selected) {
-            destination.iconSelected
-        } else {
-            destination.iconUnselected
-        }
+        destination.iconUnselected
     }
+//    }
 }
 
 enum class

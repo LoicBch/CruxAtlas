@@ -1,19 +1,15 @@
 package com.horionDev.climbingapp.data.model.dto
-
-import com.horionDev.climbingapp.utils.CommonParcelable
-import com.horionDev.climbingapp.utils.CommonParcelize
 import kotlinx.serialization.Serializable
 
 @Serializable
-@CommonParcelize
-class RouteDto(
+data class RouteDto(
     val id: Int,
     val cragId: Int,
-    val cragName: String,
+    val cragName: String? = null,
     val sectorId: Int,
     val name: String,
     val grade: String,
-    val sectorName : String,
-    val ascents: Int,
-    val rating: Double,
-): CommonParcelable
+    val sectorName : String? = null,
+    val ascents: Int? = null,
+    val rating: Double? = null,
+)

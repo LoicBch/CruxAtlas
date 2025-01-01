@@ -15,7 +15,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.CameraPosition
@@ -26,13 +25,10 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.horionDev.climbingapp.android.composables.AppButton
 import com.horionDev.climbingapp.android.extensions.hasLocationPermission
-import com.horionDev.climbingapp.android.ui.theme.Dimensions
-import com.horionDev.climbingapp.managers.location.LocationManager
 import com.horionDev.climbingapp.utils.Constants
 import com.horionDev.climbingapp.R
 import com.horionDev.climbingapp.android.destinations.AddSpotInformationsScreenDestination
-import com.horionDev.climbingapp.android.destinations.AddSpotLocationScreenDestination
-import com.horionDev.climbingapp.domain.model.composition.Location
+import com.horionDev.climbingapp.android.parcelable.toParcelable
 import com.horionDev.climbingapp.domain.model.entities.Crag
 import com.horionDev.climbingapp.utils.Globals
 import com.ramcosta.composedestinations.annotation.Destination
@@ -107,7 +103,7 @@ fun AddSpotLocationScreen(navigator: DestinationsNavigator) {
                 onClick = {
                     val lat = cameraPositionState.position.target.latitude
                     val long = cameraPositionState.position.target.longitude
-                    navigator.navigate(AddSpotInformationsScreenDestination(crag = Crag(latitude = lat, longitude = long)))
+                    navigator.navigate(AddSpotInformationsScreenDestination(crag = Crag(latitude = lat, longitude = long).toParcelable()))
                 },
                 modifier = Modifier.padding(18.dp),
                 textRes = R.string.next

@@ -1,6 +1,5 @@
 package com.horionDev.climbingapp.android.newsFeed
 
-import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -32,11 +31,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.KeyboardArrowDown
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -57,17 +53,14 @@ import com.horionDev.climbingapp.android.composables.ImageAppButton
 import com.horionDev.climbingapp.android.destinations.LoginScreenDestination
 import com.horionDev.climbingapp.android.destinations.ProfileScreenDestination
 import com.horionDev.climbingapp.android.ui.theme.AppColor
-import com.horionDev.climbingapp.domain.model.NewsItem
+import com.horionDev.climbingapp.domain.model.entities.NewsItem
 import com.horionDev.climbingapp.domain.model.entities.RouteGrade
 import com.horionDev.climbingapp.utils.SessionManager
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
-import kotlinx.coroutines.launch
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 import org.koin.androidx.compose.getViewModel
-import java.io.File
 
 @Destination
 @Composable

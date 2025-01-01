@@ -18,10 +18,10 @@ internal actual class NetworkLoyal {
     }
 
     // dunno si y'a une meilleur classe pour ca
-    private val reachabilityProvider by lazy {
-        SCNetworkReachabilityCreateWithName(
-            null,
-            "www.google.com"
-        )
-    }
+//    private val reachabilityProvider by lazy {
+//        SCNetworkReachabilityCreateWithName(
+//            null,
+//            "www.google.com"
+//        )
+//    }
 }

@@ -1,12 +1,8 @@
 package com.horionDev.climbingapp.domain.model.entities
-
-import com.horionDev.climbingapp.utils.CommonParcelable
-import com.horionDev.climbingapp.utils.CommonParcelize
 import com.horionDev.climbingapp.utils.KMMPreference
 import kotlinx.serialization.Serializable
 
 @Serializable
-@CommonParcelize
 data class Route(
     val id: Int = 0,
     val name: String = "",
@@ -16,7 +12,7 @@ data class Route(
     val area: String = "",
     val sector: String = "",
     val image: String = ""
-) : CommonParcelable
+)
 
 enum class GradeNotation(val displayValue: String) {
     French("French"), YDS("YDS"), UIAA("UIAA")

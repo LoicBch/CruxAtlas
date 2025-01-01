@@ -9,7 +9,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -26,11 +25,7 @@ import androidx.compose.ui.unit.sp
 import com.horionDev.climbingapp.android.LocalDependencyContainer
 import com.horionDev.climbingapp.android.R
 import com.horionDev.climbingapp.android.ui.theme.AppColor
-import com.horionDev.climbingapp.domain.model.entities.RouteGrade
-import com.horionDev.climbingapp.domain.model.entities.getGrade
-import com.horionDev.climbingapp.utils.Globals
-import com.horionDev.climbingapp.utils.Globals.filters.countries
-import com.horionDev.climbingapp.utils.KMMPreference
+import com.horionDev.climbingapp.android.parcelable.getGrade
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

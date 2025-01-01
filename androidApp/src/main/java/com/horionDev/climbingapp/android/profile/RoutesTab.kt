@@ -1,5 +1,6 @@
 package com.horionDev.climbingapp.android.profile
 
+import RouteWithLogDto
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -14,7 +15,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -34,13 +34,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.horionDev.climbingapp.android.R
-import com.horionDev.climbingapp.domain.model.entities.Route
-import com.horionDev.climbingapp.domain.model.entities.RouteLog
-import com.horionDev.climbingapp.domain.model.entities.RouteWithLog
 import toVo
 
 @Composable
-fun RoutesTab(routes: List<RouteWithLog>) {
+fun RoutesTab(routes: List<RouteWithLogDto>) {
     Column {
 //        Statistics()
         LogBook(routes)
@@ -66,7 +63,7 @@ fun Statistics() {
 }
 
 @Composable
-fun LogBook(routes: List<RouteWithLog>) {
+fun LogBook(routes: List<RouteWithLogDto>) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -105,7 +102,7 @@ fun LogBook(routes: List<RouteWithLog>) {
 }
 
 @Composable
-fun RouteLogItem(routeLog: RouteWithLog) {
+fun RouteLogItem(routeLog: RouteWithLogDto) {
 //    Row(
 //        modifier = Modifier
 //            .fillMaxWidth()
@@ -132,7 +129,7 @@ fun RouteLogItem(routeLog: RouteWithLog) {
                         fontFamily = FontFamily(Font(R.font.oppinsedium))
                     )
                     Text(
-                        text = routeLog.route.cragName, color = Color.Black,
+                        text = routeLog.route.cragName!!, color = Color.Black,
                         fontFamily = FontFamily(Font(R.font.oppinsedium))
                     )
                 }
